@@ -1,0 +1,30 @@
+# services/utilities/dashy/docker-compose.yml
+version: '3.8'
+
+services:
+  dashy:
+    image: lissy93/dashy:3.1.1  # Using specific version instead of 'latest'
+    container_name: dashy
+    restart: unless-stopped
+    environment:
+      - TZ=America/New_York
+      - UID=99
+      - GID=100
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=dashy
+      - CA_TS_FALLBACK_DIR=/app/user-data/
+      - IS_DOCKER=true
+      - PORT=8080
+      - DIRECTORY=/app
+    volumes:
+      - ${APPDATA_PATH}/dashy:/app/user-data
+      - ${APPDATA_PATH}/dashy/icons:/app/user-data/item-icons
+    ports:
+      - "4000:8080"
+    networks:
+      - internal_net
+
+networks:
+  internal_net:
+    external: true
