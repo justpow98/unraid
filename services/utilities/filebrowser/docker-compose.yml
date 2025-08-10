@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:v2.42.3  # Pin to specific version
+    container_name: FileBrowser
+    restart: unless-stopped
+    privileged: true  # Needed for file system access
+    environment:
+      - TZ=America/New_York
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=FileBrowser
+    volumes:
+      - /mnt/user/:/srv:rw  # Access to all files
+      - ${APPDATA_PATH}/filebrowser/:/db/:rw  # Config/database
+    ports:
+      - "8080:80"
+    networks:
+      - internal_net
+    healthcheck:
+      test: ["CMD-SHELL", "/healthcheck.sh"]
+      interval: 5s
+      timeout: 3s
+      start_period: 2s
+
+networks:
+  internal_net:
+    external: true
