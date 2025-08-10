@@ -1,0 +1,47 @@
+name: Weekly Container Update Check
+
+on:
+  schedule:
+    - cron: '0 9 * * SUN'  # Every Sunday at 9 AM
+  workflow_dispatch:  # Manual trigger for testing
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests pyyaml
+
+      - name: Check for updates
+        run: python scripts/check-updates.py
+
+      - name: Create Pull Request
+        if: env.UPDATES_FOUND == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Weekly container updates'
+          title: '📦 Weekly Container Updates - ${{ env.UPDATE_DATE }}'
+          body: |
+            ## Container Updates Available
+            
+            ${{ env.UPDATE_SUMMARY }}
+            
+            ### 🔍 Review Checklist
+            - [ ] Check changelogs for breaking changes
+            - [ ] Verify no critical services affected  
+            - [ ] Confirm recent backup exists
+            
+            ### 🚀 Deployment
+            Merge this PR to automatically deploy updates to Unraid server.
+          branch: container-updates-${{ env.UPDATE_DATE }}
+          delete-branch: true
