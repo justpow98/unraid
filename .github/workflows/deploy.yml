@@ -21,10 +21,6 @@ jobs:
           echo "🔄 Available files:"
           ls -la
           
-<<<<<<< HEAD
-          # Copy .env file to current location for relative access
-=======
->>>>>>> 981165d (🔧 Fix .env file paths in deployment)
           # .env file should be mounted directly to workspace root
           if [ -f "/workspace/.env" ]; then
             echo "✅ Found .env file at /workspace/.env"
