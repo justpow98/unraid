@@ -40,4 +40,4 @@ services/
 ### Deploy a Service
 ```bash
 cd services/utilities/dashy
-docker-compose --env-file ../../../.env up -d
+docker-compose --env-file ../../../.env up -d# Workflow files for automation
