@@ -7,7 +7,7 @@ on:
 
 jobs:
   check-updates:
-    runs-on: [self-hosted, unraid, docker-compose]  # Target your specific runner
+    runs-on: self-hosted  # Target your specific runner
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
