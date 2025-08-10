@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
   dashy:
-    image: lissy93/dashy:3.1.1  # Using specific version instead of 'latest'
+    image: lissy93/dashy:release-3.1.1  # Using specific version instead of 'latest'
     container_name: dashy
     restart: unless-stopped
     environment:
