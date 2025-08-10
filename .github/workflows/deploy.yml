@@ -10,18 +10,16 @@ on:
 jobs:
   deploy:
     if: github.event_name == 'push' || (github.event.pull_request.merged == true)
-    runs-on: self-hosted  # Target your specific runner
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         
       - name: Deploy to Unraid (Direct Access)
         run: |
-          echo "🔄 Navigating to workspace..."
-          cd /workspace
-          
-          echo "🔄 Pulling latest changes..."
-          git pull origin main
+          echo "🔄 Current directory: $(pwd)"
+          echo "🔄 Files available:"
+          ls -la
           
           echo "🔍 Checking for updated services..."
           find services -name "docker-compose.yml" -newer .git/FETCH_HEAD 2>/dev/null | while read file; do
@@ -34,7 +32,7 @@ jobs:
               docker-compose --env-file ../../../.env pull
               docker-compose --env-file ../../../.env up -d
               echo "✅ $service_name deployed successfully"
-              cd /workspace
+              cd "$GITHUB_WORKSPACE"
             fi
           done
           
