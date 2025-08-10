@@ -10,35 +10,35 @@ on:
 jobs:
   deploy:
     if: github.event_name == 'push' || (github.event.pull_request.merged == true)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, docker-compose]  # Target your specific runner
     steps:
-      - name: Deploy to Unraid
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.UNRAID_HOST }}
-          username: ${{ secrets.UNRAID_USER }}
-          key: ${{ secrets.UNRAID_SSH_KEY }}
-          script: |
-            cd /mnt/user/appdata/docker-compose
-            echo "🔄 Pulling latest changes..."
-            git pull origin main
-            
-            echo "🔍 Checking for updated services..."
-            find services -name "docker-compose.yml" -newer .git/FETCH_HEAD 2>/dev/null | while read file; do
-              if [ -f "$file" ]; then
-                service_dir=$(dirname "$file")
-                service_name=$(basename "$service_dir")
-                echo "🚀 Deploying updated service: $service_name"
-                
-                cd "$service_dir"
-                docker-compose --env-file ../../../.env pull
-                docker-compose --env-file ../../../.env up -d
-                echo "✅ $service_name deployed successfully"
-                cd /mnt/user/appdata/docker-compose
-              fi
-            done
-            
-            echo "🧹 Cleaning up unused images..."
-            docker image prune -f
-            
-            echo "🎉 Deployment completed!"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Deploy to Unraid (Direct Access)
+        run: |
+          echo "🔄 Navigating to workspace..."
+          cd /workspace
+          
+          echo "🔄 Pulling latest changes..."
+          git pull origin main
+          
+          echo "🔍 Checking for updated services..."
+          find services -name "docker-compose.yml" -newer .git/FETCH_HEAD 2>/dev/null | while read file; do
+            if [ -f "$file" ]; then
+              service_dir=$(dirname "$file")
+              service_name=$(basename "$service_dir")
+              echo "🚀 Deploying updated service: $service_name"
+              
+              cd "$service_dir"
+              docker-compose --env-file ../../../.env pull
+              docker-compose --env-file ../../../.env up -d
+              echo "✅ $service_name deployed successfully"
+              cd /workspace
+            fi
+          done
+          
+          echo "🧹 Cleaning up unused images..."
+          docker image prune -f
+          
+          echo "🎉 Deployment completed!"

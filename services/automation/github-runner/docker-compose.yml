@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  github-runner:
+    image: myoung34/github-runner:latest
+    container_name: Docker-Compose-Runner
+    restart: unless-stopped
+    environment:
+      - REPO_URL=https://github.com/justpow98/unraid
+      - RUNNER_TOKEN=${GITHUB_RUNNER_TOKEN}
+      - RUNNER_NAME=unraid-docker-compose-runner
+      - RUNNER_LABELS=unraid,docker-compose,automation
+      - RUNNER_WORKDIR=/workspace
+      - RUNNER_SCOPE=repo
+      - DISABLE_AUTOMATIC_DEREGISTRATION=true
+      - EPHEMERAL=false  # Enable runner reusage
+      - RUNNER_REPLACE_EXISTING=true  # Replace if exists
+      - TZ=America/New_York
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=Docker-Compose-Runner
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - ${APPDATA_PATH}/github_runner_compose:/runner/persistent_files:rw
+      - /mnt/user/appdata/docker-compose:/workspace:rw
+    networks:
+      - monitoring_net
+
+networks:
+  monitoring_net:
+    external: true
