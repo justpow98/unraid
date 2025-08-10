@@ -1,29 +1,43 @@
 # JP's Docker Compose Configurations
 
-Automated Docker Compose management for my Unraid server.
+Automated Docker Compose management for my Unraid server with 35+ containers.
 
-## Services
+## 🚀 Features
 
-### Monitoring
-- Dashy - Service dashboard
-- UptimeKuma - Uptime monitoring
-- Grafana Stack - Metrics and visualization
+- **Predictable Version Management**: Pinned versions instead of `:latest`
+- **Organized Structure**: Services grouped by category
+- **Git-Based Tracking**: All changes tracked and reversible
+- **Ready for Automation**: Foundation for automated updates
 
-### Smart Home & IoT
-- Home Assistant - Smart home hub
-- Zigbee2MQTT - Zigbee coordinator
-- Mosquitto - MQTT broker
+## 📁 Repository Structure
+services/
+├── utilities/
+│   ├── dashy/              # Service dashboard
+│   └── filebrowser/        # File management
+├── monitoring/             # Future: Grafana, Prometheus, UptimeKuma
+├── iot/                   # Future: Home Assistant, Zigbee2MQTT
+├── productivity/          # Future: Nextcloud, Actual, WikiJS
+└── critical/              # Future: Authentik, Vaultwarden, NPM
 
-### Critical Applications
-- Authentik - Identity provider
-- Vaultwarden - Password manager
-- Nginx Proxy Manager - Reverse proxy
+## 🎯 Migration Status
 
-## Migration Status
+| Service | Status | Version | Migration Date | Notes |
+|---------|--------|---------|----------------|-------|
+| **Utilities** |
+| Dashy | ✅ Complete | release-3.1.1 | 2025-08-09 | Perfect migration, dashboard working |
+| FileBrowser | ✅ Complete | v2.42.3 | 2025-08-10 | File access preserved, privileged mode working |
+| **Next Targets** |
+| GoAccess-NPMLogs | ⏳ Planned | - | - | Log viewer utility |
+| UptimeKuma + AutoKuma | ⏳ Planned | - | - | First services with dependencies |
+| **Future Phases** |
+| Monitoring Stack | 📋 Future | - | - | Grafana, Prometheus, exporters |
+| Smart Home | 📋 Future | - | - | Home Assistant, Zigbee2MQTT, mosquitto |
+| Critical Apps | 📋 Future | - | - | Authentik, Vaultwarden, NPM |
+| Databases | 📋 Future | - | - | All PostgreSQL, Redis, MongoDB (LAST) |
 
-| Service | Status | Migration Date | Notes |
-|---------|--------|----------------|-------|
-| Dashy | 🔄 In Progress | - | First test migration |
+## 🛠️ Usage
 
----
-*This is a private configuration repository for personal use.*
+### Deploy a Service
+```bash
+cd services/utilities/dashy
+docker-compose --env-file ../../../.env up -d
