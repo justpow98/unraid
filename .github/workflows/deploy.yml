@@ -22,7 +22,16 @@ jobs:
           ls -la
           
           # Copy .env file to current location for relative access
-          cp /mnt/user/appdata/docker-compose/.env .
+          # .env file should be mounted directly to workspace root
+          if [ -f "/workspace/.env" ]; then
+            echo "✅ Found .env file at /workspace/.env"
+            cp /workspace/.env .
+          else
+            echo "❌ .env file not found at /workspace/.env"
+            echo "📁 Contents of /workspace:"
+            ls -la /workspace/ 2>/dev/null || echo "Cannot access /workspace"
+            exit 1
+          fi
           
           echo "🔍 Checking for recently modified compose files..."
           find services -name "docker-compose.yml" -type f | while read file; do
