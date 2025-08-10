@@ -21,20 +21,26 @@ jobs:
           echo "🔄 Available files:"
           ls -la
           
+          # Copy .env file to current location for relative access
+          cp /mnt/user/appdata/docker-compose/.env .
+          
           echo "🔍 Checking for recently modified compose files..."
           find services -name "docker-compose.yml" -type f | while read file; do
             echo "🚀 Restarting service: $(dirname "$file")"
             
-            # Go to the service directory relative to current location
-            cd "$(dirname "$file")"
+            # Calculate relative path to .env from service directory
+            service_dir="$(dirname "$file")"
+            depth=$(echo "$service_dir" | tr -cd '/' | wc -c)
+            env_path=""
+            for i in $(seq 1 $depth); do
+              env_path="../$env_path"
+            done
+            env_path="${env_path}.env"
             
-            # Use absolute path to .env file
-            docker-compose --env-file /mnt/user/appdata/docker-compose/.env pull
-            docker-compose --env-file /mnt/user/appdata/docker-compose/.env up -d
-            
+            cd "$service_dir"
+            docker-compose --env-file "$env_path" pull
+            docker-compose --env-file "$env_path" up -d
             echo "✅ $(basename $(dirname "$file")) updated successfully"
-            
-            # Return to original directory
             cd "$GITHUB_WORKSPACE"
           done
           

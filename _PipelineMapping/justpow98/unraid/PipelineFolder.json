@@ -1,0 +1,12 @@
+﻿{
+  "repositoryName": "justpow98/unraid",
+  "pipelineDirectory": "unraid",
+  "workspaceDirectory": "unraid/unraid",
+  "repositories": {
+    "justpow98/unraid": {
+      "repositoryPath": "unraid/unraid",
+      "lastRunOn": "08/10/2025 12:13:01 -04:00"
+    }
+  },
+  "lastRunOn": "08/10/2025 12:13:01 -04:00"
+}
