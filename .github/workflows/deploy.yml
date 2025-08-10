@@ -21,7 +21,10 @@ jobs:
           echo "🔄 Available files:"
           ls -la
           
+<<<<<<< HEAD
           # Copy .env file to current location for relative access
+=======
+>>>>>>> 981165d (🔧 Fix .env file paths in deployment)
           # .env file should be mounted directly to workspace root
           if [ -f "/workspace/.env" ]; then
             echo "✅ Found .env file at /workspace/.env"
@@ -34,26 +37,52 @@ jobs:
           fi
           
           echo "🔍 Checking for recently modified compose files..."
-          find services -name "docker-compose.yml" -type f | while read file; do
-            echo "🚀 Restarting service: $(dirname "$file")"
-            
-            # Calculate relative path to .env from service directory
-            service_dir="$(dirname "$file")"
-            depth=$(echo "$service_dir" | tr -cd '/' | wc -c)
-            env_path=""
-            for i in $(seq 1 $depth); do
-              env_path="../$env_path"
-            done
-            env_path="${env_path}.env"
-            
-            cd "$service_dir"
-            docker-compose --env-file "$env_path" pull
-            docker-compose --env-file "$env_path" up -d
-            echo "✅ $(basename $(dirname "$file")) updated successfully"
-            cd "$GITHUB_WORKSPACE"
+          
+          # Get list of changed files in the last commit
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
+          echo "📝 Changed files: $CHANGED_FILES"
+          
+          # Check if any compose files were modified
+          UPDATED_SERVICES=""
+          echo "$CHANGED_FILES" | grep "docker-compose.yml" | while read compose_file; do
+            if [ -f "$compose_file" ]; then
+              service_dir=$(dirname "$compose_file")
+              service_name=$(basename "$service_dir")
+              
+              echo "🚀 Deploying service: $service_name at $service_dir"
+              
+              # Use direct docker-compose commands with absolute path to .env
+              cd "$service_dir"
+              
+              # Use absolute path to the .env file we copied to repo root
+              ENV_FILE="$GITHUB_WORKSPACE/.env"
+              
+              echo "📦 Pulling images for $service_name..."
+              docker-compose --env-file "$ENV_FILE" pull || echo "⚠️ Pull failed"
+              
+              echo "🔄 Restarting $service_name..."
+              docker-compose --env-file "$ENV_FILE" down || echo "⚠️ Down failed"
+              docker-compose --env-file "$ENV_FILE" up -d || echo "❌ Up failed"
+              
+              echo "✅ $service_name deployment attempt complete"
+              cd - > /dev/null
+              
+              echo "---"
+            fi
           done
           
-          echo "🧹 Cleaning up unused images..."
-          docker image prune -f
+          # If no compose files changed, check if this might be a manual deployment
+          if [ -z "$(echo "$CHANGED_FILES" | grep "docker-compose.yml")" ]; then
+            echo "ℹ️ No docker-compose.yml files were modified in this commit"
+            echo "🤔 This might be a documentation or configuration change"
+          fi
           
-          echo "🎉 Deployment completed!"
+          echo "🎉 Deployment complete!"
+          
+          # Clean up any orphaned containers
+          echo "🧹 Cleaning up orphaned containers..."
+          docker container prune -f
+          
+          # Show running containers for verification
+          echo "📊 Currently running containers:"
+          docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
