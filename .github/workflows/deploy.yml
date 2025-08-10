@@ -10,7 +10,7 @@ on:
 jobs:
   deploy:
     if: github.event_name == 'push' || (github.event.pull_request.merged == true)
-    runs-on: [self-hosted, docker-compose]  # Target your specific runner
+    runs-on: [self-hosted, unraid, docker-compose]  # Target your specific runner
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
