@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  goaccess:
+    image: xavierh/goaccess-for-nginxproxymanager:latest  # Will pin after we find version
+    container_name: GoAccess-NPMLogs
+    restart: unless-stopped
+    environment:
+      - TZ=America/New_York
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data/logs:/opt/log:ro  # Read-only access to NPM logs
+    ports:
+      - "7880:7880"
+    networks:
+      - public_net
+
+networks:
+  public_net:
+    external: true
