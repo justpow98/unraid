@@ -5,7 +5,7 @@ version: '3.8'
 
 services:
   nginx-proxy-manager:
-    image: zoeyvid/npmplus:2024-12-14-r1
+    image: zoeyvid/npmplus:349
     container_name: NPMplus-Official   
     restart: unless-stopped
     environment:
