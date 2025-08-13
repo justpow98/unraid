@@ -124,4 +124,8 @@ config/passwords.yml
 
 # Local development overrides
 docker-compose.local.yml
-docker-compose.dev.yml
+docker-compose.dev.yml_actions/
+*.backup.*
+_actions/
+_PipelineMapping/
+unraid/

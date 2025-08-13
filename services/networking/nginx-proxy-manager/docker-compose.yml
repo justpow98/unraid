@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  nginx-proxy-manager:
+    image: # TODO: Add image with specific version tag
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    environment:
+      - TZ=America/New_York
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=nginx-proxy-manager
+      # TODO: Add service-specific environment variables
+    volumes:
+      - ${APPDATA_PATH}/nginx-proxy-manager:/config
+      # TODO: Add additional volume mounts
+    ports:
+      # TODO: Add port mappings
+      - "8080:80"  # Example port mapping
+    networks:
+      - internal_net
+    # Uncomment and configure if needed:
+    # depends_on:
+    #   - database
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+
+networks:
+  internal_net:
+    external: true
