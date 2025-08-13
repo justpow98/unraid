@@ -324,11 +324,11 @@ validate_service() {
     # Test with dry run
     echo -e "${YELLOW}🧪 Testing deployment (dry run)...${NC}"
     cd "$service_path"
-    if docker-compose --env-file "/workspace/.env" config >/dev/null 2>&1; then
+    if docker-compose --env-file "/mnt/user/appdata/docker-compose/.env" config >/dev/null 2>&1; then
         echo -e "${GREEN}✅ Service configuration valid${NC}"
     else
         echo -e "${RED}❌ Service configuration issues found${NC}"
-        docker-compose --env-file "/workspace/.env" config
+        docker-compose --env-file "/mnt/user/appdata/docker-compose/.env" config
         return 1
     fi
     cd - >/dev/null
