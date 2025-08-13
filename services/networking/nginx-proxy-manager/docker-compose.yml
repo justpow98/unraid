@@ -1,35 +1,61 @@
+# services/networking/nginx-proxy-manager/docker-compose.yml
+# Central reverse proxy for all services
+
 version: '3.8'
 
 services:
   nginx-proxy-manager:
-    image: # TODO: Add image with specific version tag
-    container_name: nginx-proxy-manager
-    restart: unless-stopped
+    image: jc21/nginx-proxy-manager:2.11.3  # Pinned version (was jc21/nginx-proxy-manager:latest)
+    container_name: Nginx-Proxy-Manager-Official
+    restart: unless-stopped  # Fixed from 'no' restart policy
     environment:
       - TZ=America/New_York
-      - PUID=${PUID}
-      - PGID=${PGID}
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=nginx-proxy-manager
-      # TODO: Add service-specific environment variables
+      - HOST_CONTAINERNAME=Nginx-Proxy-Manager-Official
+      - DB_SQLITE_FILE=/data/database.sqlite
+      - SUPPRESS_NO_CONFIG_WARNING=1
+      - S6_BEHAVIOUR_IF_STAGE2_FAILS=1
+      - S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
+      - S6_FIX_ATTRS_HIDDEN=1
+      - S6_KILL_FINISH_MAXTIME=10000
+      - S6_VERBOSITY=1
+      - NODE_ENV=production
+      - NODE_OPTIONS=--openssl-legacy-provider
     volumes:
-      - ${APPDATA_PATH}/nginx-proxy-manager:/config
-      # TODO: Add additional volume mounts
+      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data:/data
+      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/letsencrypt:/etc/letsencrypt
+      - /tmp/Nginx-Proxy-Manager-Official/var/log:/var/log
     ports:
-      # TODO: Add port mappings
-      - "8080:80"  # Example port mapping
+      - "8090:80"     # HTTP
+      - "8443:443"    # HTTPS
+      - "8091:81"     # Admin Interface
+      - "3003:3000"   # Management API
     networks:
+      # NPM needs access to ALL networks to proxy services
+      - public_net
       - internal_net
-    # Uncomment and configure if needed:
-    # depends_on:
-    #   - database
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
+      - db_net
+      - monitoring_net
+      - iot_net
+      - teslamate_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:81/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
 networks:
+  public_net:
+    external: true
   internal_net:
+    external: true
+  db_net:
+    external: true
+  monitoring_net:
+    external: true
+  iot_net:
+    external: true
+  teslamate_net:
     external: true

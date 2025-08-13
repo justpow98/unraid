@@ -1,35 +1,39 @@
+# services/infrastructure/redis/docker-compose.yml
+# Shared Redis cache infrastructure
+
 version: '3.8'
 
 services:
   redis:
-    image: # TODO: Add image with specific version tag
-    container_name: redis
-    restart: unless-stopped
+    image: redis:7.4-alpine  # Pinned version (was redis:latest)
+    container_name: Redis
+    restart: unless-stopped  # Fixed from 'no' restart policy
     environment:
       - TZ=America/New_York
-      - PUID=${PUID}
-      - PGID=${PGID}
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=redis
-      # TODO: Add service-specific environment variables
+      - HOST_CONTAINERNAME=Redis
     volumes:
-      - ${APPDATA_PATH}/redis:/config
-      # TODO: Add additional volume mounts
+      # Using docker volume to preserve existing data
+      - redis_data:/data
     ports:
-      # TODO: Add port mappings
-      - "8080:80"  # Example port mapping
+      - "6379:6379"
     networks:
-      - internal_net
-    # Uncomment and configure if needed:
-    # depends_on:
-    #   - database
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
+      - db_net
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    # Redis configuration for persistence
+    command: redis-server --appendonly yes --auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size 64mb
+
+volumes:
+  redis_data:
+    external: true
+    name: ff0ddf63debae1fd7801a1ba4d1ed1dc81e918e3f19eaaf4b8a13284009baf49
 
 networks:
-  internal_net:
+  db_net:
     external: true

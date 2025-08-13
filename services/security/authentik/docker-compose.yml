@@ -1,35 +1,179 @@
+# services/security/authentik/docker-compose.yml
+# Complete Authentik authentication and authorization system
+
 version: '3.8'
 
 services:
-  authentik:
-    image: # TODO: Add image with specific version tag
-    container_name: authentik
-    restart: unless-stopped
+  authentik-postgres:
+    image: postgres:17.2  # Pinned version (was postgres:17)
+    container_name: postgresql-authentik
+    restart: unless-stopped  # Fixed from 'no' restart policy
     environment:
       - TZ=America/New_York
-      - PUID=${PUID}
-      - PGID=${PGID}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=postgresql-authentik
+      - POSTGRES_DB=${AUTHENTIK_DB_NAME}
+      - POSTGRES_USER=${AUTHENTIK_DB_USER}
+      - POSTGRES_PASSWORD=${AUTHENTIK_DB_PASSWORD}
+      - CA_TS_FALLBACK_DIR=/var/lib/postgresql/data
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ${APPDATA_PATH}/authentik/sql:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - db_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AUTHENTIK_DB_USER} -d ${AUTHENTIK_DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  authentik-redis:
+    image: bitnami/redis:7.4.1  # Pinned version (was bitnami/redis:latest)
+    container_name: redis-authentik
+    restart: unless-stopped  # Fixed from 'no' restart policy
+    environment:
+      - TZ=America/New_York
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=redis-authentik
+      - ALLOW_EMPTY_PASSWORD=no
+      - REDIS_PASSWORD=${REDIS_AUTHENTIK_PASSWORD}
+      - REDIS_EXTRA_FLAGS=--auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size 64mb
+      - CA_TS_FALLBACK_DIR=/bitnami/redis
+    volumes:
+      - ${APPDATA_PATH}/authentik/redis:/bitnami/redis
+    ports:
+      - "6380:6379"
+    networks:
+      - db_net
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_AUTHENTIK_PASSWORD} ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  authentik-server:
+    image: beryju/authentik:2025.6.4  # Already pinned - keeping same version
+    container_name: authentik
+    restart: unless-stopped  # Fixed from 'no' restart policy
+    privileged: true  # Required for Authentik functionality
+    command: server
+    environment:
+      - TZ=America/New_York
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=authentik
-      # TODO: Add service-specific environment variables
+      # Core Authentik settings
+      - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
+      - AUTHENTIK_HOST=${AUTHENTIK_HOST}
+      # Database configuration
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-postgres
+      - AUTHENTIK_POSTGRESQL__NAME=${AUTHENTIK_DB_NAME}
+      - AUTHENTIK_POSTGRESQL__USER=${AUTHENTIK_DB_USER}
+      - AUTHENTIK_POSTGRESQL__PASSWORD=${AUTHENTIK_DB_PASSWORD}
+      # Redis configuration
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_REDIS__PASSWORD=${REDIS_AUTHENTIK_PASSWORD}
+      # Email configuration
+      - AUTHENTIK_EMAIL__HOST=${AUTHENTIK_EMAIL_HOST}
+      - AUTHENTIK_EMAIL__PORT=${AUTHENTIK_EMAIL_PORT}
+      - AUTHENTIK_EMAIL__USERNAME=${AUTHENTIK_EMAIL_USERNAME}
+      - AUTHENTIK_EMAIL__PASSWORD=${AUTHENTIK_EMAIL_PASSWORD}
+      - AUTHENTIK_EMAIL__FROM=${AUTHENTIK_EMAIL_FROM}
+      - AUTHENTIK_EMAIL__USE_TLS=${AUTHENTIK_EMAIL_USE_TLS}
+      - AUTHENTIK_EMAIL__USE_SSL=${AUTHENTIK_EMAIL_USE_SSL}
+      # Security and networking
+      - AUTHENTIK_SECURITY__USE_X_FORWARDED_HOST=true
+      - AUTHENTIK_LISTEN__TRUSTED_PROXY_CIDRS=172.18.0.0/16
+      - AUTHENTIK_ALLOWED_HOSTS=${AUTHENTIK_ALLOWED_HOSTS}
+      - AUTHENTIK_CSRF_TRUSTED_ORIGINS=${AUTHENTIK_CSRF_TRUSTED_ORIGINS}
+      - AUTHENTIK_COOKIE_DOMAIN=${AUTHENTIK_COOKIE_DOMAIN}
+      - AUTHENTIK_DEFAULT_ERROR_REDIRECT=${AUTHENTIK_DEFAULT_ERROR_REDIRECT}
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING_ENABLED}
     volumes:
-      - ${APPDATA_PATH}/authentik:/config
-      # TODO: Add additional volume mounts
+      - ${APPDATA_PATH}/authentik/media:/media
+      - ${APPDATA_PATH}/authentik/templates:/templates
     ports:
-      # TODO: Add port mappings
-      - "8080:80"  # Example port mapping
+      - "9000:9000"
+      - "9443:9443"
     networks:
+      - db_net
       - internal_net
-    # Uncomment and configure if needed:
-    # depends_on:
-    #   - database
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://localhost:80 || exit 1"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
+    depends_on:
+      - authentik-postgres
+      - authentik-redis
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/-/health/live/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    security_opt:
+      - label=disable
+
+  authentik-worker:
+    image: beryju/authentik:2025.6.4  # Same version as server
+    container_name: authentik-worker
+    restart: unless-stopped  # Already correct
+    command: worker
+    environment:
+      - TZ=America/New_York
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=authentik-worker
+      # Core Authentik settings (same as server)
+      - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
+      - AUTHENTIK_HOST=${AUTHENTIK_HOST}
+      # Database configuration
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-postgres
+      - AUTHENTIK_POSTGRESQL__NAME=${AUTHENTIK_DB_NAME}
+      - AUTHENTIK_POSTGRESQL__USER=${AUTHENTIK_DB_USER}
+      - AUTHENTIK_POSTGRESQL__PASSWORD=${AUTHENTIK_DB_PASSWORD}
+      # Redis configuration
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_REDIS__PASSWORD=${REDIS_AUTHENTIK_PASSWORD}
+      # Email configuration
+      - AUTHENTIK_EMAIL__HOST=${AUTHENTIK_EMAIL_HOST}
+      - AUTHENTIK_EMAIL__PORT=${AUTHENTIK_EMAIL_PORT}
+      - AUTHENTIK_EMAIL__USERNAME=${AUTHENTIK_EMAIL_USERNAME}
+      - AUTHENTIK_EMAIL__PASSWORD=${AUTHENTIK_EMAIL_PASSWORD}
+      - AUTHENTIK_EMAIL__FROM=${AUTHENTIK_EMAIL_FROM}
+      - AUTHENTIK_EMAIL__USE_TLS=${AUTHENTIK_EMAIL_USE_TLS}
+      - AUTHENTIK_EMAIL__USE_SSL=${AUTHENTIK_EMAIL_USE_SSL}
+      # Security and networking
+      - AUTHENTIK_SECURITY__USE_X_FORWARDED_HOST=true
+      - AUTHENTIK_LISTEN__TRUSTED_PROXY_CIDRS=172.18.0.0/16
+      - AUTHENTIK_ALLOWED_HOSTS=${AUTHENTIK_ALLOWED_HOSTS}
+      - AUTHENTIK_CSRF_TRUSTED_ORIGINS=${AUTHENTIK_CSRF_TRUSTED_ORIGINS}
+      - AUTHENTIK_COOKIE_DOMAIN=${AUTHENTIK_COOKIE_DOMAIN}
+      - AUTHENTIK_DEFAULT_ERROR_REDIRECT=${AUTHENTIK_DEFAULT_ERROR_REDIRECT}
+      - AUTHENTIK_ERROR_REPORTING__ENABLED=${AUTHENTIK_ERROR_REPORTING_ENABLED}
+    volumes:
+      - ${APPDATA_PATH}/authentik/media:/media
+      - ${APPDATA_PATH}/authentik/templates:/templates
+      - ${APPDATA_PATH}/authentik/certs:/certs
+      - ${APPDATA_PATH}/authentik/backups:/backups
+    networks:
+      - db_net
+      - internal_net
+    depends_on:
+      - authentik-postgres
+      - authentik-redis
+      - authentik-server
+    healthcheck:
+      test: ["CMD-SHELL", "ak healthcheck || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
 
 networks:
+  db_net:
+    external: true
   internal_net:
     external: true
