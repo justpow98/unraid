@@ -9,9 +9,9 @@ services:
     container_name: NPMplus-Official   
     restart: unless-stopped
     environment:
-      - TZ=${TZ:-America/New_York}
-      - HOST_OS=${HOST_OS:-Unraid}
-      - HOST_HOSTNAME=${HOST_HOSTNAME:-JP-Dell}
+      - TZ=America/New_York
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=NPMplus-Official
       - DB_SQLITE_FILE=/data/database.sqlite
       - SUPPRESS_NO_CONFIG_WARNING=1
