@@ -1,18 +1,18 @@
 # services/networking/nginx-proxy-manager/docker-compose.yml
-# Central reverse proxy for all services
+# Central reverse proxy for all services - MIGRATED TO NPMplus
 
 version: '3.8'
 
 services:
   nginx-proxy-manager:
-    image: jc21/nginx-proxy-manager:2.11.3  # Pinned version (was jc21/nginx-proxy-manager:latest)
-    container_name: Nginx-Proxy-Manager-Official
-    restart: unless-stopped  # Fixed from 'no' restart policy
+    image: zoeyvid/npmplus:2024-12-14-r1
+    container_name: NPMplus-Official   
+    restart: unless-stopped
     environment:
-      - TZ=America/New_York
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Nginx-Proxy-Manager-Official
+      - TZ=${TZ:-America/New_York}
+      - HOST_OS=${HOST_OS:-Unraid}
+      - HOST_HOSTNAME=${HOST_HOSTNAME:-JP-Dell}
+      - HOST_CONTAINERNAME=NPMplus-Official
       - DB_SQLITE_FILE=/data/database.sqlite
       - SUPPRESS_NO_CONFIG_WARNING=1
       - S6_BEHAVIOUR_IF_STAGE2_FAILS=1
@@ -22,15 +22,22 @@ services:
       - S6_VERBOSITY=1
       - NODE_ENV=production
       - NODE_OPTIONS=--openssl-legacy-provider
+      # NPMplus specific environment variables
+      - ACME_EMAIL=${ACME_EMAIL}
+      - SKIP_IP_RANGES=${SKIP_IP_RANGES:-true}
+      - MODSEC=${MODSEC:-false}
+      - CROWDSEC=${CROWDSEC:-false}
+      - LOGROTATE=${LOGROTATE:-false}
+      - GOACCESS=${GOACCESS:-false}
     volumes:
-      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data:/data
-      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/letsencrypt:/etc/letsencrypt
-      - /tmp/Nginx-Proxy-Manager-Official/var/log:/var/log
+      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data:/data  # SAME: Keep existing data path
+      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/letsencrypt:/etc/letsencrypt  # SAME: Keep existing SSL path
+      - /tmp/Nginx-Proxy-Manager-Official/var/log:/var/log  # SAME: Keep existing log path
     ports:
-      - "8090:80"     # HTTP
-      - "8443:443"    # HTTPS
-      - "8091:81"     # Admin Interface
-      - "3003:3000"   # Management API
+      - "8090:80"     # HTTP - SAME
+      - "8443:443"    # HTTPS - SAME  
+      - "8091:81"     # Admin Interface (now HTTPS) - SAME port, but interface is now HTTPS
+      - "3003:3000"   # Management API - SAME
     networks:
       # NPM needs access to ALL networks to proxy services
       - public_net
@@ -40,7 +47,7 @@ services:
       - iot_net
       - teslamate_net
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:81/api/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f -k https://localhost:81/api/health || curl -f http://localhost:81/api/health || exit 1"]  # CHANGED: Updated for HTTPS admin interface
       interval: 30s
       timeout: 10s
       retries: 3
