@@ -9,7 +9,7 @@ services:
     container_name: NPMplus-Official   
     restart: unless-stopped
     environment:
-      - TZ=America/New_York
+      - TZ=US/Eastern
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=NPMplus-Official
