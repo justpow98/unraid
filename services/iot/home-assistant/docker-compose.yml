@@ -14,7 +14,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=Home-Assistant-Container
     volumes:
-      - ${APPDATA_PATH}/homeassistant:/config
+      - ${HOME_ASSISTANT_PATH}:/config
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8123:8123"
