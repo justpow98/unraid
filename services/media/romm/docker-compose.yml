@@ -19,8 +19,8 @@ services:
       - DB_PASSWD=${ROMM_DB_PASSWORD}
       - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_SECRET_KEY}
     volumes:
-      - ${APPDATA_PATH}/romm/resources:/romm/resources
-      - ${APPDATA_PATH}/romm/config:/romm/config
+      - ${ROMM_PATH}/romm/resources:/romm/resources
+      - ${ROMM_PATH}/romm/config:/romm/config
       - /mnt/user/roms:/romm/library
     ports:
       - "8085:8080"
@@ -44,7 +44,7 @@ services:
       - MYSQL_USER=${ROMM_DB_USER}
       - MYSQL_PASSWORD=${ROMM_DB_PASSWORD}
     volumes:
-      - ${APPDATA_PATH}/romm/mariadb:/var/lib/mysql
+      - ${ROMM_PATH}/romm/mariadb:/var/lib/mysql
     ports:
       - "3307:3306"
     networks:

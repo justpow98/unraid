@@ -23,7 +23,7 @@ services:
       - SMTP_USERNAME=${AUTHENTIK_EMAIL_USERNAME}
       - SMTP_PASSWORD=${AUTHENTIK_EMAIL_PASSWORD}
     volumes:
-      - ${APPDATA_PATH}/vaultwarden:/data
+      - ${VAULTWARDEN_PATH}/vaultwarden:/data
     ports:
       - "4743:80"
     labels:
