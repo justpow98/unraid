@@ -26,6 +26,12 @@ services:
       - ${APPDATA_PATH}/vaultwarden:/data
     ports:
       - "4743:80"
+    labels:
+      - "kuma.vaultwarden.name=Vaultwarden"
+      - "kuma.vaultwarden.url=http://vaultwarden:80"
+      - "kuma.vaultwarden.method=GET"
+      - "kuma.vaultwarden.interval=60"
+      - "kuma.vaultwarden.keyword=Vaultwarden"
     networks:
       - internal_net
 

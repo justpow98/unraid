@@ -26,6 +26,12 @@ services:
       - /mnt/user/videos:/videos
     ports:
       - "8083:8080"
+    labels:
+      - "kuma.immich.name=Immich"
+      - "kuma.immich.url=http://immich:8080"
+      - "kuma.immich.method=GET"
+      - "kuma.immich.interval=60"
+      - "kuma.immich.keyword=Immich"
     networks:
       - internal_net
       - db_net
@@ -49,6 +55,11 @@ services:
       - ${APPDATA_PATH}/immich/postgres:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    labels:
+      - "kuma.immichdb.name=Immich Database"
+      - "kuma.immichdb.tcp.host=immich-postgres"
+      - "kuma.immichdb.tcp.port=5432"
+      - "kuma.immichdb.interval=120"
     networks:
       - db_net
 

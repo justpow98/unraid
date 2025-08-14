@@ -18,6 +18,12 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8123:8123"
+    labels:
+      - "kuma.homeassistant.name=Home Assistant"
+      - "kuma.homeassistant.url=http://home-assistant:8123"
+      - "kuma.homeassistant.method=GET"
+      - "kuma.homeassistant.interval=60"
+      - "kuma.homeassistant.keyword=Home Assistant"
     networks:
       - iot_net
     privileged: true

@@ -17,6 +17,12 @@ services:
       - ${APPDATA_PATH}/uptimekuma:/app/data
     ports:
       - "3002:3001"
+    labels:
+      - "kuma.uptimekuma.name=UptimeKuma"
+      - "kuma.uptimekuma.url=http://uptimekuma:3001"
+      - "kuma.uptimekuma.method=GET"
+      - "kuma.uptimekuma.interval=60"
+      - "kuma.uptimekuma.keyword=Uptime Kuma"
     networks:
       - monitoring_net
 

@@ -22,6 +22,12 @@ services:
       - /mnt/user/nextcloud_data:/var/www/html/data
     ports:
       - "8666:80"
+    labels:
+      - "kuma.nextcloud.name=Nextcloud"
+      - "kuma.nextcloud.url=http://nextcloud:80"
+      - "kuma.nextcloud.method=GET"
+      - "kuma.nextcloud.interval=60"
+      - "kuma.nextcloud.keyword=Nextcloud"
     networks:
       - internal_net
       - db_net
@@ -44,6 +50,11 @@ services:
       - ${APPDATA_PATH}/nextcloud/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    labels:
+      - "kuma.nextclouddb.name=Nextcloud Database"
+      - "kuma.nextclouddb.tcp.host=nextcloud-postgres"
+      - "kuma.nextclouddb.tcp.port=5432"
+      - "kuma.nextclouddb.interval=120"
     networks:
       - db_net
 

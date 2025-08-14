@@ -48,6 +48,11 @@ services:
       - ${APPDATA_PATH}/authentik/redis:/bitnami/redis
     ports:
       - "6380:6379"
+    labels:
+      - "kuma.authentikredis.name=Authentik Redis"
+      - "kuma.authentikredis.tcp.host=redis-authentik"
+      - "kuma.authentikredis.tcp.port=6379"
+      - "kuma.authentikredis.interval=120"
     networks:
       - db_net
     healthcheck:
@@ -101,6 +106,12 @@ services:
     ports:
       - "9000:9000"
       - "9443:9443"
+    labels:
+      - "kuma.authentik.name=Authentik"
+      - "kuma.authentik.url=http://authentik:9000"
+      - "kuma.authentik.method=GET"
+      - "kuma.authentik.interval=60"
+      - "kuma.authentik.keyword=authentik"
     networks:
       - db_net
       - internal_net

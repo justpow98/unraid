@@ -22,6 +22,12 @@ services:
       - ${APPDATA_PATH}/grafana:/var/lib/grafana
     ports:
       - "3006:3000"
+    labels:
+      - "kuma.grafana.name=Grafana"
+      - "kuma.grafana.url=http://grafana:3000"
+      - "kuma.grafana.method=GET"
+      - "kuma.grafana.interval=60"
+      - "kuma.grafana.keyword=Grafana"
     networks:
       - monitoring_net
       - db_net

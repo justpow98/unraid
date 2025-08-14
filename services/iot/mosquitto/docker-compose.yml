@@ -20,6 +20,11 @@ services:
     ports:
       - "1883:1883"
       - "9001:9001"
+    labels:
+      - "kuma.mosquitto.name=MQTT Broker"
+      - "kuma.mosquitto.tcp.host=mosquitto"
+      - "kuma.mosquitto.tcp.port=1883"
+      - "kuma.mosquitto.interval=60"
     networks:
       - iot_net
     user: "${PUID}:${PGID}"
