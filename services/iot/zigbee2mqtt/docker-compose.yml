@@ -14,7 +14,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=zigbee2mqtt
     volumes:
-      - ${APPDATA_PATH}/zigbee2mqtt:/app/data
+      - ${HOME_ASSISTANT_PATH}/zigbee2mqtt:/app/data
       - /run/udev:/run/udev:ro
     ports:
       - "9442:8080"

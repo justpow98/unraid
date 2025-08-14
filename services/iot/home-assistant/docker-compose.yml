@@ -14,7 +14,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=Home-Assistant-Container
     volumes:
-      - ${HOME_ASSISTANT_PATH}:/config
+      - ${HOME_ASSISTANT_PATH}/Home-Assistant-Container:/config
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8123:8123"
@@ -38,7 +38,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=matter-server
     volumes:
-      - ${APPDATA_PATH}/matter-server:/data
+      - ${HOME_ASSISTANT_PATH}/python-matter-server:/data
     network_mode: host
 
 networks:
