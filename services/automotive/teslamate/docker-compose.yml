@@ -1,0 +1,76 @@
+# ============================================================================
+# services/automotive/teslamate/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  teslamate:
+    image: teslamate/teslamate:1.30.1
+    container_name: TeslaMate
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=TeslaMate
+      - ENCRYPTION_KEY=${TESLAMATE_ENCRYPTION_KEY}
+      - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
+      - MQTT_HOST=mosquitto.iot_net
+      - VIRTUAL_HOST=teslamate.azuleluna.xyz
+      - CHECK_ORIGIN=false
+      - TZ=America/New_York
+    volumes:
+      - ${APPDATA_PATH}/teslamate/import:/opt/app/import
+    ports:
+      - "4001:4000"
+    networks:
+      - teslamate_net
+      - db_net
+      - iot_net
+    depends_on:
+      - teslamate-postgres
+
+  teslamate-postgres:
+    image: postgres:17.2
+    container_name: teslamate-postgres
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=teslamate-postgres
+      - POSTGRES_USER=${TESLAMATE_DB_USER}
+      - POSTGRES_PASSWORD=${TESLAMATE_DB_PASSWORD}
+      - POSTGRES_DB=${TESLAMATE_DB_NAME}
+    volumes:
+      - ${APPDATA_PATH}/teslamate/postgres:/var/lib/postgresql/data
+    ports:
+      - "5436:5432"
+    networks:
+      - db_net
+
+  teslamate-grafana:
+    image: teslamate/grafana:1.30.1
+    container_name: TeslaMate-Grafana
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=TeslaMate-Grafana
+      - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
+    volumes:
+      - ${APPDATA_PATH}/teslamate/grafana:/var/lib/grafana
+    ports:
+      - "3333:3000"
+    networks:
+      - teslamate_net
+      - db_net
+
+networks:
+  teslamate_net:
+    external: true
+  db_net:
+    external: true
+  iot_net:
+    external: true

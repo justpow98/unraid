@@ -1,0 +1,29 @@
+# ============================================================================
+# services/iot/mosquitto/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.20
+    container_name: mosquitto
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=mosquitto
+    volumes:
+      - ${APPDATA_PATH}/mosquitto/config:/mosquitto/config
+      - ${APPDATA_PATH}/mosquitto/data:/mosquitto/data
+      - ${APPDATA_PATH}/mosquitto/log:/mosquitto/log
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    networks:
+      - iot_net
+    user: "${PUID}:${PGID}"
+
+networks:
+  iot_net:
+    external: true

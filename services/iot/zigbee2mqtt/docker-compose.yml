@@ -1,0 +1,27 @@
+# ============================================================================
+# services/iot/zigbee2mqtt/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt:1.41.0
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=zigbee2mqtt
+    volumes:
+      - ${APPDATA_PATH}/zigbee2mqtt:/app/data
+      - /run/udev:/run/udev:ro
+    ports:
+      - "9442:8080"
+    networks:
+      - iot_net
+    privileged: true
+
+networks:
+  iot_net:
+    external: true

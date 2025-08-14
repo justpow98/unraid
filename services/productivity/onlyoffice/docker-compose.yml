@@ -1,0 +1,33 @@
+# ============================================================================
+# services/productivity/onlyoffice/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  onlyoffice:
+    image: onlyoffice/documentserver:8.2.0
+    container_name: OnlyOfficeDocumentServer
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=OnlyOfficeDocumentServer
+      - DB_TYPE=postgres
+      - DB_HOST=onlyoffice-postgres
+      - DB_PORT=5432
+      - DB_NAME=${ONLYOFFICE_DB_NAME}
+      - DB_USER=${ONLYOFFICE_DB_USER}
+      - DB_PWD=${ONLYOFFICE_DB_PASSWORD}
+      - JWT_ENABLED=true
+      - JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
+    volumes:
+      - ${APPDATA_PATH}/onlyoffice/logs:/var/log/onlyoffice
+      - ${APPDATA_PATH}/onlyoffice/data:/var/www/onlyoffice/Data
+      - ${APPDATA_PATH}/onlyoffice/lib:/var/lib/onlyoffice
+    ports:
+      - "8082:80"
+      - "4430:443"
+    networks:
+      - internal_net
+      - db_net

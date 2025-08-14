@@ -1,0 +1,30 @@
+# ============================================================================
+# services/utilities/duplicati/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  duplicati:
+    image: lscr.io/linuxserver/duplicati:2.1.0
+    container_name: duplicati
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=duplicati
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - CLI_ARGS=--webservice-interface=any
+    volumes:
+      - ${APPDATA_PATH}/duplicati:/config
+      - /mnt/user:/source:ro
+      - /mnt/user/backups:/backups
+    ports:
+      - "8200:8200"
+    networks:
+      - internal_net
+
+networks:
+  internal_net:
+    external: true

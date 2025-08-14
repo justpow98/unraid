@@ -1,0 +1,22 @@
+# ============================================================================
+# services/utilities/honeygain/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  honeygain:
+    image: honeygain/honeygain:latest
+    container_name: honeygain
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=honeygain
+    command: -tou-accept -email ${HONEYGAIN_EMAIL} -pass ${HONEYGAIN_PASSWORD} -device ${HONEYGAIN_DEVICE_NAME}
+    networks:
+      - internal_net
+
+networks:
+  internal_net:
+    external: true

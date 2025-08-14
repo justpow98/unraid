@@ -1,0 +1,26 @@
+# ============================================================================
+# services/networking/cloudflared/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  cloudflared:
+    image: figro/unraid-cloudflared-tunnel:latest
+    container_name: Unraid-Cloudflared-Tunnel
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=Unraid-Cloudflared-Tunnel
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    volumes:
+      - ${APPDATA_PATH}/cloudflared:/etc/cloudflared
+    ports:
+      - "46495:46495"
+    networks:
+      - public_net
+
+networks:
+  public_net:
+    external: true

@@ -1,0 +1,27 @@
+# ============================================================================
+# services/productivity/actualserver/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  actualserver:
+    image: actualbudget/actual-server:25.1.0
+    container_name: ActualServer
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=ActualServer
+      - ACTUAL_UPLOAD_FILE_SIZE_SYNC_MB=20
+      - ACTUAL_UPLOAD_FILE_SIZE_IMPORT_MB=20
+    volumes:
+      - ${APPDATA_PATH}/actualserver:/data
+    ports:
+      - "5006:5006"
+    networks:
+      - internal_net
+
+networks:
+  internal_net:
+    external: true

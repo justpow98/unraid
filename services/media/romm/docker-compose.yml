@@ -1,0 +1,57 @@
+# ============================================================================
+# services/media/romm/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  romm:
+    image: rommapp/romm:3.5.1
+    container_name: romm
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=romm
+      - DB_HOST=romm-mariadb
+      - DB_NAME=${ROMM_DB_NAME}
+      - DB_USER=${ROMM_DB_USER}
+      - DB_PASSWD=${ROMM_DB_PASSWORD}
+      - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_SECRET_KEY}
+    volumes:
+      - ${APPDATA_PATH}/romm/resources:/romm/resources
+      - ${APPDATA_PATH}/romm/config:/romm/config
+      - /mnt/user/roms:/romm/library
+    ports:
+      - "8085:8080"
+    networks:
+      - internal_net
+      - db_net
+    depends_on:
+      - romm-mariadb
+
+  romm-mariadb:
+    image: mariadb:11.6.2
+    container_name: romm-MariaDB-Official
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=romm-MariaDB-Official
+      - MYSQL_ROOT_PASSWORD=${ROMM_DB_PASSWORD}
+      - MYSQL_DATABASE=${ROMM_DB_NAME}
+      - MYSQL_USER=${ROMM_DB_USER}
+      - MYSQL_PASSWORD=${ROMM_DB_PASSWORD}
+    volumes:
+      - ${APPDATA_PATH}/romm/mariadb:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - db_net
+
+networks:
+  internal_net:
+    external: true
+  db_net:
+    external: true

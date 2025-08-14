@@ -1,0 +1,73 @@
+# ============================================================================
+# services/media/immich/docker-compose.yml
+# ============================================================================
+version: '3.8'
+
+services:
+  immich:
+    image: ghcr.io/imagegenius/immich:1.128.0
+    container_name: immich
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=immich
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - DB_HOSTNAME=immich-postgres
+      - DB_USERNAME=${IMMICH_DB_USER}
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
+      - DB_DATABASE_NAME=${IMMICH_DB_NAME}
+      - REDIS_HOSTNAME=immich-redis
+    volumes:
+      - ${APPDATA_PATH}/immich:/config
+      - /mnt/user/photos:/photos
+      - /mnt/user/videos:/videos
+    ports:
+      - "8083:8080"
+    networks:
+      - internal_net
+      - db_net
+    depends_on:
+      - immich-postgres
+      - immich-redis
+
+  immich-postgres:
+    image: ghcr.io/immich-app/postgres:16-vectorchord0.3.0-pgvectors0.3.0
+    container_name: Immich_PostgreSQL
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=Immich_PostgreSQL
+      - POSTGRES_DB=${IMMICH_DB_NAME}
+      - POSTGRES_USER=${IMMICH_DB_USER}
+      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
+    volumes:
+      - ${APPDATA_PATH}/immich/postgres:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - db_net
+
+  immich-redis:
+    image: redis:7.4.1-alpine
+    container_name: immich-redis
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=immich-redis
+    volumes:
+      - ${APPDATA_PATH}/immich/redis:/data
+    networks:
+      - db_net
+
+networks:
+  internal_net:
+    external: true
+  db_net:
+    external: true
