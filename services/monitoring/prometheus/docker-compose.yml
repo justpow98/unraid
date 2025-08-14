@@ -22,8 +22,8 @@ services:
       - '--web.enable-lifecycle'
       - '--web.external-url=https://prometheus.azuleluna.xyz'
     volumes:
-      - ${APPDATA_PATH}/prometheus/config:/etc/prometheus
-      - ${APPDATA_PATH}/prometheus/data:/prometheus
+      - ${OBSERVABILITY_PATH}/prometheus/config:/etc/prometheus
+      - ${OBSERVABILITY_PATH}/prometheus/data:/prometheus
     ports:
       - "9090:9090"
     networks:

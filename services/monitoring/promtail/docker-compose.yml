@@ -1,0 +1,39 @@
+# ============================================================================
+# services/monitoring/promtail/docker-compose.yml  
+# Grafana Promtail - Log Collector Agent
+# ============================================================================
+version: '3.8'
+
+services:
+  promtail:
+    image: grafana/promtail:2.9.8
+    container_name: GrafanaPromtail
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=GrafanaPromtail
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ${OBSERVABILITY_PATH}/promtail/config:/etc/promtail
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "9080:9080"
+    networks:
+      - monitoring_net
+    user: "${PUID}:${PGID}"
+    depends_on:
+      - loki
+    labels:
+      - "kuma.promtail.name=Grafana Promtail"
+      - "kuma.promtail.url=http://promtail:9080/ready"
+      - "kuma.promtail.method=GET"
+      - "kuma.promtail.interval=60"
+      - "kuma.promtail.keyword=ready"
+
+networks:
+  monitoring_net:
+    external: true

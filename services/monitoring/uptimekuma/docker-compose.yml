@@ -14,7 +14,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=UptimeKuma
     volumes:
-      - ${APPDATA_PATH}/uptimekuma:/app/data
+      - ${OBSERVABILITY_PATH}/uptimekuma:/app/data
     ports:
       - "3002:3001"
     labels:

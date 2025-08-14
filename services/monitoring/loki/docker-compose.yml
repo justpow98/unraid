@@ -1,0 +1,35 @@
+# ============================================================================
+# services/monitoring/loki/docker-compose.yml
+# Grafana Loki - Log Aggregation System
+# ============================================================================
+version: '3.8'
+
+services:
+  loki:
+    image: grafana/loki:2.9.8
+    container_name: GrafanaLoki
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=GrafanaLoki
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ${OBSERVABILITY_PATH}/loki/config:/etc/loki
+      - ${OBSERVABILITY_PATH}/loki/data:/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - monitoring_net
+    user: "${PUID}:${PGID}"
+    labels:
+      - "kuma.loki.name=Grafana Loki"
+      - "kuma.loki.url=http://loki:3100/ready"
+      - "kuma.loki.method=GET"
+      - "kuma.loki.interval=60"
+      - "kuma.loki.keyword=ready"
+
+networks:
+  monitoring_net:
+    external: true

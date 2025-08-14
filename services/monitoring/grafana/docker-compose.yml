@@ -19,7 +19,7 @@ services:
       - GF_SERVER_ROOT_URL=https://grafana.azuleluna.xyz
       - GF_SECURITY_COOKIE_SECURE=true
     volumes:
-      - ${APPDATA_PATH}/grafana:/var/lib/grafana
+      - ${OBSERVABILITY_PATH}/grafana:/var/lib/grafana
     ports:
       - "3006:3000"
     labels:
