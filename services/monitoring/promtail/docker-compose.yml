@@ -25,8 +25,6 @@ services:
     networks:
       - monitoring_net
     user: "${PUID}:${PGID}"
-    depends_on:
-      - loki
     labels:
       - "kuma.promtail.name=Grafana Promtail"
       - "kuma.promtail.url=http://promtail:9080/ready"
