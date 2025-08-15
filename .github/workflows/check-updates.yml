@@ -38,7 +38,15 @@ jobs:
         run: |
           echo "📦 Installing Python dependencies..."
           pip install --upgrade pip
-          pip install requests pyyaml python-dateutil
+          
+          # Install from requirements.txt if it exists, otherwise install individually
+          if [ -f "requirements.txt" ]; then
+            echo "📄 Installing from requirements.txt..."
+            pip install -r requirements.txt
+          else
+            echo "📦 Installing dependencies individually..."
+            pip install requests pyyaml python-dateutil
+          fi
           
           # Verify installations
           python --version
