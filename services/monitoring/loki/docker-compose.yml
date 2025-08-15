@@ -29,6 +29,8 @@ services:
       - "kuma.loki.method=GET"
       - "kuma.loki.interval=60"
       - "kuma.loki.keyword=ready"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/loki-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:3100]"
 
 networks:
   monitoring_net:

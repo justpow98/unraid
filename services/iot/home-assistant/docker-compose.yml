@@ -24,6 +24,8 @@ services:
       - "kuma.homeassistant.method=GET"
       - "kuma.homeassistant.interval=60"
       - "kuma.homeassistant.keyword=Home Assistant"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8123]"
     networks:
       - iot_net
     privileged: true
@@ -40,6 +42,13 @@ services:
     volumes:
       - ${HOME_ASSISTANT_PATH}/python-matter-server:/data
     network_mode: host
+    labels:
+      - "kuma.matterserver.name=Matter Server"
+      - "kuma.matterserver.url=http://matter-server:5540"
+      - "kuma.matterserver.method=GET"
+      - "kuma.matterserver.interval=60"
+      - "kuma.matterserver.keyword=Matter Server"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png"
 
 networks:
   iot_net:

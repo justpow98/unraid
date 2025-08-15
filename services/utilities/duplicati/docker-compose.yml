@@ -20,6 +20,14 @@ services:
       - ${APPDATA_PATH}/duplicati:/config
       - /mnt/user:/source:ro
       - /mnt/user/backups:/backups
+    labels:
+      - "kuma.duplicati.name=Duplicati Backup"
+      - "kuma.duplicati.url=http://duplicati:8200"
+      - "kuma.duplicati.method=GET"
+      - "kuma.duplicati.interval=60"
+      - "kuma.duplicati.keyword=Duplicati"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/duplicati-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8200]"
     ports:
       - "8200:8200"
     networks:

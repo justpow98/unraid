@@ -21,6 +21,14 @@ services:
       - DB_NAME=${WIKIJS_DB_NAME}
     volumes:
       - ${APPDATA_PATH}/wikijs:/wiki/data
+    labels:
+      - "kuma.wikijs.name=Wiki.js"
+      - "kuma.wikijs.url=http://wikijs:3000"
+      - "kuma.wikijs.method=GET"
+      - "kuma.wikijs.interval=60"
+      - "kuma.wikijs.keyword=Wiki.js"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:3000]"
     ports:
       - "3000:3000"
     networks:

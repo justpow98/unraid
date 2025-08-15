@@ -9,6 +9,14 @@ services:
       - TZ=America/New_York
       - PUID=${PUID}
       - PGID=${PGID}
+    labels:
+      - "kuma.goaccess.name=GoAccess for NPM Logs"
+      - "kuma.goaccess.url=http://goaccess:7880"
+      - "kuma.goaccess.method=GET"
+      - "kuma.goaccess.interval=60"
+      - "kuma.goaccess.keyword=GoAccess"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/goaccess-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:7880]"
     volumes:
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data/logs:/opt/log:ro  # Read-only access to NPM logs
     ports:

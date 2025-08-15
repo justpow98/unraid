@@ -32,6 +32,8 @@ services:
       - "kuma.vaultwarden.method=GET"
       - "kuma.vaultwarden.interval=60"
       - "kuma.vaultwarden.keyword=Vaultwarden"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/vaultwarden-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:4743]"
     networks:
       - internal_net
 

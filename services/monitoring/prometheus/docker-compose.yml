@@ -29,6 +29,14 @@ services:
     networks:
       - monitoring_net
     user: "${PUID}:${PGID}"
+    labels:
+      - "kuma.prometheus.name=Prometheus"
+      - "kuma.prometheus.url=http://prometheus:9090/ready"
+      - "kuma.prometheus.method=GET"
+      - "kuma.prometheus.interval=60"
+      - "kuma.prometheus.keyword=ready"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:9090]"
 
 networks:
   monitoring_net:

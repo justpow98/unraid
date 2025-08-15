@@ -25,6 +25,9 @@ services:
       - "kuma.mosquitto.tcp.host=mosquitto"
       - "kuma.mosquitto.tcp.port=1883"
       - "kuma.mosquitto.interval=60"
+      - "kuma.mosquitto.keyword=MQTT Broker"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mosquitto-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:9001]"
     networks:
       - iot_net
     user: "${PUID}:${PGID}"

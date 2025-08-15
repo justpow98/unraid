@@ -28,6 +28,13 @@ services:
       start_period: 10s
     # Redis configuration for persistence
     command: redis-server --appendonly yes --auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size 64mb
+    labels:
+      - "kuma.redis.name=Redis Cache"
+      - "kuma.redis.url=http://redis:6379"
+      - "kuma.redis.method=GET"
+      - "kuma.redis.interval=60"
+      - "kuma.redis.keyword=PONG"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
 
 volumes:
   redis_data:

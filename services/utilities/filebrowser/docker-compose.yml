@@ -20,6 +20,14 @@ services:
       - "8080:80"
     networks:
       - internal_net
+    labels:
+      - "kuma.filebrowser.name=File Browser"
+      - "kuma.filebrowser.url=http://filebrowser:8080"
+      - "kuma.filebrowser.method=GET"
+      - "kuma.filebrowser.interval=60"
+      - "kuma.filebrowser.keyword=File Browser"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/filebrowser-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8080]"
     healthcheck:
       test: ["CMD-SHELL", "/healthcheck.sh"]
       interval: 5s

@@ -21,6 +21,14 @@ services:
       - "5006:5006"
     networks:
       - internal_net
+    labels:
+      - "kuma.actualserver.name=Actual Server"
+      - "kuma.actualserver.url=http://actualserver:5006"
+      - "kuma.actualserver.method=GET"
+      - "kuma.actualserver.interval=60"
+      - "kuma.actualserver.keyword=Actual Server"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/actualserver-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:5006]"
 
 networks:
   internal_net:

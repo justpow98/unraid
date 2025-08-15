@@ -26,6 +26,13 @@ services:
       - /mnt/user/appdata/docker-compose/.env:/workspace/.env:ro
     networks:
       - monitoring_net
+    labels:
+      - "kuma.github-runner.name=GitHub Runner"
+      - "kuma.github-runner.url=http://github-runner:8080"
+      - "kuma.github-runner.method=GET"
+      - "kuma.github-runner.interval=60"
+      - "kuma.github-runner.keyword=GitHub Runner"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/github-desktop-icon.png"
 
 networks:
   monitoring_net:

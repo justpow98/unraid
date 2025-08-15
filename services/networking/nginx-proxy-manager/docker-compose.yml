@@ -29,6 +29,14 @@ services:
       - CROWDSEC=${CROWDSEC:-false}
       - LOGROTATE=${LOGROTATE:-false}
       - GOACCESS=${GOACCESS:-false}
+    labels:
+      - "kuma.nginx-proxy-manager.name=Nginx Proxy Manager"
+      - "kuma.nginx-proxy-manager.url=http://nginx-proxy-manager:3000"
+      - "kuma.nginx-proxy-manager.method=GET"
+      - "kuma.nginx-proxy-manager.interval=60"
+      - "kuma.nginx-proxy-manager.keyword=Nginx Proxy Manager"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nginx-proxy-manager-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:3000]"
     volumes:
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data:/data  # SAME: Keep existing data path
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/letsencrypt:/etc/letsencrypt  # SAME: Keep existing SSL path

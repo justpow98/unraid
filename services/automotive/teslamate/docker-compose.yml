@@ -23,6 +23,14 @@ services:
       - ${APPDATA_PATH}/teslamate/import:/opt/app/import
     ports:
       - "4001:4000"
+    labels:
+      - "kuma.teslamate.name=TeslaMate"
+      - "kuma.teslamate.url=http://teslamate:4000"
+      - "kuma.teslamate.method=GET"
+      - "kuma.teslamate.interval=60"
+      - "kuma.teslamate.keyword=TeslaMate"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/adriankumpf/teslamate/master/priv/static/images/logo.svg"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:4001]"
     networks:
       - teslamate_net
       - db_net
@@ -44,6 +52,12 @@ services:
       - POSTGRES_DB=${TESLAMATE_DB_NAME}
     volumes:
       - ${TESLAMATE_PATH}/postgres:/var/lib/postgresql/data
+    labels:
+      - "kuma.teslamatedb.name=TeslaMate Database"
+      - "kuma.teslamatedb.tcp.host=teslamate-postgres"
+      - "kuma.teslamatedb.tcp.port=5432"
+      - "kuma.teslamatedb.interval=120"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     ports:
       - "5436:5432"
     networks:
@@ -61,6 +75,14 @@ services:
       - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
     volumes:
       - ${TESLAMATE_PATH}/grafana:/var/lib/grafana
+    labels:
+      - "kuma.teslamategrafana.name=TeslaMate Grafana"
+      - "kuma.teslamategrafana.url=http://teslamate-grafana:3000"
+      - "kuma.teslamategrafana.method=GET"
+      - "kuma.teslamategrafana.interval=60"
+      - "kuma.teslamategrafana.keyword=TeslaMate Grafana"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:3333]"
     ports:
       - "3333:3000"
     networks:

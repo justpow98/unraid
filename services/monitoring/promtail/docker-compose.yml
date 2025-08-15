@@ -31,6 +31,8 @@ services:
       - "kuma.promtail.method=GET"
       - "kuma.promtail.interval=60"
       - "kuma.promtail.keyword=ready"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/promtail-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:9080]"
 
 networks:
   monitoring_net:

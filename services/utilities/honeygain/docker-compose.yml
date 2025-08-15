@@ -13,6 +13,14 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=honeygain
+    labels:
+      - "kuma.honeygain.name=Honeygain"
+      - "kuma.honeygain.url=http://honeygain:8080/ready"
+      - "kuma.honeygain.method=GET"
+      - "kuma.honeygain.interval=60"
+      - "kuma.honeygain.keyword=ready"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/honeygain-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8080]"
     command: -tou-accept -email ${HONEYGAIN_EMAIL} -pass ${HONEYGAIN_PASSWORD} -device ${HONEYGAIN_DEVICE_NAME}
     networks:
       - internal_net

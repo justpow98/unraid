@@ -18,6 +18,13 @@ services:
       - DB_USER=${ROMM_DB_USER}
       - DB_PASSWD=${ROMM_DB_PASSWORD}
       - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_SECRET_KEY}
+    labels:
+      - "kuma.romm.name=ROMM"
+      - "kuma.romm.url=http://romm:8085"
+      - "kuma.romm.method=GET"
+      - "kuma.romm.interval=60"
+      - "kuma.romm.keyword=ROMM"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/romm-icon.png"
     volumes:
       - ${ROMM_PATH}/romm/resources:/romm/resources
       - ${ROMM_PATH}/romm/config:/romm/config
@@ -43,6 +50,12 @@ services:
       - MYSQL_DATABASE=${ROMM_DB_NAME}
       - MYSQL_USER=${ROMM_DB_USER}
       - MYSQL_PASSWORD=${ROMM_DB_PASSWORD}
+    labels:
+      - "kuma.rommdb.name=ROMM Database"
+      - "kuma.rommdb.tcp.host=romm-mariadb"
+      - "kuma.rommdb.tcp.port=3306"
+      - "kuma.rommdb.interval=120"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mariadb-icon.png"
     volumes:
       - ${ROMM_PATH}/romm/mariadb:/var/lib/mysql
     ports:

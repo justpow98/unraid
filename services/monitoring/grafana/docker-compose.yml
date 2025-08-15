@@ -28,6 +28,8 @@ services:
       - "kuma.grafana.method=GET"
       - "kuma.grafana.interval=60"
       - "kuma.grafana.keyword=Grafana"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:3006]"
     networks:
       - monitoring_net
       - db_net

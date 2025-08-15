@@ -20,6 +20,12 @@ services:
       - PGDATA=/var/lib/postgresql/data
     volumes:
       - ${APPDATA_PATH}/authentik/sql:/var/lib/postgresql/data
+    labels:
+      - "kuma.authentikdb.name=Authentik Database"
+      - "kuma.authentikdb.tcp.host=authentik-postgres"
+      - "kuma.authentikdb.tcp.port=5432"
+      - "kuma.authentikdb.interval=120"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     ports:
       - "5434:5432"
     networks:
@@ -53,6 +59,7 @@ services:
       - "kuma.authentikredis.tcp.host=redis-authentik"
       - "kuma.authentikredis.tcp.port=6379"
       - "kuma.authentikredis.interval=120"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
     networks:
       - db_net
     healthcheck:
@@ -112,6 +119,8 @@ services:
       - "kuma.authentik.method=GET"
       - "kuma.authentik.interval=60"
       - "kuma.authentik.keyword=authentik"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/authentik-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:9000]"
     networks:
       - db_net
       - internal_net

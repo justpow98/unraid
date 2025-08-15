@@ -30,6 +30,8 @@ services:
       - "kuma.nextcloud.method=GET"
       - "kuma.nextcloud.interval=60"
       - "kuma.nextcloud.keyword=Nextcloud"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8666]"
     networks:
       - internal_net
       - db_net
@@ -57,6 +59,7 @@ services:
       - "kuma.nextclouddb.tcp.host=nextcloud-postgres"
       - "kuma.nextclouddb.tcp.port=5432"
       - "kuma.nextclouddb.interval=120"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     networks:
       - db_net
 

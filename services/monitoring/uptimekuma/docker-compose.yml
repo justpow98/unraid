@@ -23,6 +23,8 @@ services:
       - "kuma.uptimekuma.method=GET"
       - "kuma.uptimekuma.interval=60"
       - "kuma.uptimekuma.keyword=Uptime Kuma"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:3002]"
     networks:
       - monitoring_net
 
@@ -36,6 +38,14 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=AutoKuma
       - AUTOKUMA_UPTIME_KUMA_URL=http://uptimekuma:3001
+    labels:
+      - "kuma.autokuma.name=AutoKuma"
+      - "kuma.autokuma.url=http://autokuma:3000"
+      - "kuma.autokuma.method=GET"
+      - "kuma.autokuma.interval=60"
+      - "kuma.autokuma.keyword=Auto Kuma"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:3000]"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:

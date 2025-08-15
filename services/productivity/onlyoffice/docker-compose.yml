@@ -25,6 +25,14 @@ services:
       - ${APPDATA_PATH}/onlyoffice/logs:/var/log/onlyoffice
       - ${APPDATA_PATH}/onlyoffice/data:/var/www/onlyoffice/Data
       - ${APPDATA_PATH}/onlyoffice/lib:/var/lib/onlyoffice
+    labels:
+      - "kuma.onlyoffice.name=OnlyOffice Document Server"
+      - "kuma.onlyoffice.url=http://onlyoffice:80"
+      - "kuma.onlyoffice.method=GET"
+      - "kuma.onlyoffice.interval=60"
+      - "kuma.onlyoffice.keyword=OnlyOffice"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/onlyoffice-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8082]"
     ports:
       - "8082:80"
       - "4430:443"

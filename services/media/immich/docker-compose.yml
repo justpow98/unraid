@@ -33,6 +33,8 @@ services:
       - "kuma.immich.method=GET"
       - "kuma.immich.interval=60"
       - "kuma.immich.keyword=Immich"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8083]"
     networks:
       - internal_net
       - db_net
@@ -61,6 +63,7 @@ services:
       - "kuma.immichdb.tcp.host=immich-postgres"
       - "kuma.immichdb.tcp.port=5432"
       - "kuma.immichdb.interval=120"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     networks:
       - db_net
 
@@ -73,6 +76,13 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=immich-redis
+    labels:
+      - "kuma.immichredis.name=Immich Redis Cache"
+      - "kuma.immichredis.url=http://immich-redis:6379"
+      - "kuma.immichredis.method=GET"
+      - "kuma.immichredis.interval=60"
+      - "kuma.immichredis.keyword=PONG"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
     volumes:
       - ${CACHE_PATH}/immich/redis:/data
     networks:

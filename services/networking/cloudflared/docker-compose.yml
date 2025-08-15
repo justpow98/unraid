@@ -16,6 +16,14 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     volumes:
       - ${APPDATA_PATH}/cloudflared:/etc/cloudflared
+    labels:
+      - "kuma.cloudflared.name=Cloudflared Tunnel"
+      - "kuma.cloudflared.url=http://cloudflared:46495"
+      - "kuma.cloudflared.method=GET"
+      - "kuma.cloudflared.interval=60"
+      - "kuma.cloudflared.keyword=Cloudflared Tunnel"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/cloudflared-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:46495]"
     ports:
       - "46495:46495"
     networks:
