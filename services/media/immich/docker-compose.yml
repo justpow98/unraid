@@ -15,6 +15,7 @@ services:
       - HOST_CONTAINERNAME=immich
       - PUID=${PUID}
       - PGID=${PGID}
+      - UMASK=${UMASK}
       - DB_HOSTNAME=immich-postgres
       - DB_USERNAME=${IMMICH_DB_USER}
       - DB_PASSWORD=${IMMICH_DB_PASSWORD}
