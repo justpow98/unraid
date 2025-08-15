@@ -18,8 +18,10 @@ services:
       - OVERWRITEPROTOCOL=https
       - OVERWRITEHOST=nextcloud.azuleluna.xyz
     volumes:
-      - ${APPDATA_PATH}/nextcloud:/var/www/html
-      - /mnt/user/nextcloud_data:/var/www/html/data
+      - ${APPDATA_PATH}/nextcloud/html:/var/www/html
+      - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
+      - ${APPDATA_PATH}/nextcloud/config:/var/www/html/config
+      - ${APPDATA_PATH}/nextcloud/data:/var/www/html/data
     ports:
       - "8666:80"
     labels:
@@ -47,7 +49,7 @@ services:
       - POSTGRES_USER=${NEXTCLOUD_DB_USER}
       - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
     volumes:
-      - ${APPDATA_PATH}/nextcloud/postgres:/var/lib/postgresql/data
+      - ${CACHE_PATH}/postgresql17:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     labels:

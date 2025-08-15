@@ -21,9 +21,9 @@ services:
       - DB_DATABASE_NAME=${IMMICH_DB_NAME}
       - REDIS_HOSTNAME=immich-redis
     volumes:
-      - ${APPDATA_PATH}/immich:/config
-      - /mnt/user/photos:/photos
-      - /mnt/user/videos:/videos
+      - ${APPDATA_PATH}/immich/photos:/photos
+      - ${APPDATA_PATH}/immich/libraries:/libraries
+      - ${APPDATA_PATH}/immich/config:/config
     ports:
       - "8083:8080"
     labels:
@@ -52,7 +52,7 @@ services:
       - POSTGRES_USER=${IMMICH_DB_USER}
       - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
     volumes:
-      - ${APPDATA_PATH}/immich/postgres:/var/lib/postgresql/data
+      - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     labels:
@@ -73,7 +73,7 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=immich-redis
     volumes:
-      - ${APPDATA_PATH}/immich/redis:/data
+      - ${CACHE_PATH}/immich/redis:/data
     networks:
       - db_net
 
