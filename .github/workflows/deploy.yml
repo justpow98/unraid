@@ -6,79 +6,318 @@ on:
   pull_request:
     types: [ closed ]
     branches: [ main ]
+  workflow_dispatch:  # Manual trigger
 
 jobs:
   deploy:
-    if: github.event_name == 'push' || (github.event.pull_request.merged == true)
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true)
     runs-on: self-hosted
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit for comparison
         
-      - name: Deploy Updated Services
+      - name: Setup Environment
         run: |
-          echo "🔄 Working directory: $(pwd)"
-          echo "🔄 Available files:"
-          ls -la
+          echo "🔄 Setting up deployment environment..."
+          echo "Working directory: $(pwd)"
+          echo "Runner: ${{ runner.name }}"
+          echo "Event: ${{ github.event_name }}"
           
-          # .env file should be mounted directly to workspace root
-          if [ -f "/workspace/.env" ]; then
-            echo "✅ Found .env file at /workspace/.env"
-            cp /workspace/.env .
+          # Navigate to the docker-compose directory
+          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          if [ -d "$COMPOSE_PATH" ]; then
+            echo "✅ Found docker-compose directory at $COMPOSE_PATH"
+            cd "$COMPOSE_PATH"
+            echo "📁 Changed to: $(pwd)"
           else
-            echo "❌ .env file not found at /workspace/.env"
-            echo "📁 Contents of /workspace:"
+            echo "❌ Docker-compose directory not found at $COMPOSE_PATH"
+            exit 1
+          fi
+          
+          # Verify .env file access
+          if [ -f ".env" ]; then
+            echo "✅ Found .env file in docker-compose directory"
+          elif [ -f "/workspace/.env" ]; then
+            echo "✅ Found .env file at /workspace/.env, copying to compose directory"
+            cp /workspace/.env .env
+          else
+            echo "❌ .env file not found"
+            echo "📁 Checking alternate locations..."
             ls -la /workspace/ 2>/dev/null || echo "Cannot access /workspace"
             exit 1
           fi
           
-          echo "🔍 Checking for recently modified compose files..."
+          # Verify Docker access
+          docker --version
+          docker-compose --version
+          echo "📊 Current running containers:"
+          docker ps --format "table {{.Names}}\t{{.Status}}" | head -10
+
+      - name: Detect Changed Services
+        id: changes
+        run: |
+          echo "🔍 Detecting changed services..."
           
-          # Get list of changed files in the last commit
-          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
-          echo "📝 Changed files: $CHANGED_FILES"
+          # Ensure we're in the docker-compose directory
+          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          cd "$COMPOSE_PATH"
           
-          # Check if any compose files were modified
-          UPDATED_SERVICES=""
-          echo "$CHANGED_FILES" | grep "docker-compose.yml" | while read compose_file; do
-            if [ -f "$compose_file" ]; then
-              service_dir=$(dirname "$compose_file")
-              service_name=$(basename "$service_dir")
-              
-              echo "🚀 Deploying service: $service_name at $service_dir"
-              
-              # Use direct docker-compose commands with absolute path to .env
-              cd "$service_dir"
-              
-              # Use absolute path to the .env file we copied to repo root
-              ENV_FILE="$GITHUB_WORKSPACE/.env"
-              
-              echo "📦 Pulling images for $service_name..."
-              docker-compose --env-file "$ENV_FILE" pull || echo "⚠️ Pull failed"
-              
-              echo "🔄 Restarting $service_name..."
-              docker-compose --env-file "$ENV_FILE" down || echo "⚠️ Down failed"
-              docker-compose --env-file "$ENV_FILE" up -d || echo "❌ Up failed"
-              
-              echo "✅ $service_name deployment attempt complete"
-              cd - > /dev/null
-              
-              echo "---"
-            fi
-          done
+          # Initialize arrays
+          CHANGED_SERVICES=""
+          ALL_SERVICES=""
           
-          # If no compose files changed, check if this might be a manual deployment
-          if [ -z "$(echo "$CHANGED_FILES" | grep "docker-compose.yml")" ]; then
-            echo "ℹ️ No docker-compose.yml files were modified in this commit"
-            echo "🤔 This might be a documentation or configuration change"
+          # Find all docker-compose.yml files
+          echo "📁 Scanning for all services..."
+          find services -name "docker-compose.yml" -type f | while read compose_file; do
+            service_dir=$(dirname "$compose_file")
+            service_name=$(basename "$service_dir")
+            category=$(basename $(dirname "$service_dir"))
+            echo "Found: $category/$service_name ($compose_file)"
+          done > all_services.txt
+          
+          # Determine deployment scope
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "🚀 Manual deployment triggered - checking all services"
+            DEPLOYMENT_TYPE="manual"
+            # For manual deployments, we'll deploy services that have been recently modified
+            find services -name "docker-compose.yml" -mtime -7 | head -10 > changed_services.txt
+          else
+            echo "📝 Automatic deployment - checking git changes"
+            DEPLOYMENT_TYPE="automatic"
+            
+            # Check for changes in the repository (GitHub workspace)
+            cd "$GITHUB_WORKSPACE"
+            
+            # Get changed files between current and previous commit
+            git diff --name-only HEAD~1 HEAD > changed_files.txt || git diff --name-only HEAD > changed_files.txt
+            
+            echo "Changed files:"
+            cat changed_files.txt
+            
+            # Find services with changed compose files
+            grep "docker-compose.yml" changed_files.txt > /tmp/changed_services.txt || touch /tmp/changed_services.txt
+            
+            # Copy back to compose directory
+            cd "$COMPOSE_PATH"
+            cp /tmp/changed_services.txt changed_services.txt
           fi
           
-          echo "🎉 Deployment complete!"
+          # Set outputs
+          echo "deployment_type=$DEPLOYMENT_TYPE" >> $GITHUB_OUTPUT
           
-          # Clean up any orphaned containers
-          echo "🧹 Cleaning up orphaned containers..."
+          # Count services
+          TOTAL_SERVICES=$(wc -l < all_services.txt)
+          CHANGED_COUNT=$(wc -l < changed_services.txt)
+          
+          echo "📊 Service Summary:"
+          echo "  Total services: $TOTAL_SERVICES"
+          echo "  Changed services: $CHANGED_COUNT"
+          echo "  Deployment type: $DEPLOYMENT_TYPE"
+          
+          echo "total_services=$TOTAL_SERVICES" >> $GITHUB_OUTPUT
+          echo "changed_services=$CHANGED_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Deploy Infrastructure Services First
+        if: steps.changes.outputs.changed_services > 0 || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "🏗️ Deploying infrastructure services first..."
+          
+          # Ensure we're in the docker-compose directory
+          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          cd "$COMPOSE_PATH"
+          
+          # Priority order for infrastructure
+          INFRASTRUCTURE_SERVICES=(
+            "services/infrastructure/networks"
+            "services/infrastructure/redis"
+            "services/networking/nginx-proxy-manager"
+            "services/networking/cloudflared"
+            "services/security/authentik"
+            "services/monitoring/prometheus"
+            "services/monitoring/loki"
+          )
+          
+          for service_path in "${INFRASTRUCTURE_SERVICES[@]}"; do
+            if [ -f "$service_path/docker-compose.yml" ]; then
+              if [ "${{ steps.changes.outputs.deployment_type }}" = "manual" ] || grep -q "$service_path" changed_services.txt; then
+                echo "🔧 Deploying infrastructure: $(basename $service_path)"
+                "$GITHUB_WORKSPACE/scripts/deploy-service.sh" "$service_path" || echo "⚠️ Infrastructure deployment failed: $service_path"
+                sleep 5  # Allow time for service startup
+              fi
+            fi
+          done
+
+      - name: Deploy Application Services
+        if: steps.changes.outputs.changed_services > 0 || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "📦 Deploying application services..."
+          
+          # Ensure we're in the docker-compose directory
+          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          cd "$COMPOSE_PATH"
+          
+          # Process changed services or all recent services for manual deployment
+          DEPLOYED_COUNT=0
+          FAILED_COUNT=0
+          
+          if [ -s changed_services.txt ]; then
+            echo "🎯 Deploying specific changed services:"
+            cat changed_services.txt
+            
+            while IFS= read -r compose_file; do
+              if [ -f "$compose_file" ]; then
+                service_dir=$(dirname "$compose_file")
+                service_name=$(basename "$service_dir")
+                category=$(basename $(dirname "$service_dir"))
+                
+                # Skip infrastructure services (already deployed)
+                if [[ "$category" == "infrastructure" ]] || [[ "$category" == "networking" && "$service_name" =~ ^(nginx-proxy-manager|cloudflared)$ ]]; then
+                  echo "⏭️ Skipping infrastructure service: $category/$service_name"
+                  continue
+                fi
+                
+                echo "🚀 Deploying: $category/$service_name"
+                
+                if "$GITHUB_WORKSPACE/scripts/deploy-service.sh" "$service_dir"; then
+                  echo "✅ Successfully deployed: $category/$service_name"
+                  ((DEPLOYED_COUNT++))
+                else
+                  echo "❌ Failed to deploy: $category/$service_name"
+                  ((FAILED_COUNT++))
+                fi
+                
+                # Brief pause between deployments
+                sleep 2
+              fi
+            done < changed_services.txt
+          else
+            echo "ℹ️ No changed services found"
+          fi
+          
+          echo "📊 Deployment Summary:"
+          echo "  Successful: $DEPLOYED_COUNT"
+          echo "  Failed: $FAILED_COUNT"
+          echo "  Total attempted: $((DEPLOYED_COUNT + FAILED_COUNT))"
+
+      - name: Health Check Deployed Services
+        if: steps.changes.outputs.changed_services > 0 || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "🔍 Performing health checks on deployed services..."
+          
+          # Wait for services to start
+          sleep 10
+          
+          # Check running containers
+          echo "📊 Currently running containers:"
+          docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}" | head -20
+          
+          # Check for any failed containers
+          FAILED_CONTAINERS=$(docker ps -a --filter "status=exited" --filter "status=dead" --format "{{.Names}}" | head -10)
+          
+          if [ ! -z "$FAILED_CONTAINERS" ]; then
+            echo "⚠️ Found containers with issues:"
+            echo "$FAILED_CONTAINERS"
+            
+            # Show logs for failed containers
+            echo "$FAILED_CONTAINERS" | while read container; do
+              if [ ! -z "$container" ]; then
+                echo "📋 Logs for $container:"
+                docker logs --tail 20 "$container" 2>&1 || echo "Could not get logs for $container"
+                echo "---"
+              fi
+            done
+          else
+            echo "✅ All containers appear to be running correctly"
+          fi
+
+      - name: Cleanup and Optimization
+        run: |
+          echo "🧹 Performing cleanup and optimization..."
+          
+          # Remove orphaned containers
+          echo "🗑️ Removing orphaned containers..."
           docker container prune -f
           
-          # Show running containers for verification
-          echo "📊 Currently running containers:"
-          docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
+          # Remove unused images (be careful not to remove recently pulled images)
+          echo "🗑️ Removing unused images older than 24h..."
+          docker image prune -a -f --filter "until=24h"
+          
+          # Remove unused networks
+          echo "🗑️ Removing unused networks..."
+          docker network prune -f
+          
+          # Remove unused volumes (be very careful with this)
+          echo "🗑️ Removing unused volumes..."
+          docker volume prune -f
+          
+          # Show final status
+          echo "📊 Final system status:"
+          echo "🐳 Containers: $(docker ps -q | wc -l) running"
+          echo "🖼️ Images: $(docker images -q | wc -l) total"
+          echo "🌐 Networks: $(docker network ls -q | wc -l) total"
+          echo "💾 Volumes: $(docker volume ls -q | wc -l) total"
+          
+          # Show disk usage
+          echo "💽 Docker disk usage:"
+          docker system df
+
+      - name: Generate Deployment Report
+        if: always()
+        run: |
+          echo "📋 Generating deployment report..."
+          
+          TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S UTC')
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          
+          # Create deployment summary
+          cat > deployment_report.md << EOF
+          # Deployment Report - $TIMESTAMP
+          
+          ## 📊 Deployment Details
+          - **Trigger**: ${{ github.event_name }}
+          - **Branch**: ${{ github.ref_name }}
+          - **Commit**: \`${COMMIT_SHA:0:7}\`
+          - **Message**: $COMMIT_MSG
+          - **Runner**: ${{ runner.name }}
+          
+          ## 🔄 Services Summary
+          - **Total Services**: ${{ steps.changes.outputs.total_services }}
+          - **Changed Services**: ${{ steps.changes.outputs.changed_services }}
+          - **Deployment Type**: ${{ steps.changes.outputs.deployment_type }}
+          
+          ## 🐳 Container Status
+          \`\`\`
+          $(docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" | head -10)
+          \`\`\`
+          
+          ## 💾 System Resources
+          \`\`\`
+          $(docker system df)
+          \`\`\`
+          
+          ---
+          *Generated automatically by GitHub Actions*
+          EOF
+          
+          echo "📄 Deployment report generated:"
+          cat deployment_report.md
+
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "🚨 Deployment failed!"
+          echo "Please check the logs above for details."
+          echo "Consider running a manual deployment with workflow_dispatch."
+          
+          # Show recent container logs that might indicate issues
+          echo "📋 Recent logs from potentially problematic containers:"
+          docker ps --filter "status=exited" --format "{{.Names}}" | head -5 | while read container; do
+            if [ ! -z "$container" ]; then
+              echo "=== $container ==="
+              docker logs --tail 10 "$container" 2>&1 || echo "No logs available"
+            fi
+          done
