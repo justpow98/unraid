@@ -1,0 +1,7 @@
+# requirements.txt
+# Python dependencies for Docker Compose infrastructure automation
+
+# Core dependencies for update checker
+requests>=2.31.0
+pyyaml>=6.0
+python-dateutil>=2.8.2
