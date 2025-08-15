@@ -5,7 +5,7 @@ version: '3.8'
 
 services:
   home-assistant:
-    image: ghcr.io/home-assistant/home-assistant:2025.1.3
+    image: ghcr.io/home-assistant/home-assistant:2025.8
     container_name: Home-Assistant-Container
     restart: unless-stopped
     environment:
