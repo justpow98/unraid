@@ -17,6 +17,8 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.azuleluna.xyz
       - OVERWRITEPROTOCOL=https
       - OVERWRITEHOST=nextcloud.azuleluna.xyz
+      - PUID=${NEXTCLOUD_PUID}
+      - PGID=${NEXTCLOUD_PGID}
     volumes:
       - ${APPDATA_PATH}/nextcloud/html:/var/www/html
       - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
