@@ -19,12 +19,6 @@ services:
     ports:
       - "9442:8080"
     labels:
-      - "kuma.zigbee2mqtt.type=http"
-      - "kuma.zigbee2mqtt.url=http://zigbee2mqtt:8080"
-      - "kuma.zigbee2mqtt.name=Zigbee2MQTT"
-      - "kuma.zigbee2mqtt.interval=60"
-      - "kuma.zigbee2mqtt.keyword=Zigbee2MQTT"
-      - "kuma.zigbee2mqtt.tags=iot,zigbee"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/zigbee2mqtt-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:9442]"
