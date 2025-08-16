@@ -95,6 +95,9 @@ jobs:
         env:
           FORCE_CHECK: ${{ github.event.inputs.force_check || 'false' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
           echo "🔍 Starting comprehensive update check..."
           echo "Force check: $FORCE_CHECK"
