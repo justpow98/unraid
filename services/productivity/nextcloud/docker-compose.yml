@@ -1,68 +1,62 @@
 version: '3.8'
-
 services:
   nextcloud:
-    image: nextcloud:31.0.7
+    image: nextcloud:31.0.8
     container_name: Nextcloud
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Nextcloud
-      - POSTGRES_HOST=nextcloud-postgres
-      - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
-      - POSTGRES_USER=${NEXTCLOUD_DB_USER}
-      - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
-      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.azuleluna.xyz
-      - OVERWRITEPROTOCOL=https
-      - OVERWRITEHOST=nextcloud.azuleluna.xyz
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Nextcloud
+    - POSTGRES_HOST=nextcloud-postgres
+    - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
+    - POSTGRES_USER=${NEXTCLOUD_DB_USER}
+    - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+    - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.azuleluna.xyz
+    - OVERWRITEPROTOCOL=https
+    - OVERWRITEHOST=nextcloud.azuleluna.xyz
     volumes:
-      - ${APPDATA_PATH}/nextcloud/html:/var/www/html
-      - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
-      - ${APPDATA_PATH}/nextcloud/config:/var/www/html/config
-      - ${APPDATA_PATH}/nextcloud/data:/var/www/html/data
+    - ${APPDATA_PATH}/nextcloud/html:/var/www/html
+    - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
+    - ${APPDATA_PATH}/nextcloud/config:/var/www/html/config
+    - ${APPDATA_PATH}/nextcloud/data:/var/www/html/data
     ports:
-      - "8666:80"
+    - 8666:80
     labels:
-      - "kuma.nextcloud.type=http"
-      - "kuma.nextcloud.url=http://Nextcloud:80/status.php"
-      - "kuma.nextcloud.name=Nextcloud"
-      - "kuma.nextcloud.interval=60"
-      - "kuma.nextcloud.keyword=installed"
-      - "kuma.nextcloud.tags=productivity,cloud"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:8666]"
+    - kuma.nextcloud.type=http
+    - kuma.nextcloud.url=http://Nextcloud:80/status.php
+    - kuma.nextcloud.name=Nextcloud
+    - kuma.nextcloud.interval=60
+    - kuma.nextcloud.keyword=installed
+    - kuma.nextcloud.tags=productivity,cloud
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nextcloud-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:8666]
     networks:
-      - internal_net
-      - db_net
+    - internal_net
+    - db_net
     depends_on:
-      - nextcloud-postgres
-
+    - nextcloud-postgres
   nextcloud-postgres:
-    image: postgres:17.2
+    image: postgres:16.10
     container_name: Nextcloud-PostGres
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Nextcloud-PostGres
-      - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
-      - POSTGRES_USER=${NEXTCLOUD_DB_USER}
-      - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Nextcloud-PostGres
+    - POSTGRES_DB=${NEXTCLOUD_DB_NAME}
+    - POSTGRES_USER=${NEXTCLOUD_DB_USER}
+    - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
     volumes:
-      - ${CACHE_PATH}/postgresql17:/var/lib/postgresql/data
+    - ${CACHE_PATH}/postgresql17:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+    - 5432:5432
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
-
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     networks:
-      - db_net
-
+    - db_net
 networks:
   internal_net:
     external: true
