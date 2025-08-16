@@ -57,6 +57,7 @@ services:
     labels:
       - "kuma.nextclouddb.name=Nextcloud Database"
       - "kuma.nextclouddb.tcp.host=nextcloud-postgres"
+      - "kuma.nextclouddb.tcp.url=http://nextcloud-postgres:5432"
       - "kuma.nextclouddb.tcp.port=5432"
       - "kuma.nextclouddb.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"

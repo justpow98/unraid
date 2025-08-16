@@ -61,6 +61,7 @@ services:
     labels:
       - "kuma.immichdb.name=Immich Database"
       - "kuma.immichdb.tcp.host=immich-postgres"
+      - "kuma.immichdb.tcp.url=http://immich-postgres:5432"
       - "kuma.immichdb.tcp.port=5432"
       - "kuma.immichdb.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"

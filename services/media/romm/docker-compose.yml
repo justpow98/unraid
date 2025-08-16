@@ -53,6 +53,7 @@ services:
     labels:
       - "kuma.rommdb.name=ROMM Database"
       - "kuma.rommdb.tcp.host=romm-mariadb"
+      - "kuma.rommdb.tcp.url=http://romm-mariadb:3306"
       - "kuma.rommdb.tcp.port=3306"
       - "kuma.rommdb.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mariadb-icon.png"

@@ -55,6 +55,7 @@ services:
     labels:
       - "kuma.teslamatedb.name=TeslaMate Database"
       - "kuma.teslamatedb.tcp.host=teslamate-postgres"
+      - "kuma.teslamatedb.tcp.url=http://teslamate-postgres:5432"
       - "kuma.teslamatedb.tcp.port=5432"
       - "kuma.teslamatedb.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
