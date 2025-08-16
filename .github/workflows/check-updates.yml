@@ -135,6 +135,33 @@ jobs:
           # Clean up backups if successful
           find services -name "docker-compose.yml.backup" -delete
 
+      - name: Copy Changes Back to Repository
+        if: env.UPDATES_FOUND == 'true'
+        run: |
+          echo "📁 Copying updated files back to repository..."
+          
+          # Copy modified docker-compose files from workspace to repo
+          cd "/workspace"
+          find services -name "docker-compose.yml" -type f | while read file; do
+            if [ -f "$GITHUB_WORKSPACE/$file" ]; then
+              echo "Copying: $file"
+              cp "$file" "$GITHUB_WORKSPACE/$file"
+            fi
+          done
+          
+          # Switch to repository directory
+          cd "$GITHUB_WORKSPACE"
+          
+          # Verify changes in repository
+          echo "📊 Changes detected in repository:"
+          if git diff --quiet; then
+            echo "❌ No changes found after copying - this indicates an issue"
+            exit 1
+          else
+            echo "✅ Changes confirmed:"
+            git diff --name-only HEAD | grep "docker-compose.yml"
+          fi
+
       - name: Validate Updated Compose Files
         if: env.UPDATES_FOUND == 'true'
         run: |
@@ -191,6 +218,9 @@ jobs:
         if: env.UPDATES_FOUND == 'true'
         run: |
           echo "📋 Generating update summary..."
+          
+          # Ensure we're in the repository directory
+          cd "$GITHUB_WORKSPACE"
           
           # Create a simple summary file
           echo "## Container Updates Available" > update_summary.md
@@ -255,6 +285,8 @@ jobs:
             automated
             container-updates
             infrastructure
+          committer: GitHub <noreply@github.com>
+          author: justpow98 <justpow98@users.noreply.github.com>
 
       - name: Dry Run Summary
         if: github.event.inputs.dry_run == 'true'
@@ -285,7 +317,8 @@ jobs:
         run: |
           echo "🧹 Cleaning up after failure..."
           
-          # Restore any backup files
+          # Restore any backup files in workspace
+          cd "/workspace"
           find services -name "docker-compose.yml.backup" | while read backup; do
             original=${backup%.backup}
             if [ -f "$backup" ]; then
@@ -294,7 +327,8 @@ jobs:
             fi
           done
           
-          # Reset any uncommitted changes
+          # Reset any uncommitted changes in repository
+          cd "$GITHUB_WORKSPACE"
           git checkout -- . || true
           
           echo "❌ Update check failed. Repository state restored."
