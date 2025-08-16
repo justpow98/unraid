@@ -112,6 +112,9 @@ jobs:
           echo "💾 Creating backup of current docker-compose files..."
           find services -name "docker-compose.yml" -exec cp {} {}.backup \;
           
+          # Clear the GITHUB_ENV file to start fresh
+          echo "" > $GITHUB_ENV
+          
           # Run update checker
           echo "🚀 Running enhanced update checker..."
           if python "$GITHUB_WORKSPACE/scripts/check-updates.py"; then
@@ -184,33 +187,20 @@ jobs:
           
           echo "✅ All compose files validated successfully"
 
-      - name: Generate Update Summary
+      - name: Generate Simple Update Summary
         if: env.UPDATES_FOUND == 'true'
         run: |
-          echo "📋 Generating detailed update summary..."
+          echo "📋 Generating update summary..."
           
-          # Count updated services by category
-          echo "## Update Summary by Category" > update_summary.md
+          # Create a simple summary file
+          echo "## Container Updates Available" > update_summary.md
           echo "" >> update_summary.md
-          
-          find services -name "docker-compose.yml" -type f | while read compose_file; do
-            category=$(echo $compose_file | cut -d'/' -f2)
-            service=$(echo $compose_file | cut -d'/' -f3)
-            
-            # Check if this file was modified (has git changes)
-            if git diff --quiet HEAD -- "$compose_file"; then
-              : # No changes
-            else
-              echo "- **$category/$service**: Updated" >> update_summary.md
-            fi
-          done
-          
-          # Add file list
+          echo "Found updates for container services." >> update_summary.md
           echo "" >> update_summary.md
-          echo "## Modified Files" >> update_summary.md
+          echo "### Modified Files" >> update_summary.md
           git diff --name-only HEAD | grep "docker-compose.yml" | while read file; do
             echo "- \`$file\`" >> update_summary.md
-          done
+          done || echo "- No modified files found" >> update_summary.md
           
           # Show the summary
           echo "📄 Update Summary:"
@@ -225,16 +215,13 @@ jobs:
             📦 Weekly container updates - ${{ env.UPDATE_DATE }}
             
             Automated update check found new versions for multiple services.
-            
-            Updated categories:
-            ${{ env.UPDATE_SUMMARY }}
           title: '📦 Weekly Container Updates - ${{ env.UPDATE_DATE }}'
           body: |
             ## 🔄 Automated Container Updates
             
             This PR contains automated updates for container versions across the infrastructure.
             
-            ${{ env.UPDATE_SUMMARY }}
+            **Update Summary:** ${{ env.UPDATE_SUMMARY }}
             
             ### 🔍 Review Checklist
             - [ ] Review changelog links for breaking changes
@@ -249,14 +236,13 @@ jobs:
             4. **Rollback if needed** using previous compose file versions
             
             ### 📊 Update Statistics
-            - **Total Services Checked**: $(find services -name "docker-compose.yml" | wc -l)
-            - **Services Updated**: $(git diff --name-only HEAD | grep -c "docker-compose.yml" || echo "0")
             - **Update Date**: ${{ env.UPDATE_DATE }}
+            - **Services Updated**: Multiple services across various categories
             
             ### 🔗 Useful Links
             - [Deployment Logs](https://github.com/${{ github.repository }}/actions)
-            - [Service Dashboard](http://your-dashboard-url)  <!-- Update this -->
-            - [Monitoring](http://your-grafana-url)  <!-- Update this -->
+            - [Service Dashboard](http://your-dashboard-url)
+            - [Monitoring](http://your-grafana-url)
             
             ---
             

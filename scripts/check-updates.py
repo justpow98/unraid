@@ -158,32 +158,22 @@ def get_image_key(image_name: str) -> str:
         return parts[-1].split(':')[0]
     return clean_name.split(':')[0]
 
-def sanitize_github_actions_content(content: str) -> str:
-    """Sanitize content for safe use in GitHub Actions environment variables"""
+def sanitize_for_github_env(content: str) -> str:
+    """Sanitize content for GitHub Actions environment variables - much more aggressive"""
     if not content:
         return ""
     
     # Convert to string and handle encoding issues
     content = str(content)
     
-    # Replace problematic GitHub Actions patterns
-    # @ symbols can be interpreted as GitHub mentions
-    content = content.replace('@', '(at)')
+    # Remove/replace problematic characters for GitHub Actions
+    content = re.sub(r'[<>"`$\\]', '', content)  # Remove dangerous chars
+    content = re.sub(r'[\r\n\t]', ' ', content)  # Replace newlines/tabs with spaces
+    content = re.sub(r'\s+', ' ', content)       # Normalize whitespace
+    content = re.sub(r'[^\x20-\x7E]', '', content)  # Remove non-printable chars
     
-    # Square brackets can be interpreted as GitHub Actions expressions
-    content = content.replace('[', '(').replace(']', ')')
-    
-    # Escape special characters that could break environment variable parsing
-    content = content.replace('`', "'")  # Backticks can break shell parsing
-    content = content.replace('$', '\\$')  # Dollar signs for variable substitution
-    content = content.replace('"', '\\"')  # Escape quotes
-    
-    # Remove control characters and normalize whitespace
-    content = re.sub(r'\s+', ' ', content)  # Multiple whitespace to single space
-    content = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', content)  # Remove control chars
-    
-    # Limit length to prevent environment variable size issues
-    max_length = 500  # Reasonable limit for changelog entries
+    # Limit length to prevent issues
+    max_length = 200
     if len(content) > max_length:
         content = content[:max_length].rsplit(' ', 1)[0] + '...'
     
@@ -274,11 +264,7 @@ def get_dockerhub_latest_tag(registry_path: str, rate_limiter: RateLimitManager)
         
         if response.status_code == 429:
             print(f"Docker Hub rate limited for {registry_path}")
-            # Check for rate limit headers
-            if 'ratelimit-remaining' in response.headers:
-                remaining = response.headers.get('ratelimit-remaining', '0')
-                print(f"Rate limit remaining: {remaining}")
-            time.sleep(30)  # Wait 30 seconds
+            time.sleep(30)
             return None
         
         if response.status_code != 200:
@@ -344,9 +330,9 @@ def get_github_releases(repo_name: str, old_version: str, new_version: str, rate
                 
                 if tag == new_clean or (old_clean < tag <= new_clean):
                     # Sanitize all text content for GitHub Actions safety
-                    version = sanitize_github_actions_content(release.get('tag_name', ''))
-                    name = sanitize_github_actions_content(release.get('name', ''))
-                    body = sanitize_github_actions_content(release.get('body', ''))
+                    version = sanitize_for_github_env(release.get('tag_name', ''))
+                    name = sanitize_for_github_env(release.get('name', ''))
+                    body = sanitize_for_github_env(release.get('body', ''))
                     url = release.get('html_url', '')  # URLs are generally safe
                     published = release.get('published_at', '')[:10]  # Just the date part
                     
@@ -449,16 +435,16 @@ def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitMan
     return updates, modified
 
 def safe_write_github_env(env_file: str, updates: List[Dict]) -> None:
-    """Safely write environment variables for GitHub Actions using heredoc syntax"""
+    """Write environment variables for GitHub Actions using simple format"""
     try:
         with open(env_file, 'a') as f:
             f.write("UPDATES_FOUND=true\n")
             f.write(f"UPDATE_DATE={datetime.now().strftime('%Y-%m-%d')}\n")
             
-            # Use heredoc syntax for complex content
-            f.write("UPDATE_SUMMARY<<EOF\n")
+            # Create a simple, safe summary
+            summary_lines = []
             
-            # Generate safe summary
+            # Group by category
             by_category = {}
             for update in updates:
                 category = update['file'].split('/')[1]
@@ -466,63 +452,26 @@ def safe_write_github_env(env_file: str, updates: List[Dict]) -> None:
                     by_category[category] = []
                 by_category[category].append(update)
             
-            # Basic summary
-            f.write(f"## 📋 Updated Services\\n\\n")
-            f.write(f"**Total Updates**: {len(updates)} services across {len(by_category)} categories\\n\\n")
+            # Build summary
+            summary_lines.append(f"Found {len(updates)} container updates across {len(by_category)} categories")
+            summary_lines.append("")
             
-            # Category overview
-            f.write("### 📊 Updates by Category\\n\\n")
             for category, cat_updates in sorted(by_category.items()):
-                f.write(f"- **{category.title()}**: {len(cat_updates)} update(s)\\n")
-            f.write("\\n")
-            
-            # Detailed updates by category
-            for category, cat_updates in sorted(by_category.items()):
-                f.write(f"### 📁 {category.title()} Services\\n\\n")
-                
+                summary_lines.append(f"{category.upper()}:")
                 for update in cat_updates:
-                    service_name = sanitize_github_actions_content(update['service'])
-                    old_version = sanitize_github_actions_content(update['old_version'])
-                    new_version = sanitize_github_actions_content(update['new_version'])
-                    image_name = sanitize_github_actions_content(update['image'])
-                    
-                    f.write(f"#### 🔄 {service_name} ({old_version} → {new_version})\\n")
-                    f.write(f"**Image**: `{image_name}`\\n")
-                    
-                    if update['repo']:
-                        repo_name = sanitize_github_actions_content(update['repo'])
-                        f.write(f"**Repository**: [GitHub]({update['repo'].replace('@', '%40')})\\n")
-                    
-                    # Add changelog if available and safe
-                    if update['changelog']:
-                        f.write("\\n**Recent Changes**:\\n")
-                        for change in update['changelog']:
-                            try:
-                                version = change.get('version', 'Unknown')
-                                published = change.get('published', 'Unknown')
-                                name = change.get('name', 'Release')
-                                
-                                f.write(f"- **{version}** ({published}): {name}\\n")
-                                
-                                if change.get('body'):
-                                    f.write(f"  {change['body']}\\n")
-                                
-                                if change.get('url'):
-                                    f.write(f"  [View Release]({change['url']})\\n")
-                            except Exception as e:
-                                print(f"Warning: Skipping changelog entry: {e}")
-                                continue
-                    else:
-                        f.write("\\n**Changelog**: Check repository releases manually\\n")
-                    f.write("\\n")
-                
-                f.write("---\\n\\n")
+                    service_name = sanitize_for_github_env(update['service'])
+                    old_version = sanitize_for_github_env(update['old_version'])
+                    new_version = sanitize_for_github_env(update['new_version'])
+                    summary_lines.append(f"  - {service_name}: {old_version} -> {new_version}")
+                summary_lines.append("")
             
-            f.write("EOF\n")
+            # Write as a simple string (no heredoc)
+            summary_content = " | ".join(summary_lines).replace('\n', ' ')
+            f.write(f"UPDATE_SUMMARY={summary_content}\n")
             
     except Exception as e:
         print(f"Error writing GitHub environment variables: {e}")
-        # Fallback to simple format
+        # Fallback to absolute minimum
         with open(env_file, 'a') as f:
             f.write("UPDATES_FOUND=true\n")
             f.write(f"UPDATE_DATE={datetime.now().strftime('%Y-%m-%d')}\n")
