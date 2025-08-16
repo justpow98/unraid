@@ -39,6 +39,7 @@ services:
     labels:
       - "kuma.github_runner.type=docker"
       - "kuma.github_runner.docker_container=Docker-Compose-Runner"
+      - "kuma.github_runner.docker_host=unix:///var/run/docker.sock"  # Add this line
       - "kuma.github_runner.name=GitHub Actions Runner"
       - "kuma.github_runner.interval=60"
       - "kuma.github_runner.tags=automation,ci-cd"

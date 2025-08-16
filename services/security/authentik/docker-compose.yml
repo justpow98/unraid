@@ -21,15 +21,6 @@ services:
     volumes:
       - ${APPDATA_PATH}/authentik/sql:/var/lib/postgresql/data
     labels:
-      - "kuma.authentik_db.type=postgres"
-      - "kuma.authentik_db.hostname=postgresql-authentik"
-      - "kuma.authentik_db.port=5432"
-      - "kuma.authentik_db.database=${AUTHENTIK_DB_NAME}"
-      - "kuma.authentik_db.username=${AUTHENTIK_DB_USER}"
-      - "kuma.authentik_db.password=${AUTHENTIK_DB_PASSWORD}"
-      - "kuma.authentik_db.name=Authentik Database"
-      - "kuma.authentik_db.interval=120"
-      - "kuma.authentik_db.tags=security,database"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
 
@@ -62,13 +53,6 @@ services:
     ports:
       - "6380:6379"
     labels:
-      - "kuma.authentik_redis.type=redis"
-      - "kuma.authentik_redis.hostname=redis-authentik"
-      - "kuma.authentik_redis.port=6379"
-      - "kuma.authentik_redis.password=${REDIS_AUTHENTIK_PASSWORD}"
-      - "kuma.authentik_redis.name=Authentik Redis"
-      - "kuma.authentik_redis.interval=60"
-      - "kuma.authentik_redis.tags=security,cache"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
 
@@ -195,6 +179,7 @@ services:
     labels:
       - "kuma.authentik_worker.type=docker"
       - "kuma.authentik_worker.docker_container=authentik-worker"
+      - "kuma.authentik_worker.docker_host=unix:///var/run/docker.sock"  # Add this line
       - "kuma.authentik_worker.name=Authentik Worker"
       - "kuma.authentik_worker.interval=60"
       - "kuma.authentik_worker.tags=security,worker"

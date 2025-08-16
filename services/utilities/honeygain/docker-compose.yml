@@ -16,6 +16,7 @@ services:
     labels:
       - "kuma.honeygain.type=docker"
       - "kuma.honeygain.docker_container=honeygain"
+      - "kuma.honeygain.docker_host=unix:///var/run/docker.sock"  # Add this line
       - "kuma.honeygain.name=Honeygain"
       - "kuma.honeygain.interval=60"
       - "kuma.honeygain.tags=utilities,passive-income"

@@ -43,6 +43,7 @@ services:
     labels:
       - "kuma.autokuma.type=docker"
       - "kuma.autokuma.docker_container=AutoKuma"
+      - "kuma.autokuma.docker_host=unix:///var/run/docker.sock"  # Add this line
       - "kuma.autokuma.name=AutoKuma Agent"
       - "kuma.autokuma.interval=60"
       - "kuma.autokuma.tags=monitoring,automation"

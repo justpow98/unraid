@@ -53,15 +53,6 @@ services:
       - MYSQL_USER=${ROMM_DB_USER}
       - MYSQL_PASSWORD=${ROMM_DB_PASSWORD}
     labels:
-      - "kuma.romm_db.type=mysql"
-      - "kuma.romm_db.hostname=romm-MariaDB-Official"
-      - "kuma.romm_db.port=3306"
-      - "kuma.romm_db.database=${ROMM_DB_NAME}"
-      - "kuma.romm_db.username=${ROMM_DB_USER}"
-      - "kuma.romm_db.password=${ROMM_DB_PASSWORD}"
-      - "kuma.romm_db.name=ROMM Database"
-      - "kuma.romm_db.interval=120"
-      - "kuma.romm_db.tags=media,database"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mariadb-icon.png"
     volumes:

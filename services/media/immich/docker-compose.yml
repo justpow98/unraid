@@ -61,15 +61,6 @@ services:
     ports:
       - "5433:5432"
     labels:
-      - "kuma.immich_db.type=postgres"
-      - "kuma.immich_db.hostname=Immich_PostgreSQL"
-      - "kuma.immich_db.port=5432"
-      - "kuma.immich_db.database=${IMMICH_DB_NAME}"
-      - "kuma.immich_db.username=${IMMICH_DB_USER}"
-      - "kuma.immich_db.password=${IMMICH_DB_PASSWORD}"
-      - "kuma.immich_db.name=Immich Database"
-      - "kuma.immich_db.interval=120"
-      - "kuma.immich_db.tags=media,database"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     networks:
@@ -85,12 +76,6 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=immich-redis
     labels:
-      - "kuma.immich_redis.type=redis"
-      - "kuma.immich_redis.hostname=immich-redis"
-      - "kuma.immich_redis.port=6379"
-      - "kuma.immich_redis.name=Immich Redis Cache"
-      - "kuma.immich_redis.interval=60"
-      - "kuma.immich_redis.tags=media,cache"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
     volumes:

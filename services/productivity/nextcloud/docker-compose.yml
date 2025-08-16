@@ -57,15 +57,6 @@ services:
     ports:
       - "5432:5432"
     labels:
-      - "kuma.nextcloud_db.type=postgres"
-      - "kuma.nextcloud_db.hostname=Nextcloud-PostGres"
-      - "kuma.nextcloud_db.port=5432"
-      - "kuma.nextcloud_db.database=${NEXTCLOUD_DB_NAME}"
-      - "kuma.nextcloud_db.username=${NEXTCLOUD_DB_USER}"
-      - "kuma.nextcloud_db.password=${NEXTCLOUD_DB_PASSWORD}"
-      - "kuma.nextcloud_db.name=Nextcloud Database"
-      - "kuma.nextcloud_db.interval=120"
-      - "kuma.nextcloud_db.tags=productivity,database"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
 

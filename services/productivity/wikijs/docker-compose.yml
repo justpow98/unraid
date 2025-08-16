@@ -54,15 +54,6 @@ services:
     volumes:
       - ${APPDATA_PATH}/wikijs/postgres:/var/lib/postgresql/data
     labels:
-      - "kuma.wikijs_db.type=postgres"
-      - "kuma.wikijs_db.hostname=wikijs-postgresql"
-      - "kuma.wikijs_db.port=5432"
-      - "kuma.wikijs_db.database=${WIKIJS_DB_NAME}"
-      - "kuma.wikijs_db.username=${WIKIJS_DB_USER}"
-      - "kuma.wikijs_db.password=${WIKIJS_DB_PASSWORD}"
-      - "kuma.wikijs_db.name=Wiki.js Database"
-      - "kuma.wikijs_db.interval=120"
-      - "kuma.wikijs_db.tags=productivity,database"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
 

@@ -54,15 +54,6 @@ services:
     volumes:
       - ${TESLAMATE_PATH}/postgres:/var/lib/postgresql/data
     labels:
-      - "kuma.teslamate_db.type=postgres"
-      - "kuma.teslamate_db.hostname=teslamate-postgres"
-      - "kuma.teslamate_db.port=5432"
-      - "kuma.teslamate_db.database=${TESLAMATE_DB_NAME}"
-      - "kuma.teslamate_db.username=${TESLAMATE_DB_USER}"
-      - "kuma.teslamate_db.password=${TESLAMATE_DB_PASSWORD}"
-      - "kuma.teslamate_db.name=TeslaMate Database"
-      - "kuma.teslamate_db.interval=120"
-      - "kuma.teslamate_db.tags=automotive,database"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     ports:
