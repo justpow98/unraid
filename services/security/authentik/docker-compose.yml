@@ -22,6 +22,7 @@ services:
       - ${APPDATA_PATH}/authentik/sql:/var/lib/postgresql/data
     labels:
       - "kuma.authentikdb.name=Authentik Database"
+      - "kuma.authentikdb.url=http://authentik-postgres:5432"
       - "kuma.authentikdb.tcp.host=authentik-postgres"
       - "kuma.authentikdb.tcp.port=5432"
       - "kuma.authentikdb.interval=120"
@@ -57,6 +58,7 @@ services:
     labels:
       - "kuma.authentikredis.name=Authentik Redis"
       - "kuma.authentikredis.tcp.host=redis-authentik"
+      - "kuma.authentikredis.tcp.url=http://authentik-redis:6379"
       - "kuma.authentikredis.tcp.port=6379"
       - "kuma.authentikredis.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
