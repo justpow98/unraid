@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   onlyoffice:
-    image: onlyoffice/documentserver:9.0
+    image: onlyoffice/documentserver:8.2.2
     container_name: OnlyOfficeDocumentServer
     restart: unless-stopped
     environment:
