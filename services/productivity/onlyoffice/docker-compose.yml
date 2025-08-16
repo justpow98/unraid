@@ -5,7 +5,7 @@ version: '3.8'
 
 services:
   onlyoffice:
-    image: onlyoffice/documentserver:8.2.0
+    image: onlyoffice/documentserver:9.0
     container_name: OnlyOfficeDocumentServer
     restart: unless-stopped
     environment:
@@ -39,3 +39,42 @@ services:
     networks:
       - internal_net
       - db_net
+    depends_on:
+      - onlyoffice-postgres
+
+  onlyoffice-postgres:
+    image: postgres:17.2
+    container_name: onlyoffice-postgres
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=onlyoffice-postgres
+      - POSTGRES_DB=${ONLYOFFICE_DB_NAME}
+      - POSTGRES_USER=${ONLYOFFICE_DB_USER}
+      - POSTGRES_PASSWORD=${ONLYOFFICE_DB_PASSWORD}
+    volumes:
+      - ${APPDATA_PATH}/onlyoffice/postgres:/var/lib/postgresql/data
+    ports:
+      - "5437:5432"
+    labels:
+      - "kuma.onlyofficedb.name=OnlyOffice Database"
+      - "kuma.onlyofficedb.tcp.host=onlyoffice-postgres"
+      - "kuma.onlyofficedb.tcp.port=5432"
+      - "kuma.onlyofficedb.interval=120"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
+    networks:
+      - db_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ONLYOFFICE_DB_USER} -d ${ONLYOFFICE_DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  internal_net:
+    external: true
+  db_net:
+    external: true
