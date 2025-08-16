@@ -2,19 +2,26 @@ version: '3.8'
 
 services:
   github-runner:
-    image: myoung34/github-runner:latest
+    image: myoung34/github-runner:2.328.0
     container_name: Docker-Compose-Runner
     restart: unless-stopped
     environment:
+      # Repository configuration
       - REPO_URL=https://github.com/justpow98/unraid
       - RUNNER_TOKEN=${GITHUB_RUNNER_TOKEN}
       - RUNNER_NAME=unraid-docker-compose-runner
       - RUNNER_LABELS=unraid,docker-compose,automation
       - RUNNER_WORKDIR=/workspace
       - RUNNER_SCOPE=repo
+      
+      # CRITICAL: This enables reusage by configuring persistent files
+      - CONFIGURED_ACTIONS_RUNNER_FILES_DIR=/actions-runner-files
+      
+      # Optional: These may help but aren't required according to docs
       - DISABLE_AUTOMATIC_DEREGISTRATION=true
-      - EPHEMERAL=false  # Enable runner reusage
-      - RUNNER_REPLACE_EXISTING=true  # Replace if exists
+      - RUNNER_REPLACE_EXISTING=true
+      
+      # System configuration
       - TZ=America/New_York
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
@@ -23,13 +30,11 @@ services:
       # Docker socket for container management
       - /var/run/docker.sock:/var/run/docker.sock:rw
       
-      # Persistent runner data (corrected path)
-      - ${APPDATA_PATH}/github_runner_compose:/runner:rw
+      # CRITICAL: Actions runner files for persistence (this enables reusage)
+      - ${APPDATA_PATH}/github_runner_compose:/actions-runner-files:rw
       
-      # Docker-compose workspace (includes .env automatically)
+      # Docker-compose workspace (your work directory)
       - /mnt/user/appdata/docker-compose:/workspace:rw
-      
-      # Remove redundant .env mount - it's already included above
     networks:
       - monitoring_net
     labels:
