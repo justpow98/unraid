@@ -21,7 +21,7 @@ services:
       - HOST_CONTAINERNAME=Docker-Compose-Runner
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
-      - ${APPDATA_PATH}/github_runner_compose:/runner/persistent_files:rw
+      - ${APPDATA_PATH}/github_runner_compose:/runner/data:rw
       - /mnt/user/appdata/docker-compose:/workspace:rw
       - /mnt/user/appdata/docker-compose/.env:/workspace/.env:ro
     networks:
