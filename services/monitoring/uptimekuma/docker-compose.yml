@@ -18,12 +18,6 @@ services:
     ports:
       - "3002:3001"
     labels:
-      - "kuma.uptimekuma.type=http"
-      - "kuma.uptimekuma.url=http://UptimeKuma:3001"
-      - "kuma.uptimekuma.name=Uptime Kuma"
-      - "kuma.uptimekuma.interval=60"
-      - "kuma.uptimekuma.keyword=Uptime Kuma"
-      - "kuma.uptimekuma.tags=monitoring,uptime"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:3002]"
@@ -41,12 +35,6 @@ services:
       - HOST_CONTAINERNAME=AutoKuma
       - AUTOKUMA_UPTIME_KUMA_URL=http://UptimeKuma:3001
     labels:
-      - "kuma.autokuma.type=docker"
-      - "kuma.autokuma.docker_container=AutoKuma"
-      - "kuma.autokuma.docker_host=unix:///var/run/docker.sock"  # Add this line
-      - "kuma.autokuma.name=AutoKuma Agent"
-      - "kuma.autokuma.interval=60"
-      - "kuma.autokuma.tags=monitoring,automation"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png"
     volumes:
