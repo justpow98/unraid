@@ -32,7 +32,6 @@ REPO_MAPPINGS = {
     'nextcloud': 'nextcloud/server',
     'actualbudget/actual-server': 'actualbudget/actual-server',
     'requarks/wiki': 'requarks/wiki',
-    'onlyoffice/documentserver': 'ONLYOFFICE/DocumentServer',
     
     # Monitoring
     'grafana/grafana': 'grafana/grafana',
