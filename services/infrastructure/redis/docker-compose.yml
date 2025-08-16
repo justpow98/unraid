@@ -29,12 +29,13 @@ services:
     # Redis configuration for persistence
     command: redis-server --appendonly yes --auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size 64mb
     labels:
-      - "kuma.monitoring.group.name=Infrastructure"
-      - "kuma.uptime_kuma.name=Redis Cache"
-      - "kuma.uptime_kuma.url=http://redis:6379"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=PONG"
+      - "kuma.redis.type=redis"
+      - "kuma.redis.hostname=Redis"
+      - "kuma.redis.port=6379"
+      - "kuma.redis.name=Redis Cache"
+      - "kuma.redis.interval=60"
+      - "kuma.redis.tags=infrastructure,cache"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
 
 volumes:

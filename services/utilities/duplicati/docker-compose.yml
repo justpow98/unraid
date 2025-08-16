@@ -21,12 +21,13 @@ services:
       - /mnt/user:/source:ro
       - /mnt/user/backups:/backups
     labels:
-      - "kuma.monitoring.group.name=Utilities"
-      - "kuma.uptime_kuma.name=Duplicati Backup"
-      - "kuma.uptime_kuma.url=http://duplicati:8200"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Duplicati"
+      - "kuma.duplicati.type=http"
+      - "kuma.duplicati.url=http://duplicati:8200"
+      - "kuma.duplicati.name=Duplicati Backup"
+      - "kuma.duplicati.interval=60"
+      - "kuma.duplicati.keyword=Duplicati"
+      - "kuma.duplicati.tags=utilities,backup"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/duplicati-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:8200]"
     ports:

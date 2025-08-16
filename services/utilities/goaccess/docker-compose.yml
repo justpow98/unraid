@@ -10,14 +10,16 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
     labels:
-      - "kuma.monitoring.group.name=Utilities"
-      - "kuma.uptime_kuma.name=GoAccess for NPM Logs"
-      - "kuma.uptime_kuma.url=http://goaccess:7880"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=GoAccess"
+      - "kuma.goaccess.type=http"
+      - "kuma.goaccess.url=http://GoAccess-NPMLogs:7880"
+      - "kuma.goaccess.name=GoAccess Analytics"
+      - "kuma.goaccess.interval=60"
+      - "kuma.goaccess.keyword=GoAccess"
+      - "kuma.goaccess.tags=utilities,analytics"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/goaccess-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:7880]"
+
     volumes:
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data/logs:/opt/log:ro  # Read-only access to NPM logs
     ports:

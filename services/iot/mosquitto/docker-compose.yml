@@ -21,13 +21,13 @@ services:
       - "1883:1883"
       - "9001:9001"
     labels:
-      - "kuma.monitoring.group.name=IoT"
-      - "kuma.uptime_kuma.name=MQTT Broker"
-      - "kuma.uptime_kuma.url=http://mosquitto:1883"
-      - "kuma.uptime_kuma.tcp.host=mosquitto"
-      - "kuma.uptime_kuma.tcp.port=1883"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=MQTT Broker"
+      - "kuma.mosquitto.type=mqtt"
+      - "kuma.mosquitto.hostname=mosquitto"
+      - "kuma.mosquitto.port=1883"
+      - "kuma.mosquitto.name=MQTT Broker"
+      - "kuma.mosquitto.interval=60"
+      - "kuma.mosquitto.tags=iot,messaging"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mosquitto-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:9001]"
     networks:

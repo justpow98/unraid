@@ -19,12 +19,13 @@ services:
     ports:
       - "8123:8123"
     labels:
-      - "kuma.monitoring.group.name=IoT"
-      - "kuma.uptime_kuma.name=Home Assistant"
-      - "kuma.uptime_kuma.url=http://home-assistant:8123"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Home Assistant"
+      - "kuma.homeassistant.type=http"
+      - "kuma.homeassistant.url=http://Home-Assistant-Container:8123"
+      - "kuma.homeassistant.name=Home Assistant"
+      - "kuma.homeassistant.interval=60"
+      - "kuma.homeassistant.keyword=Home Assistant"
+      - "kuma.homeassistant.tags=iot,smart-home"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:8123]"
     networks:
@@ -44,14 +45,13 @@ services:
       - ${HOME_ASSISTANT_PATH}/python-matter-server:/data
     network_mode: host
     labels:
-      - "kuma.monitoring.group.name=IoT"
-      - "kuma.uptime_kuma.name=Matter Server"
-      - "kuma.uptime_kuma.url=http://matter-server:5540"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Matter Server"
+      - "kuma.matter_server.type=http"
+      - "kuma.matter_server.url=http://matter-server:5540"
+      - "kuma.matter_server.name=Matter Server"
+      - "kuma.matter_server.interval=60"
+      - "kuma.matter_server.tags=iot,matter"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png"
-
 networks:
   iot_net:
     external: true

@@ -21,13 +21,18 @@ services:
     volumes:
       - ${APPDATA_PATH}/authentik/sql:/var/lib/postgresql/data
     labels:
-      - "kuma.monitoring.group.name=Security"
-      - "kuma.uptime_kuma.name=Authentik Database"
-      - "kuma.uptime_kuma.url=http://authentik-postgres:5432"
-      - "kuma.uptime_kuma.tcp.host=authentik-postgres"
-      - "kuma.uptime_kuma.tcp.port=5432"
-      - "kuma.uptime_kuma.interval=120"
+      - "kuma.authentik_db.type=postgres"
+      - "kuma.authentik_db.hostname=postgresql-authentik"
+      - "kuma.authentik_db.port=5432"
+      - "kuma.authentik_db.database=${AUTHENTIK_DB_NAME}"
+      - "kuma.authentik_db.username=${AUTHENTIK_DB_USER}"
+      - "kuma.authentik_db.password=${AUTHENTIK_DB_PASSWORD}"
+      - "kuma.authentik_db.name=Authentik Database"
+      - "kuma.authentik_db.interval=120"
+      - "kuma.authentik_db.tags=security,database"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
+
     ports:
       - "5434:5432"
     networks:
@@ -57,13 +62,16 @@ services:
     ports:
       - "6380:6379"
     labels:
-      - "kuma.monitoring.group.name=Security"
-      - "kuma.uptime_kuma.name=Authentik Redis"
-      - "kuma.uptime_kuma.tcp.host=redis-authentik"
-      - "kuma.uptime_kuma.tcp.url=http://authentik-redis:6379"
-      - "kuma.uptime_kuma.tcp.port=6379"
-      - "kuma.uptime_kuma.interval=120"
+      - "kuma.authentik_redis.type=redis"
+      - "kuma.authentik_redis.hostname=redis-authentik"
+      - "kuma.authentik_redis.port=6379"
+      - "kuma.authentik_redis.password=${REDIS_AUTHENTIK_PASSWORD}"
+      - "kuma.authentik_redis.name=Authentik Redis"
+      - "kuma.authentik_redis.interval=60"
+      - "kuma.authentik_redis.tags=security,cache"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
+
     networks:
       - db_net
     healthcheck:
@@ -118,12 +126,13 @@ services:
       - "9000:9000"
       - "9443:9443"
     labels:
-      - "kuma.monitoring.group.name=Security"
-      - "kuma.uptime_kuma.name=Authentik"
-      - "kuma.uptime_kuma.url=http://authentik:9000"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=authentik"
+      - "kuma.authentik.type=http"
+      - "kuma.authentik.url=http://authentik:9000/-/health/live/"
+      - "kuma.authentik.name=Authentik Server"
+      - "kuma.authentik.interval=60"
+      - "kuma.authentik.keyword=ok"
+      - "kuma.authentik.tags=security,auth"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/authentik-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:9000]"
     networks:
@@ -183,6 +192,12 @@ services:
       - ${APPDATA_PATH}/authentik/templates:/templates
       - ${APPDATA_PATH}/authentik/certs:/certs
       - ${APPDATA_PATH}/authentik/backups:/backups
+    labels:
+      - "kuma.authentik_worker.type=docker"
+      - "kuma.authentik_worker.docker_container=authentik-worker"
+      - "kuma.authentik_worker.name=Authentik Worker"
+      - "kuma.authentik_worker.interval=60"
+      - "kuma.authentik_worker.tags=security,worker"
     networks:
       - db_net
       - internal_net

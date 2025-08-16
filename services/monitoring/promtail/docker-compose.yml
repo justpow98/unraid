@@ -26,12 +26,13 @@ services:
       - monitoring_net
     user: "${PUID}:${PGID}"
     labels:
-      - "kuma.monitoring.group.name=Monitoring"
-      - "kuma.uptime_kuma.name=Grafana Promtail"
-      - "kuma.uptime_kuma.url=http://promtail:9080/ready"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=ready"
+      - "kuma.promtail.type=http"
+      - "kuma.promtail.url=http://GrafanaPromtail:9080/ready"
+      - "kuma.promtail.name=Grafana Promtail"
+      - "kuma.promtail.interval=60"
+      - "kuma.promtail.keyword=ready"
+      - "kuma.promtail.tags=monitoring,logs"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/promtail-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:9080]"
 

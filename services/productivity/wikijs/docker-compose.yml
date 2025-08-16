@@ -22,12 +22,13 @@ services:
     volumes:
       - ${APPDATA_PATH}/wikijs:/wiki/data
     labels:
-      - "kuma.monitoring.group.name=Productivity"
-      - "kuma.uptime_kuma.name=Wiki.js"
-      - "kuma.uptime_kuma.url=http://wikijs:3000"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Wiki.js"
+      - "kuma.wikijs.type=http"
+      - "kuma.wikijs.url=http://wikijs:3000"
+      - "kuma.wikijs.name=Wiki.js"
+      - "kuma.wikijs.interval=60"
+      - "kuma.wikijs.keyword=Wiki.js"
+      - "kuma.wikijs.tags=productivity,wiki"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:3000]"
     ports:
@@ -53,13 +54,18 @@ services:
     volumes:
       - ${APPDATA_PATH}/wikijs/postgres:/var/lib/postgresql/data
     labels:
-      - "kuma.monitoring.group.name=Productivity"
-      - "kuma.uptime_kuma.name=Wiki.js Database"
-      - "kuma.uptime_kuma.tcp.host=wikijs-postgres"
-      - "kuma.uptime_kuma.tcp.url=http://wikijs-postgres:5432"
-      - "kuma.uptime_kuma.tcp.port=5432"
-      - "kuma.uptime_kuma.interval=120"
+      - "kuma.wikijs_db.type=postgres"
+      - "kuma.wikijs_db.hostname=wikijs-postgresql"
+      - "kuma.wikijs_db.port=5432"
+      - "kuma.wikijs_db.database=${WIKIJS_DB_NAME}"
+      - "kuma.wikijs_db.username=${WIKIJS_DB_USER}"
+      - "kuma.wikijs_db.password=${WIKIJS_DB_PASSWORD}"
+      - "kuma.wikijs_db.name=Wiki.js Database"
+      - "kuma.wikijs_db.interval=120"
+      - "kuma.wikijs_db.tags=productivity,database"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
+
     ports:
       - "5435:5432"
     networks:

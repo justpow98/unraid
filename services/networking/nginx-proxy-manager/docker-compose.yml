@@ -30,14 +30,15 @@ services:
       - LOGROTATE=${LOGROTATE:-false}
       - GOACCESS=${GOACCESS:-false}
     labels:
-      - "kuma.monitoring.group.name=Networking"
-      - "kuma.uptime_kuma.name=Nginx Proxy Manager"
-      - "kuma.uptime_kuma.url=http://nginx-proxy-manager:3000"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Nginx Proxy Manager"
+      - "kuma.nginx_proxy.type=http"
+      - "kuma.nginx_proxy.url=http://NPMplus-Official:81/api/health"
+      - "kuma.nginx_proxy.name=Nginx Proxy Manager"
+      - "kuma.nginx_proxy.interval=60"
+      - "kuma.nginx_proxy.accepted_statuscodes=200,401"
+      - "kuma.nginx_proxy.tags=networking,proxy"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nginx-proxy-manager-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:3000]"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8091]"
     volumes:
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data:/data  # SAME: Keep existing data path
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/letsencrypt:/etc/letsencrypt  # SAME: Keep existing SSL path

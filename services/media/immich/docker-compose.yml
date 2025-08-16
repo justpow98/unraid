@@ -28,12 +28,13 @@ services:
     ports:
       - "8083:8080"
     labels:
-      - "kuma.monitoring.group.name=Media"
-      - "kuma.uptime_kuma.name=Immich"
-      - "kuma.uptime_kuma.url=http://immich:8080"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Immich"
+      - "kuma.immich.type=http"
+      - "kuma.immich.url=http://immich:8080"
+      - "kuma.immich.name=Immich Photos"
+      - "kuma.immich.interval=60"
+      - "kuma.immich.keyword=Immich"
+      - "kuma.immich.tags=media,photos"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:8083]"
     networks:
@@ -60,12 +61,16 @@ services:
     ports:
       - "5433:5432"
     labels:
-      - "kuma.monitoring.group.name=Media"
-      - "kuma.uptime_kuma.name=Immich Database"
-      - "kuma.uptime_kuma.tcp.host=immich-postgres"
-      - "kuma.uptime_kuma.tcp.url=http://immich-postgres:5432"
-      - "kuma.uptime_kuma.tcp.port=5432"
-      - "kuma.uptime_kuma.interval=120"
+      - "kuma.immich_db.type=postgres"
+      - "kuma.immich_db.hostname=Immich_PostgreSQL"
+      - "kuma.immich_db.port=5432"
+      - "kuma.immich_db.database=${IMMICH_DB_NAME}"
+      - "kuma.immich_db.username=${IMMICH_DB_USER}"
+      - "kuma.immich_db.password=${IMMICH_DB_PASSWORD}"
+      - "kuma.immich_db.name=Immich Database"
+      - "kuma.immich_db.interval=120"
+      - "kuma.immich_db.tags=media,database"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     networks:
       - db_net
@@ -80,12 +85,13 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=immich-redis
     labels:
-      - "kuma.monitoring.group.name=Media"
-      - "kuma.uptime_kuma.name=Immich Redis Cache"
-      - "kuma.uptime_kuma.url=http://immich-redis:6379"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=PONG"
+      - "kuma.immich_redis.type=redis"
+      - "kuma.immich_redis.hostname=immich-redis"
+      - "kuma.immich_redis.port=6379"
+      - "kuma.immich_redis.name=Immich Redis Cache"
+      - "kuma.immich_redis.interval=60"
+      - "kuma.immich_redis.tags=media,cache"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
     volumes:
       - ${CACHE_PATH}/immich/redis:/data

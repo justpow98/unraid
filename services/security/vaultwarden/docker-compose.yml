@@ -27,12 +27,13 @@ services:
     ports:
       - "4743:80"
     labels:
-      - "kuma.monitoring.group.name=Security"
-      - "kuma.uptime_kuma.name=Vaultwarden"
-      - "kuma.uptime_kuma.url=http://vaultwarden:80"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Vaultwarden"
+      - "kuma.vaultwarden.type=http"
+      - "kuma.vaultwarden.url=http://vaultwarden:80/alive"
+      - "kuma.vaultwarden.name=Vaultwarden"
+      - "kuma.vaultwarden.interval=60"
+      - "kuma.vaultwarden.keyword=alive"
+      - "kuma.vaultwarden.tags=security,passwords"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/vaultwarden-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:4743]"
     networks:

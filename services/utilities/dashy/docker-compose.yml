@@ -18,12 +18,13 @@ services:
       - PORT=8080
       - DIRECTORY=/app
     labels:
-      - "kuma.monitoring.group.name=Utilities"
-      - "kuma.uptime_kuma.name=Dashy"
-      - "kuma.uptime_kuma.url=http://dashy:8080"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=Dashy"
+      - "kuma.dashy.type=http"
+      - "kuma.dashy.url=http://dashy:8080"
+      - "kuma.dashy.name=Dashy Dashboard"
+      - "kuma.dashy.interval=60"
+      - "kuma.dashy.keyword=Dashy"
+      - "kuma.dashy.tags=utilities,dashboard"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/dashy-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:4000]"
     volumes:

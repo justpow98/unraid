@@ -19,12 +19,13 @@ services:
       - DB_PASSWD=${ROMM_DB_PASSWORD}
       - ROMM_AUTH_SECRET_KEY=${ROMM_AUTH_SECRET_KEY}
     labels:
-      - "kuma.monitoring.group.name=Media"
-      - "kuma.uptime_kuma.name=ROMM"
-      - "kuma.uptime_kuma.url=http://romm:8085"
-      - "kuma.uptime_kuma.method=GET"
-      - "kuma.uptime_kuma.interval=60"
-      - "kuma.uptime_kuma.keyword=ROMM"
+      - "kuma.romm.type=http"
+      - "kuma.romm.url=http://romm:8080"
+      - "kuma.romm.name=ROMM Game Library"
+      - "kuma.romm.interval=60"
+      - "kuma.romm.keyword=ROMM"
+      - "kuma.romm.tags=media,gaming"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/romm-icon.png"
     volumes:
       - ${ROMM_PATH}/romm/resources:/romm/resources
@@ -52,12 +53,16 @@ services:
       - MYSQL_USER=${ROMM_DB_USER}
       - MYSQL_PASSWORD=${ROMM_DB_PASSWORD}
     labels:
-      - "kuma.monitoring.group.name=Media"
-      - "kuma.uptime_kuma.name=ROMM Database"
-      - "kuma.uptime_kuma.tcp.host=romm-mariadb"
-      - "kuma.uptime_kuma.tcp.url=http://romm-mariadb:3306"
-      - "kuma.uptime_kuma.tcp.port=3306"
-      - "kuma.uptime_kuma.interval=120"
+      - "kuma.romm_db.type=mysql"
+      - "kuma.romm_db.hostname=romm-MariaDB-Official"
+      - "kuma.romm_db.port=3306"
+      - "kuma.romm_db.database=${ROMM_DB_NAME}"
+      - "kuma.romm_db.username=${ROMM_DB_USER}"
+      - "kuma.romm_db.password=${ROMM_DB_PASSWORD}"
+      - "kuma.romm_db.name=ROMM Database"
+      - "kuma.romm_db.interval=120"
+      - "kuma.romm_db.tags=media,database"
+      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mariadb-icon.png"
     volumes:
       - ${ROMM_PATH}/romm/mariadb:/var/lib/mysql
