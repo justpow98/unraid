@@ -14,12 +14,15 @@ NC='\033[0m'
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-COMPOSE_BASE_PATH="/mnt/user/appdata/docker-compose"
 
 # Determine the correct working directory and .env file location
-if [ -d "$COMPOSE_BASE_PATH" ]; then
-    WORKING_DIR="$COMPOSE_BASE_PATH"
-    ENV_FILE="$COMPOSE_BASE_PATH/.env"
+# Check if we're running in GitHub Actions environment
+if [ "$GITHUB_ACTIONS" = "true" ] && [ -d "/workspace" ]; then
+    WORKING_DIR="/workspace"
+    ENV_FILE="/workspace/.env"
+elif [ -d "/mnt/user/appdata/docker-compose" ]; then
+    WORKING_DIR="/mnt/user/appdata/docker-compose"
+    ENV_FILE="/mnt/user/appdata/docker-compose/.env"
 else
     # Fallback to repo root for development
     WORKING_DIR="$REPO_ROOT"

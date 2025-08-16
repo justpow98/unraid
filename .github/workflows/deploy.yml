@@ -26,14 +26,16 @@ jobs:
           echo "Runner: ${{ runner.name }}"
           echo "Event: ${{ github.event_name }}"
           
-          # Navigate to the docker-compose directory
-          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          # Navigate to the docker-compose directory (mounted in runner)
+          COMPOSE_PATH="/workspace"
           if [ -d "$COMPOSE_PATH" ]; then
             echo "✅ Found docker-compose directory at $COMPOSE_PATH"
             cd "$COMPOSE_PATH"
             echo "📁 Changed to: $(pwd)"
           else
             echo "❌ Docker-compose directory not found at $COMPOSE_PATH"
+            echo "📁 Available paths:"
+            ls -la /
             exit 1
           fi
           
@@ -41,11 +43,10 @@ jobs:
           if [ -f ".env" ]; then
             echo "✅ Found .env file in docker-compose directory"
           elif [ -f "/workspace/.env" ]; then
-            echo "✅ Found .env file at /workspace/.env, copying to compose directory"
-            cp /workspace/.env .env
+            echo "✅ Found .env file at /workspace/.env"
           else
             echo "❌ .env file not found"
-            echo "📁 Checking alternate locations..."
+            echo "📁 Checking workspace contents..."
             ls -la /workspace/ 2>/dev/null || echo "Cannot access /workspace"
             exit 1
           fi
@@ -61,8 +62,8 @@ jobs:
         run: |
           echo "🔍 Detecting changed services..."
           
-          # Ensure we're in the docker-compose directory
-          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          # Ensure we're in the docker-compose directory (mounted in runner)
+          COMPOSE_PATH="/workspace"
           cd "$COMPOSE_PATH"
           
           # Initialize arrays
@@ -125,8 +126,8 @@ jobs:
         run: |
           echo "🏗️ Deploying infrastructure services first..."
           
-          # Ensure we're in the docker-compose directory
-          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          # Ensure we're in the docker-compose directory (mounted in runner)
+          COMPOSE_PATH="/workspace"
           cd "$COMPOSE_PATH"
           
           # Priority order for infrastructure
@@ -155,8 +156,8 @@ jobs:
         run: |
           echo "📦 Deploying application services..."
           
-          # Ensure we're in the docker-compose directory
-          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          # Ensure we're in the docker-compose directory (mounted in runner)
+          COMPOSE_PATH="/workspace"
           cd "$COMPOSE_PATH"
           
           # Process changed services or all recent services for manual deployment

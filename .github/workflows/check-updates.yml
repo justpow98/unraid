@@ -56,13 +56,17 @@ jobs:
         run: |
           echo "🔍 Validating repository structure..."
           
-          # Navigate to docker-compose directory
-          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          # Navigate to docker-compose directory (mounted in the runner)
+          COMPOSE_PATH="/workspace"
           if [ -d "$COMPOSE_PATH" ]; then
             echo "✅ Found docker-compose directory at $COMPOSE_PATH"
             cd "$COMPOSE_PATH"
           else
             echo "❌ Docker-compose directory not found at $COMPOSE_PATH"
+            echo "📁 Available directories:"
+            ls -la /
+            echo "📁 Workspace contents:"
+            ls -la /workspace/ 2>/dev/null || echo "Workspace not accessible"
             exit 1
           fi
           
@@ -96,8 +100,8 @@ jobs:
           echo "Force check: $FORCE_CHECK"
           echo "Dry run: $DRY_RUN"
           
-          # Navigate to docker-compose directory
-          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          # Navigate to docker-compose directory (mounted in runner)
+          COMPOSE_PATH="/workspace"
           cd "$COMPOSE_PATH"
           echo "📁 Working from: $(pwd)"
           
@@ -130,8 +134,8 @@ jobs:
         run: |
           echo "🔍 Validating updated docker-compose files..."
           
-          # Navigate to docker-compose directory
-          COMPOSE_PATH="/mnt/user/appdata/docker-compose"
+          # Navigate to docker-compose directory (mounted in runner)
+          COMPOSE_PATH="/workspace"
           cd "$COMPOSE_PATH"
           
           # Find .env file for validation

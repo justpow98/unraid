@@ -113,19 +113,19 @@ find_env_file() {
     # 1. Current directory (docker-compose directory)
     if [ -f "$(pwd)/.env" ]; then
         env_file="$(pwd)/.env"
-        echo -e "${GREEN}✅ Using .env from docker-compose directory${NC}"
-    # 2. Docker-compose base directory
+        echo -e "${GREEN}✅ Using .env from current directory${NC}"
+    # 2. Workspace (GitHub Actions runner mount)
+    elif [ -f "/workspace/.env" ]; then
+        env_file="/workspace/.env"
+        echo -e "${GREEN}✅ Using .env from workspace (GitHub runner)${NC}"
+    # 3. Docker-compose base directory
     elif [ -f "/mnt/user/appdata/docker-compose/.env" ]; then
         env_file="/mnt/user/appdata/docker-compose/.env"
         echo -e "${GREEN}✅ Using .env from docker-compose base directory${NC}"
-    # 3. GitHub workspace
+    # 4. GitHub workspace
     elif [ -f "$GITHUB_WORKSPACE/.env" ]; then
         env_file="$GITHUB_WORKSPACE/.env"
         echo -e "${GREEN}✅ Using .env from GitHub workspace${NC}"
-    # 4. Workspace root
-    elif [ -f "/workspace/.env" ]; then
-        env_file="/workspace/.env"
-        echo -e "${GREEN}✅ Using .env from workspace root${NC}"
     # 5. Relative path fallback
     elif [ -f "../../../.env" ]; then
         env_file="../../../.env"
@@ -134,9 +134,9 @@ find_env_file() {
         echo -e "${RED}❌ .env file not found in any expected location${NC}"
         echo -e "${YELLOW}📍 Checked locations:${NC}"
         echo "  - $(pwd)/.env"
+        echo "  - /workspace/.env"
         echo "  - /mnt/user/appdata/docker-compose/.env"
         echo "  - $GITHUB_WORKSPACE/.env"
-        echo "  - /workspace/.env"
         echo "  - ../../../.env"
         exit 1
     fi

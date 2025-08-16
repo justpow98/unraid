@@ -318,7 +318,11 @@ def main():
     all_updates = []
     
     # Define the base path for docker-compose files
-    COMPOSE_BASE_PATH = '/mnt/user/appdata/docker-compose'
+    # Check if we're running in GitHub Actions environment
+    if os.environ.get('GITHUB_ACTIONS') == 'true':
+        COMPOSE_BASE_PATH = '/workspace'
+    else:
+        COMPOSE_BASE_PATH = '/mnt/user/appdata/docker-compose'
     
     # Check if we're running from the mounted path or need to change directory
     if os.path.exists(COMPOSE_BASE_PATH):
