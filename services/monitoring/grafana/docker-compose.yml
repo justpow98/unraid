@@ -23,11 +23,12 @@ services:
     ports:
       - "3006:3000"
     labels:
-      - "kuma.grafana.name=Grafana"
-      - "kuma.grafana.url=http://grafana:3000"
-      - "kuma.grafana.method=GET"
-      - "kuma.grafana.interval=60"
-      - "kuma.grafana.keyword=Grafana"
+      - "kuma.monitoring.group.name=Monitoring"
+      - "kuma.uptime_kuma.name=Grafana"
+      - "kuma.uptime_kuma.url=http://grafana:3000"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=Grafana"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:3006]"
     networks:

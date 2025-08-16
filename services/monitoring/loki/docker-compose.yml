@@ -24,11 +24,12 @@ services:
       - monitoring_net
     user: "${PUID}:${PGID}"
     labels:
-      - "kuma.loki.name=Grafana Loki"
-      - "kuma.loki.url=http://loki:3100/ready"
-      - "kuma.loki.method=GET"
-      - "kuma.loki.interval=60"
-      - "kuma.loki.keyword=ready"
+      - "kuma.monitoring.group.name=Monitoring"
+      - "kuma.uptime_kuma.name=Grafana Loki"
+      - "kuma.uptime_kuma.url=http://loki:3100/ready"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=ready"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/loki-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:3100]"
 

@@ -17,11 +17,12 @@ services:
     volumes:
       - ${APPDATA_PATH}/cloudflared:/etc/cloudflared
     labels:
-      - "kuma.cloudflared.name=Cloudflared Tunnel"
-      - "kuma.cloudflared.url=http://cloudflared:46495"
-      - "kuma.cloudflared.method=GET"
-      - "kuma.cloudflared.interval=60"
-      - "kuma.cloudflared.keyword=Cloudflared Tunnel"
+      - "kuma.monitoring.group.name=Networking"
+      - "kuma.uptime_kuma.name=Cloudflared Tunnel"
+      - "kuma.uptime_kuma.url=http://cloudflared:46495"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=Cloudflared Tunnel"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/cloudflared-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:46495]"
     ports:

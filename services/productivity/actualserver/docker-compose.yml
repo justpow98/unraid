@@ -22,11 +22,12 @@ services:
     networks:
       - internal_net
     labels:
-      - "kuma.actualserver.name=Actual Server"
-      - "kuma.actualserver.url=http://actualserver:5006"
-      - "kuma.actualserver.method=GET"
-      - "kuma.actualserver.interval=60"
-      - "kuma.actualserver.keyword=Actual Server"
+      - "kuma.monitoring.group.name=Productivity"
+      - "kuma.uptime_kuma.name=Actual Server"
+      - "kuma.uptime_kuma.url=http://actualserver:5006"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=Actual Server"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/actualserver-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:5006]"
 

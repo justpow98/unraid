@@ -37,12 +37,12 @@ services:
     networks:
       - monitoring_net
     labels:
-      - "kuma.github-runner.name=GitHub Runner"
-      - "kuma.github-runner.url=http://github-runner:8080"
-      - "kuma.github-runner.method=GET"
-      - "kuma.github-runner.interval=60"
-      - "kuma.github-runner.keyword=GitHub Runner"
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/github-desktop-icon.png"
+      - "kuma.monitoring.group.name=Automation"
+      - "kuma.uptime_kuma.name=GitHub Runner"
+      - "kuma.uptime_kuma.url=http://github-runner:8080"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=GitHub Runner"
 
 networks:
   monitoring_net:

@@ -21,11 +21,12 @@ services:
     volumes:
       - ${APPDATA_PATH}/authentik/sql:/var/lib/postgresql/data
     labels:
-      - "kuma.authentikdb.name=Authentik Database"
-      - "kuma.authentikdb.url=http://authentik-postgres:5432"
-      - "kuma.authentikdb.tcp.host=authentik-postgres"
-      - "kuma.authentikdb.tcp.port=5432"
-      - "kuma.authentikdb.interval=120"
+      - "kuma.monitoring.group.name=Security"
+      - "kuma.uptime_kuma.name=Authentik Database"
+      - "kuma.uptime_kuma.url=http://authentik-postgres:5432"
+      - "kuma.uptime_kuma.tcp.host=authentik-postgres"
+      - "kuma.uptime_kuma.tcp.port=5432"
+      - "kuma.uptime_kuma.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     ports:
       - "5434:5432"
@@ -56,11 +57,12 @@ services:
     ports:
       - "6380:6379"
     labels:
-      - "kuma.authentikredis.name=Authentik Redis"
-      - "kuma.authentikredis.tcp.host=redis-authentik"
-      - "kuma.authentikredis.tcp.url=http://authentik-redis:6379"
-      - "kuma.authentikredis.tcp.port=6379"
-      - "kuma.authentikredis.interval=120"
+      - "kuma.monitoring.group.name=Security"
+      - "kuma.uptime_kuma.name=Authentik Redis"
+      - "kuma.uptime_kuma.tcp.host=redis-authentik"
+      - "kuma.uptime_kuma.tcp.url=http://authentik-redis:6379"
+      - "kuma.uptime_kuma.tcp.port=6379"
+      - "kuma.uptime_kuma.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
     networks:
       - db_net
@@ -116,11 +118,12 @@ services:
       - "9000:9000"
       - "9443:9443"
     labels:
-      - "kuma.authentik.name=Authentik"
-      - "kuma.authentik.url=http://authentik:9000"
-      - "kuma.authentik.method=GET"
-      - "kuma.authentik.interval=60"
-      - "kuma.authentik.keyword=authentik"
+      - "kuma.monitoring.group.name=Security"
+      - "kuma.uptime_kuma.name=Authentik"
+      - "kuma.uptime_kuma.url=http://authentik:9000"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=authentik"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/authentik-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:9000]"
     networks:

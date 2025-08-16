@@ -28,11 +28,12 @@ services:
     ports:
       - "8083:8080"
     labels:
-      - "kuma.immich.name=Immich"
-      - "kuma.immich.url=http://immich:8080"
-      - "kuma.immich.method=GET"
-      - "kuma.immich.interval=60"
-      - "kuma.immich.keyword=Immich"
+      - "kuma.monitoring.group.name=Media"
+      - "kuma.uptime_kuma.name=Immich"
+      - "kuma.uptime_kuma.url=http://immich:8080"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=Immich"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:8083]"
     networks:
@@ -59,11 +60,12 @@ services:
     ports:
       - "5433:5432"
     labels:
-      - "kuma.immichdb.name=Immich Database"
-      - "kuma.immichdb.tcp.host=immich-postgres"
-      - "kuma.immichdb.tcp.url=http://immich-postgres:5432"
-      - "kuma.immichdb.tcp.port=5432"
-      - "kuma.immichdb.interval=120"
+      - "kuma.monitoring.group.name=Media"
+      - "kuma.uptime_kuma.name=Immich Database"
+      - "kuma.uptime_kuma.tcp.host=immich-postgres"
+      - "kuma.uptime_kuma.tcp.url=http://immich-postgres:5432"
+      - "kuma.uptime_kuma.tcp.port=5432"
+      - "kuma.uptime_kuma.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     networks:
       - db_net
@@ -78,11 +80,12 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=immich-redis
     labels:
-      - "kuma.immichredis.name=Immich Redis Cache"
-      - "kuma.immichredis.url=http://immich-redis:6379"
-      - "kuma.immichredis.method=GET"
-      - "kuma.immichredis.interval=60"
-      - "kuma.immichredis.keyword=PONG"
+      - "kuma.monitoring.group.name=Media"
+      - "kuma.uptime_kuma.name=Immich Redis Cache"
+      - "kuma.uptime_kuma.url=http://immich-redis:6379"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=PONG"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
     volumes:
       - ${CACHE_PATH}/immich/redis:/data

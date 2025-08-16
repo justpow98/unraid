@@ -24,11 +24,12 @@ services:
     ports:
       - "4001:4000"
     labels:
-      - "kuma.teslamate.name=TeslaMate"
-      - "kuma.teslamate.url=http://teslamate:4000"
-      - "kuma.teslamate.method=GET"
-      - "kuma.teslamate.interval=60"
-      - "kuma.teslamate.keyword=TeslaMate"
+      - "kuma.monitoring.group.name=Automotive"
+      - "kuma.uptime_kuma.name=TeslaMate"
+      - "kuma.uptime_kuma.url=http://teslamate:4000"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=TeslaMate"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/adriankumpf/teslamate/master/priv/static/images/logo.svg"
       - "net.unraid.docker.webui=http://[IP]:[PORT:4001]"
     networks:
@@ -53,11 +54,12 @@ services:
     volumes:
       - ${TESLAMATE_PATH}/postgres:/var/lib/postgresql/data
     labels:
-      - "kuma.teslamatedb.name=TeslaMate Database"
-      - "kuma.teslamatedb.tcp.host=teslamate-postgres"
-      - "kuma.teslamatedb.tcp.url=http://teslamate-postgres:5432"
-      - "kuma.teslamatedb.tcp.port=5432"
-      - "kuma.teslamatedb.interval=120"
+      - "kuma.monitoring.group.name=Automotive"
+      - "kuma.uptime_kuma.name=TeslaMate Database"
+      - "kuma.uptime_kuma.tcp.host=teslamate-postgres"
+      - "kuma.uptime_kuma.tcp.url=http://teslamate-postgres:5432"
+      - "kuma.uptime_kuma.tcp.port=5432"
+      - "kuma.uptime_kuma.interval=120"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
     ports:
       - "5436:5432"
@@ -77,11 +79,12 @@ services:
     volumes:
       - ${TESLAMATE_PATH}/grafana:/var/lib/grafana
     labels:
-      - "kuma.teslamategrafana.name=TeslaMate Grafana"
-      - "kuma.teslamategrafana.url=http://teslamate-grafana:3000"
-      - "kuma.teslamategrafana.method=GET"
-      - "kuma.teslamategrafana.interval=60"
-      - "kuma.teslamategrafana.keyword=TeslaMate Grafana"
+      - "kuma.monitoring.group.name=Automotive"
+      - "kuma.uptime_kuma.name=TeslaMate Grafana"
+      - "kuma.uptime_kuma.url=http://teslamate-grafana:3000"
+      - "kuma.uptime_kuma.method=GET"
+      - "kuma.uptime_kuma.interval=60"
+      - "kuma.uptime_kuma.keyword=TeslaMate Grafana"
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:3333]"
     ports:
