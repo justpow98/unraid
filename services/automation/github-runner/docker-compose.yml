@@ -20,10 +20,16 @@ services:
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=Docker-Compose-Runner
     volumes:
+      # Docker socket for container management
       - /var/run/docker.sock:/var/run/docker.sock:rw
-      - ${APPDATA_PATH}/github_runner_compose:/runner/data:rw
+      
+      # Persistent runner data (corrected path)
+      - ${APPDATA_PATH}/github_runner_compose:/runner:rw
+      
+      # Docker-compose workspace (includes .env automatically)
       - /mnt/user/appdata/docker-compose:/workspace:rw
-      - /mnt/user/appdata/docker-compose/.env:/workspace/.env:ro
+      
+      # Remove redundant .env mount - it's already included above
     networks:
       - monitoring_net
     labels:
