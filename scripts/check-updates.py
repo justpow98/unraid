@@ -7,8 +7,10 @@ from datetime import datetime
 import glob
 from typing import Dict, List, Optional, Tuple
 import time
+import base64
+import json
 
-# Comprehensive repository mappings for GitHub releases
+# Enhanced repository mappings for GitHub releases
 REPO_MAPPINGS = {
     # Utilities
     'lissy93/dashy': 'lissy93/dashy',
@@ -35,7 +37,7 @@ REPO_MAPPINGS = {
     'grafana/grafana': 'grafana/grafana',
     'prom/prometheus': 'prometheus/prometheus',
     'grafana/loki': 'grafana/loki',
-    'grafana/promtail': 'grafana/loki',  # Promtail is part of Loki project
+    'grafana/promtail': 'grafana/loki',
     'louislam/uptime-kuma': 'louislam/uptime-kuma',
     'ghcr.io/bigboot/autokuma': 'BigBoot/AutoKuma',
     
@@ -63,7 +65,7 @@ REPO_MAPPINGS = {
     'myoung34/github-runner': 'myoung34/docker-github-actions-runner',
 }
 
-# Custom version patterns for different image types
+# Enhanced version patterns
 VERSION_PATTERNS = {
     'dashy': r'^release-\d+\.\d+\.\d+$',
     'filebrowser': r'^v\d+\.\d+\.\d+$',
@@ -72,11 +74,11 @@ VERSION_PATTERNS = {
     'prometheus': r'^v\d+\.\d+\.\d+$',
     'loki': r'^\d+\.\d+\.\d+$',
     'promtail': r'^\d+\.\d+\.\d+$',
-    'authentik': r'^\d{4}\.\d+\.\d+$',  # Year-based versioning
+    'authentik': r'^\d{4}\.\d+\.\d+$',
     'vaultwarden': r'^\d+\.\d+\.\d+$',
     'nextcloud': r'^\d+\.\d+\.\d+$',
     'teslamate': r'^\d+\.\d+\.\d+$',
-    'home-assistant': r'^\d{4}\.\d+$',  # Year.month versioning
+    'home-assistant': r'^\d{4}\.\d+$',
     'zigbee2mqtt': r'^\d+\.\d+\.\d+$',
     'matter-server': r'^\d+\.\d+\.\d+$',
     'redis': r'^\d+\.\d+(\.\d+)?(-alpine)?$',
@@ -89,62 +91,185 @@ VERSION_PATTERNS = {
     'onlyoffice': r'^\d+\.\d+\.\d+$',
     'duplicati': r'^\d+\.\d+\.\d+$',
     'mosquitto': r'^\d+\.\d+\.\d+$',
-    'npmplus': r'^\d+$',  # Single number versioning
-    'cloudflared': r'^\d{4}\.\d+\.\d+$',  # Year-based
+    'npmplus': r'^\d+$',
+    'cloudflared': r'^\d{4}\.\d+\.\d+$',
     'github-runner': r'^v\d+\.\d+\.\d+$',
     'autokuma': r'^\d+\.\d+\.\d+$',
 }
 
+class RateLimitManager:
+    """Manages rate limiting across different registries"""
+    def __init__(self):
+        self.last_request = {}
+        self.delays = {
+            'dockerhub': 2.0,     # 2 seconds between Docker Hub requests
+            'ghcr': 1.0,          # 1 second between GHCR requests
+            'github_api': 1.0,    # 1 second between GitHub API requests
+            'default': 0.5        # 0.5 seconds for other registries
+        }
+    
+    def wait_if_needed(self, registry_type: str):
+        """Wait if needed to respect rate limits"""
+        now = time.time()
+        last = self.last_request.get(registry_type, 0)
+        delay = self.delays.get(registry_type, self.delays['default'])
+        
+        if now - last < delay:
+            time.sleep(delay - (now - last))
+        
+        self.last_request[registry_type] = time.time()
+
+def get_auth_headers() -> Dict[str, str]:
+    """Get authentication headers for various registries"""
+    headers = {
+        'User-Agent': 'Docker-Update-Checker/1.0'
+    }
+    
+    # GitHub token for GHCR and GitHub API
+    github_token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GITHUB_ACCESS_TOKEN')
+    if github_token:
+        headers['Authorization'] = f'token {github_token}'
+    
+    return headers
+
+def get_docker_hub_auth_headers() -> Dict[str, str]:
+    """Get Docker Hub authentication headers if credentials available"""
+    headers = {'User-Agent': 'Docker-Update-Checker/1.0'}
+    
+    username = os.environ.get('DOCKER_HUB_USERNAME')
+    password = os.environ.get('DOCKER_HUB_PASSWORD')
+    
+    if username and password:
+        # Create basic auth header
+        credentials = f"{username}:{password}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        headers['Authorization'] = f'Basic {encoded_credentials}'
+    
+    return headers
+
 def get_image_key(image_name: str) -> str:
-    """Extract key from image name for pattern matching."""
-    # Remove registry prefixes
+    """Extract key from image name for pattern matching"""
     clean_name = image_name.replace('ghcr.io/', '').replace('lscr.io/', '')
     clean_name = clean_name.replace('docker.io/', '').replace('quay.io/', '')
     
-    # Extract service name
     if '/' in clean_name:
         parts = clean_name.split('/')
-        return parts[-1].split(':')[0]  # Get last part, remove tag
+        return parts[-1].split(':')[0]
     return clean_name.split(':')[0]
 
-def get_latest_docker_tag(image_name: str) -> Optional[str]:
-    """Get the latest tag for a Docker image with intelligent pattern matching."""
+def get_ghcr_latest_tag(registry_path: str, rate_limiter: RateLimitManager) -> Optional[str]:
+    """Get latest tag from GitHub Container Registry with authentication"""
+    try:
+        rate_limiter.wait_if_needed('ghcr')
+        
+        parts = registry_path.split('/')
+        if len(parts) < 2:
+            return None
+        
+        owner = parts[0]
+        package = parts[1]
+        
+        # Use GitHub Packages API
+        url = f"https://api.github.com/users/{owner}/packages/container/{package}/versions"
+        headers = get_auth_headers()
+        
+        response = requests.get(url, headers=headers, timeout=20)
+        
+        if response.status_code == 429:
+            print(f"Rate limited for GHCR {registry_path}, waiting...")
+            time.sleep(60)
+            return None
+        
+        if response.status_code != 200:
+            print(f"GHCR API error for {registry_path}: {response.status_code}")
+            return None
+        
+        versions = response.json()
+        if not versions:
+            return None
+        
+        # Find the latest version with a semantic version tag
+        image_key = get_image_key(registry_path)
+        pattern = VERSION_PATTERNS.get(image_key)
+        
+        for version in versions:
+            tags = version.get('metadata', {}).get('container', {}).get('tags', [])
+            for tag in tags:
+                if pattern and re.match(pattern, tag):
+                    return tag
+                elif re.match(r'^\d+\.\d+(\.\d+)?$', tag):
+                    return tag
+                elif re.match(r'^v\d+\.\d+(\.\d+)?$', tag):
+                    return tag
+        
+        return None
+        
+    except Exception as e:
+        print(f"Error checking GHCR {registry_path}: {e}")
+        return None
+
+def get_latest_docker_tag(image_name: str, rate_limiter: RateLimitManager) -> Optional[str]:
+    """Get the latest tag for a Docker image with enhanced authentication"""
     try:
         # Handle different registry formats
         if image_name.startswith('ghcr.io/'):
             registry_path = image_name.replace('ghcr.io/', '')
+            return get_ghcr_latest_tag(registry_path, rate_limiter)
         elif image_name.startswith('lscr.io/'):
+            # LinuxServer.io images - try fallback to GitHub releases
             registry_path = image_name.replace('lscr.io/', '')
+            return get_dockerhub_latest_tag(registry_path, rate_limiter)
         elif '/' not in image_name:
             registry_path = f"library/{image_name}"
+            return get_dockerhub_latest_tag(registry_path, rate_limiter)
         else:
-            registry_path = image_name
+            return get_dockerhub_latest_tag(image_name, rate_limiter)
         
-        # For GitHub Container Registry
-        if image_name.startswith('ghcr.io/'):
-            return get_ghcr_latest_tag(registry_path)
+    except Exception as e:
+        print(f"Error checking {image_name}: {e}")
+        return None
+
+def get_dockerhub_latest_tag(registry_path: str, rate_limiter: RateLimitManager) -> Optional[str]:
+    """Get latest tag from Docker Hub with authentication"""
+    try:
+        rate_limiter.wait_if_needed('dockerhub')
         
-        # For Docker Hub
         url = f"https://registry.hub.docker.com/v2/repositories/{registry_path}/tags"
-        params = {"page_size": 100, "ordering": "last_updated"}
+        params = {"page_size": 50, "ordering": "last_updated"}
+        headers = get_docker_hub_auth_headers()
         
-        response = requests.get(url, timeout=15)
-        if response.status_code != 200:
-            print(f"Warning: Could not fetch tags for {image_name} (status: {response.status_code})")
+        response = requests.get(url, params=params, headers=headers, timeout=20)
+        
+        if response.status_code == 429:
+            print(f"Docker Hub rate limited for {registry_path}")
+            # Check for rate limit headers
+            if 'ratelimit-remaining' in response.headers:
+                remaining = response.headers.get('ratelimit-remaining', '0')
+                print(f"Rate limit remaining: {remaining}")
+            time.sleep(30)  # Wait 30 seconds
             return None
         
-        tags = response.json().get("results", [])
-        image_key = get_image_key(image_name)
+        if response.status_code != 200:
+            print(f"Docker Hub API error for {registry_path}: {response.status_code}")
+            return None
         
-        # Try to find appropriate pattern
+        data = response.json()
+        tags = data.get("results", [])
+        
+        if not tags:
+            return None
+        
+        image_key = get_image_key(registry_path)
         pattern = VERSION_PATTERNS.get(image_key)
+        
+        # Try pattern matching first
         if pattern:
             for tag in tags:
                 tag_name = tag["name"]
                 if re.match(pattern, tag_name):
                     return tag_name
         
-        # Fallback: generic semantic versioning
+        # Fallback to generic semantic versioning
         for tag in tags:
             tag_name = tag["name"]
             if re.match(r'^\d+\.\d+(\.\d+)?$', tag_name):
@@ -155,51 +280,22 @@ def get_latest_docker_tag(image_name: str) -> Optional[str]:
         return None
         
     except Exception as e:
-        print(f"Error checking {image_name}: {e}")
+        print(f"Error checking Docker Hub {registry_path}: {e}")
         return None
 
-def get_ghcr_latest_tag(registry_path: str) -> Optional[str]:
-    """Get latest tag from GitHub Container Registry."""
+def get_github_releases(repo_name: str, old_version: str, new_version: str, rate_limiter: RateLimitManager) -> Optional[List[Dict]]:
+    """Get GitHub releases between two versions with authentication"""
     try:
-        # Extract owner and package from registry path
-        parts = registry_path.split('/')
-        if len(parts) < 2:
-            return None
+        rate_limiter.wait_if_needed('github_api')
         
-        owner = parts[0]
-        package = parts[1]
-        
-        # Use GitHub API to get package versions
-        url = f"https://api.github.com/users/{owner}/packages/container/{package}/versions"
-        headers = {"Accept": "application/vnd.github.v3+json"}
-        
-        response = requests.get(url, headers=headers, timeout=15)
-        if response.status_code != 200:
-            return None
-        
-        versions = response.json()
-        if not versions:
-            return None
-        
-        # Find the latest version with a semantic version tag
-        for version in versions:
-            tags = version.get('metadata', {}).get('container', {}).get('tags', [])
-            for tag in tags:
-                if re.match(r'^\d+\.\d+(\.\d+)?$', tag) or re.match(r'^v\d+\.\d+(\.\d+)?$', tag):
-                    return tag
-        
-        return None
-        
-    except Exception as e:
-        print(f"Error checking GHCR {registry_path}: {e}")
-        return None
-
-def get_github_releases(repo_name: str, old_version: str, new_version: str) -> Optional[List[Dict]]:
-    """Get GitHub releases between two versions."""
-    try:
         url = f"https://api.github.com/repos/{repo_name}/releases"
-        headers = {"Accept": "application/vnd.github.v3+json"}
-        response = requests.get(url, headers=headers, timeout=15)
+        headers = get_auth_headers()
+        response = requests.get(url, headers=headers, timeout=20)
+        
+        if response.status_code == 429:
+            print(f"GitHub API rate limited for {repo_name}")
+            time.sleep(60)
+            return None
         
         if response.status_code != 200:
             return None
@@ -207,14 +303,12 @@ def get_github_releases(repo_name: str, old_version: str, new_version: str) -> O
         releases = response.json()
         changes = []
         
-        # Clean version strings for comparison
         old_clean = old_version.replace('release-', '').replace('v', '').replace('-alpine', '')
         new_clean = new_version.replace('release-', '').replace('v', '').replace('-alpine', '')
         
         for release in releases:
             tag = release.get('tag_name', '').replace('release-', '').replace('v', '').replace('-alpine', '')
             
-            # Include releases between old and new versions
             if tag == new_clean or (old_clean < tag <= new_clean):
                 changes.append({
                     'version': release.get('tag_name', ''),
@@ -226,14 +320,14 @@ def get_github_releases(repo_name: str, old_version: str, new_version: str) -> O
                     'published': release.get('published_at', '')[:10]
                 })
         
-        return changes[:3]  # Limit to 3 most recent
+        return changes[:3]
         
     except Exception as e:
         print(f"Error getting releases for {repo_name}: {e}")
     return None
 
-def check_service_for_updates(compose_file_path: str) -> Tuple[List[Dict], bool]:
-    """Check a specific docker-compose file for updates."""
+def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitManager) -> Tuple[List[Dict], bool]:
+    """Check a specific docker-compose file for updates with rate limiting"""
     updates = []
     
     try:
@@ -268,8 +362,8 @@ def check_service_for_updates(compose_file_path: str) -> Tuple[List[Dict], bool]
         
         print(f"Checking {service_name} ({current_image})...")
         
-        # Get latest version
-        latest_tag = get_latest_docker_tag(image_name)
+        # Get latest version with rate limiting
+        latest_tag = get_latest_docker_tag(image_name, rate_limiter)
         
         if latest_tag and latest_tag != current_tag:
             print(f"  Update available: {current_tag} -> {latest_tag}")
@@ -278,7 +372,7 @@ def check_service_for_updates(compose_file_path: str) -> Tuple[List[Dict], bool]
             changelog = None
             repo_name = REPO_MAPPINGS.get(image_name)
             if repo_name:
-                changelog = get_github_releases(repo_name, current_tag, latest_tag)
+                changelog = get_github_releases(repo_name, current_tag, latest_tag, rate_limiter)
             
             # Update the compose file
             service_config['image'] = f"{image_name}:{latest_tag}"
@@ -298,9 +392,6 @@ def check_service_for_updates(compose_file_path: str) -> Tuple[List[Dict], bool]
                 print(f"  Up to date: {current_tag}")
             else:
                 print(f"  Could not check: {current_tag}")
-        
-        # Rate limiting
-        time.sleep(0.5)
     
     # Save modified file
     if modified:
@@ -314,27 +405,46 @@ def check_service_for_updates(compose_file_path: str) -> Tuple[List[Dict], bool]
     return updates, modified
 
 def main():
-    """Main function to check all services for updates."""
+    """Main function with enhanced rate limiting and authentication"""
+    print("🔍 Enhanced Docker Update Checker with Authentication")
+    print("=" * 60)
+    
+    # Check for authentication
+    github_token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GITHUB_ACCESS_TOKEN')
+    docker_user = os.environ.get('DOCKER_HUB_USERNAME')
+    
+    print(f"GitHub Token: {'✅ Available' if github_token else '❌ Not set'}")
+    print(f"Docker Hub Auth: {'✅ Available' if docker_user else '❌ Not set'}")
+    print()
+    
+    if not github_token:
+        print("⚠️ Warning: No GitHub token found. GHCR checks will be limited.")
+        print("   Set GITHUB_TOKEN or GITHUB_ACCESS_TOKEN environment variable")
+    
+    if not docker_user:
+        print("⚠️ Warning: No Docker Hub credentials. Rate limits will be strict.")
+        print("   Set DOCKER_HUB_USERNAME and DOCKER_HUB_PASSWORD environment variables")
+    
+    print()
+    
+    rate_limiter = RateLimitManager()
     all_updates = []
     
-    # Define the base path for docker-compose files
-    # Check if we're running in GitHub Actions environment
+    # Define paths
     if os.environ.get('GITHUB_ACTIONS') == 'true':
         COMPOSE_BASE_PATH = '/workspace'
     else:
         COMPOSE_BASE_PATH = '/mnt/user/appdata/docker-compose'
     
-    # Check if we're running from the mounted path or need to change directory
     if os.path.exists(COMPOSE_BASE_PATH):
         os.chdir(COMPOSE_BASE_PATH)
         compose_files = glob.glob('services/**/docker-compose.yml', recursive=True)
     else:
-        # Fallback to current directory (for development/testing)
         compose_files = glob.glob('services/**/docker-compose.yml', recursive=True)
     
     print(f"🔍 Checking {len(compose_files)} services for updates...")
     print(f"📁 Base path: {os.getcwd()}")
-    print("=" * 50)
+    print("=" * 60)
     
     for compose_file in sorted(compose_files):
         category = compose_file.split('/')[1] if len(compose_file.split('/')) > 1 else 'unknown'
@@ -343,16 +453,16 @@ def main():
         print(f"\n📁 {category}/{service}")
         print(f"   File: {compose_file}")
         
-        updates, modified = check_service_for_updates(compose_file)
+        updates, modified = check_service_for_updates(compose_file, rate_limiter)
         if updates:
             all_updates.extend(updates)
             print(f"   ✅ {len(updates)} update(s) found")
         else:
             print(f"   ℹ️ No updates available")
     
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 60)
     
-    # Generate PR summary
+    # Generate results
     if all_updates:
         summary = generate_update_summary(all_updates)
         
@@ -382,11 +492,11 @@ def main():
         with open(env_file, 'a') as f:
             f.write("UPDATES_FOUND=false\n")
         print("ℹ️ All services are up to date!")
+    
+    print(f"\n✅ Update check completed successfully")
 
 def generate_update_summary(all_updates: List[Dict]) -> str:
-    """Generate a formatted summary for the PR description."""
-    
-    # Group updates by category
+    """Generate a formatted summary for the PR description"""
     by_category = {}
     for update in all_updates:
         category = update['file'].split('/')[1]
@@ -419,7 +529,6 @@ def generate_update_summary(all_updates: List[Dict]) -> str:
                 for change in update['changelog']:
                     summary += f"- **{change['version']}** ({change['published']}): {change['name']}\\n"
                     if change['body']:
-                        # Clean up changelog body
                         body = change['body'].replace('\\n', ' ').replace('\\r', '')
                         summary += f"  {body}\\n"
                     summary += f"  [View Release]({change['url']})\\n"
