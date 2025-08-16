@@ -25,7 +25,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN  }}
           fetch-depth: 1
 
       - name: Set up Python Environment
@@ -95,7 +95,7 @@ jobs:
         env:
           FORCE_CHECK: ${{ github.event.inputs.force_check || 'false' }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN  }}
           DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
         run: |
@@ -210,7 +210,7 @@ jobs:
         if: env.UPDATES_FOUND == 'true' && github.event.inputs.dry_run != 'true'
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN  }}
           commit-message: |
             📦 Weekly container updates - ${{ env.UPDATE_DATE }}
             
