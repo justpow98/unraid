@@ -495,50 +495,82 @@ def main():
     
     print(f"\n✅ Update check completed successfully")
 
+# Quick fix for the changelog parsing errors
+# Add this to the generate_update_summary function around line 400
+
 def generate_update_summary(all_updates: List[Dict]) -> str:
     """Generate a formatted summary for the PR description"""
-    by_category = {}
-    for update in all_updates:
-        category = update['file'].split('/')[1]
-        if category not in by_category:
-            by_category[category] = []
-        by_category[category].append(update)
-    
-    summary = "## 📋 Updated Services\\n\\n"
-    summary += f"**Total Updates**: {len(all_updates)} services across {len(by_category)} categories\\n\\n"
-    
-    # Category overview
-    summary += "### 📊 Updates by Category\\n\\n"
-    for category, updates in sorted(by_category.items()):
-        summary += f"- **{category.title()}**: {len(updates)} update(s)\\n"
-    summary += "\\n"
-    
-    # Detailed updates by category
-    for category, updates in sorted(by_category.items()):
-        summary += f"### 📁 {category.title()} Services\\n\\n"
+    try:
+        by_category = {}
+        for update in all_updates:
+            category = update['file'].split('/')[1]
+            if category not in by_category:
+                by_category[category] = []
+            by_category[category].append(update)
         
-        for update in updates:
-            summary += f"#### 🔄 {update['service']} ({update['old_version']} → {update['new_version']})\\n"
-            summary += f"**Image**: `{update['image']}`\\n"
-            
-            if update['repo']:
-                summary += f"**Repository**: [{update['repo']}](https://github.com/{update['repo']})\\n"
-            
-            if update['changelog']:
-                summary += "\\n**Recent Changes**:\\n"
-                for change in update['changelog']:
-                    summary += f"- **{change['version']}** ({change['published']}): {change['name']}\\n"
-                    if change['body']:
-                        body = change['body'].replace('\\n', ' ').replace('\\r', '')
-                        summary += f"  {body}\\n"
-                    summary += f"  [View Release]({change['url']})\\n"
-            else:
-                summary += "\\n**Changelog**: Check repository releases manually\\n"
-            summary += "\\n"
+        summary = "## 📋 Updated Services\\n\\n"
+        summary += f"**Total Updates**: {len(all_updates)} services across {len(by_category)} categories\\n\\n"
         
-        summary += "---\\n\\n"
-    
-    return summary
+        # Category overview
+        summary += "### 📊 Updates by Category\\n\\n"
+        for category, updates in sorted(by_category.items()):
+            summary += f"- **{category.title()}**: {len(updates)} update(s)\\n"
+        summary += "\\n"
+        
+        # Detailed updates by category
+        for category, updates in sorted(by_category.items()):
+            summary += f"### 📁 {category.title()} Services\\n\\n"
+            
+            for update in updates:
+                summary += f"#### 🔄 {update['service']} ({update['old_version']} → {update['new_version']})\\n"
+                summary += f"**Image**: `{update['image']}`\\n"
+                
+                if update['repo']:
+                    summary += f"**Repository**: [{update['repo']}](https://github.com/{update['repo']})\\n"
+                
+                # Fix changelog processing with better error handling
+                if update['changelog']:
+                    summary += "\\n**Recent Changes**:\\n"
+                    for change in update['changelog']:
+                        try:
+                            version = change.get('version', 'Unknown')
+                            published = change.get('published', 'Unknown')[:10]  # Limit date length
+                            name = change.get('name', 'Release')
+                            
+                            # Clean up the change name and body
+                            if name:
+                                # Remove problematic characters and limit length
+                                name = str(name).replace('\\n', ' ').replace('\\r', '').replace('\\', '')[:100]
+                            
+                            summary += f"- **{version}** ({published}): {name}\\n"
+                            
+                            # Process body more carefully
+                            body = change.get('body', '')
+                            if body:
+                                # Clean and truncate body
+                                body = str(body).replace('\\n', ' ').replace('\\r', '').replace('\\', '')
+                                body = body[:200]  # Limit to 200 chars
+                                summary += f"  {body}\\n"
+                            
+                            url = change.get('url', '')
+                            if url:
+                                summary += f"  [View Release]({url})\\n"
+                        except Exception as e:
+                            # Skip problematic changelog entries
+                            print(f"Warning: Skipping changelog entry due to formatting error: {e}")
+                            continue
+                else:
+                    summary += "\\n**Changelog**: Check repository releases manually\\n"
+                summary += "\\n"
+            
+            summary += "---\\n\\n"
+        
+        return summary
+        
+    except Exception as e:
+        print(f"Error generating summary: {e}")
+        # Return a simple summary if there's an error
+        return f"## 📋 Updated Services\\n\\n**Total Updates**: {len(all_updates)} services\\n\\n"
 
 if __name__ == "__main__":
     main()
