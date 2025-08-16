@@ -103,7 +103,7 @@ class RateLimitManager:
         self.last_request = {}
         self.delays = {
             'dockerhub': 2.0,     # 2 seconds between Docker Hub requests
-            'ghcr': 1.0,          # 1 second between GHCR requests
+            'ghcr': 3.0,          # 3 seconds between GHCR requests
             'github_api': 1.0,    # 1 second between GitHub API requests
             'default': 0.5        # 0.5 seconds for other registries
         }
