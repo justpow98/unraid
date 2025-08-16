@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Tuple
 import time
 import base64
 import json
+import html
 
 # Enhanced repository mappings for GitHub releases
 REPO_MAPPINGS = {
@@ -157,6 +158,37 @@ def get_image_key(image_name: str) -> str:
         return parts[-1].split(':')[0]
     return clean_name.split(':')[0]
 
+def sanitize_github_actions_content(content: str) -> str:
+    """Sanitize content for safe use in GitHub Actions environment variables"""
+    if not content:
+        return ""
+    
+    # Convert to string and handle encoding issues
+    content = str(content)
+    
+    # Replace problematic GitHub Actions patterns
+    # @ symbols can be interpreted as GitHub mentions
+    content = content.replace('@', '(at)')
+    
+    # Square brackets can be interpreted as GitHub Actions expressions
+    content = content.replace('[', '(').replace(']', ')')
+    
+    # Escape special characters that could break environment variable parsing
+    content = content.replace('`', "'")  # Backticks can break shell parsing
+    content = content.replace('$', '\\$')  # Dollar signs for variable substitution
+    content = content.replace('"', '\\"')  # Escape quotes
+    
+    # Remove control characters and normalize whitespace
+    content = re.sub(r'\s+', ' ', content)  # Multiple whitespace to single space
+    content = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', content)  # Remove control chars
+    
+    # Limit length to prevent environment variable size issues
+    max_length = 500  # Reasonable limit for changelog entries
+    if len(content) > max_length:
+        content = content[:max_length].rsplit(' ', 1)[0] + '...'
+    
+    return content.strip()
+
 def get_ghcr_latest_tag(registry_path: str, rate_limiter: RateLimitManager) -> Optional[str]:
     """Get latest tag from GitHub Container Registry with authentication"""
     try:
@@ -284,7 +316,7 @@ def get_dockerhub_latest_tag(registry_path: str, rate_limiter: RateLimitManager)
         return None
 
 def get_github_releases(repo_name: str, old_version: str, new_version: str, rate_limiter: RateLimitManager) -> Optional[List[Dict]]:
-    """Get GitHub releases between two versions with authentication"""
+    """Get GitHub releases between two versions with enhanced error handling"""
     try:
         rate_limiter.wait_if_needed('github_api')
         
@@ -307,20 +339,32 @@ def get_github_releases(repo_name: str, old_version: str, new_version: str, rate
         new_clean = new_version.replace('release-', '').replace('v', '').replace('-alpine', '')
         
         for release in releases:
-            tag = release.get('tag_name', '').replace('release-', '').replace('v', '').replace('-alpine', '')
-            
-            if tag == new_clean or (old_clean < tag <= new_clean):
-                changes.append({
-                    'version': release.get('tag_name', ''),
-                    'name': release.get('name', ''),
-                    'body': (release.get('body', '')[:300] + '...' 
-                           if len(release.get('body', '')) > 300 
-                           else release.get('body', '')),
-                    'url': release.get('html_url', ''),
-                    'published': release.get('published_at', '')[:10]
-                })
+            try:
+                tag = release.get('tag_name', '').replace('release-', '').replace('v', '').replace('-alpine', '')
+                
+                if tag == new_clean or (old_clean < tag <= new_clean):
+                    # Sanitize all text content for GitHub Actions safety
+                    version = sanitize_github_actions_content(release.get('tag_name', ''))
+                    name = sanitize_github_actions_content(release.get('name', ''))
+                    body = sanitize_github_actions_content(release.get('body', ''))
+                    url = release.get('html_url', '')  # URLs are generally safe
+                    published = release.get('published_at', '')[:10]  # Just the date part
+                    
+                    # Only add if we have meaningful content
+                    if version and name:
+                        changes.append({
+                            'version': version,
+                            'name': name,
+                            'body': body,
+                            'url': url,
+                            'published': published
+                        })
+            except Exception as e:
+                # Skip individual releases that cause issues
+                print(f"Warning: Skipping release due to parsing error: {e}")
+                continue
         
-        return changes[:3]
+        return changes[:3]  # Limit to 3 most recent
         
     except Exception as e:
         print(f"Error getting releases for {repo_name}: {e}")
@@ -404,6 +448,86 @@ def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitMan
     
     return updates, modified
 
+def safe_write_github_env(env_file: str, updates: List[Dict]) -> None:
+    """Safely write environment variables for GitHub Actions using heredoc syntax"""
+    try:
+        with open(env_file, 'a') as f:
+            f.write("UPDATES_FOUND=true\n")
+            f.write(f"UPDATE_DATE={datetime.now().strftime('%Y-%m-%d')}\n")
+            
+            # Use heredoc syntax for complex content
+            f.write("UPDATE_SUMMARY<<EOF\n")
+            
+            # Generate safe summary
+            by_category = {}
+            for update in updates:
+                category = update['file'].split('/')[1]
+                if category not in by_category:
+                    by_category[category] = []
+                by_category[category].append(update)
+            
+            # Basic summary
+            f.write(f"## 📋 Updated Services\\n\\n")
+            f.write(f"**Total Updates**: {len(updates)} services across {len(by_category)} categories\\n\\n")
+            
+            # Category overview
+            f.write("### 📊 Updates by Category\\n\\n")
+            for category, cat_updates in sorted(by_category.items()):
+                f.write(f"- **{category.title()}**: {len(cat_updates)} update(s)\\n")
+            f.write("\\n")
+            
+            # Detailed updates by category
+            for category, cat_updates in sorted(by_category.items()):
+                f.write(f"### 📁 {category.title()} Services\\n\\n")
+                
+                for update in cat_updates:
+                    service_name = sanitize_github_actions_content(update['service'])
+                    old_version = sanitize_github_actions_content(update['old_version'])
+                    new_version = sanitize_github_actions_content(update['new_version'])
+                    image_name = sanitize_github_actions_content(update['image'])
+                    
+                    f.write(f"#### 🔄 {service_name} ({old_version} → {new_version})\\n")
+                    f.write(f"**Image**: `{image_name}`\\n")
+                    
+                    if update['repo']:
+                        repo_name = sanitize_github_actions_content(update['repo'])
+                        f.write(f"**Repository**: [GitHub]({update['repo'].replace('@', '%40')})\\n")
+                    
+                    # Add changelog if available and safe
+                    if update['changelog']:
+                        f.write("\\n**Recent Changes**:\\n")
+                        for change in update['changelog']:
+                            try:
+                                version = change.get('version', 'Unknown')
+                                published = change.get('published', 'Unknown')
+                                name = change.get('name', 'Release')
+                                
+                                f.write(f"- **{version}** ({published}): {name}\\n")
+                                
+                                if change.get('body'):
+                                    f.write(f"  {change['body']}\\n")
+                                
+                                if change.get('url'):
+                                    f.write(f"  [View Release]({change['url']})\\n")
+                            except Exception as e:
+                                print(f"Warning: Skipping changelog entry: {e}")
+                                continue
+                    else:
+                        f.write("\\n**Changelog**: Check repository releases manually\\n")
+                    f.write("\\n")
+                
+                f.write("---\\n\\n")
+            
+            f.write("EOF\n")
+            
+    except Exception as e:
+        print(f"Error writing GitHub environment variables: {e}")
+        # Fallback to simple format
+        with open(env_file, 'a') as f:
+            f.write("UPDATES_FOUND=true\n")
+            f.write(f"UPDATE_DATE={datetime.now().strftime('%Y-%m-%d')}\n")
+            f.write(f"UPDATE_SUMMARY=Found {len(updates)} container updates\n")
+
 def main():
     """Main function with enhanced rate limiting and authentication"""
     print("🔍 Enhanced Docker Update Checker with Authentication")
@@ -462,20 +586,14 @@ def main():
     
     print("\n" + "=" * 60)
     
-    # Generate results
+    # Generate results with safe GitHub Actions handling
     if all_updates:
-        summary = generate_update_summary(all_updates)
-        
-        # Set GitHub Actions environment variables
         env_file = os.environ.get('GITHUB_ENV', '/tmp/github_env')
-        with open(env_file, 'a') as f:
-            f.write("UPDATES_FOUND=true\n")
-            f.write(f"UPDATE_DATE={datetime.now().strftime('%Y-%m-%d')}\n")
-            f.write(f"UPDATE_SUMMARY={summary}\n")
+        safe_write_github_env(env_file, all_updates)
         
         print(f"✅ Found {len(all_updates)} total updates!")
         
-        # Group by category for summary
+        # Group by category for console display
         by_category = {}
         for update in all_updates:
             category = update['file'].split('/')[1]
@@ -494,83 +612,6 @@ def main():
         print("ℹ️ All services are up to date!")
     
     print(f"\n✅ Update check completed successfully")
-
-# Quick fix for the changelog parsing errors
-# Add this to the generate_update_summary function around line 400
-
-def generate_update_summary(all_updates: List[Dict]) -> str:
-    """Generate a formatted summary for the PR description"""
-    try:
-        by_category = {}
-        for update in all_updates:
-            category = update['file'].split('/')[1]
-            if category not in by_category:
-                by_category[category] = []
-            by_category[category].append(update)
-        
-        summary = "## 📋 Updated Services\\n\\n"
-        summary += f"**Total Updates**: {len(all_updates)} services across {len(by_category)} categories\\n\\n"
-        
-        # Category overview
-        summary += "### 📊 Updates by Category\\n\\n"
-        for category, updates in sorted(by_category.items()):
-            summary += f"- **{category.title()}**: {len(updates)} update(s)\\n"
-        summary += "\\n"
-        
-        # Detailed updates by category
-        for category, updates in sorted(by_category.items()):
-            summary += f"### 📁 {category.title()} Services\\n\\n"
-            
-            for update in updates:
-                summary += f"#### 🔄 {update['service']} ({update['old_version']} → {update['new_version']})\\n"
-                summary += f"**Image**: `{update['image']}`\\n"
-                
-                if update['repo']:
-                    summary += f"**Repository**: [{update['repo']}](https://github.com/{update['repo']})\\n"
-                
-                # Fix changelog processing with better error handling
-                if update['changelog']:
-                    summary += "\\n**Recent Changes**:\\n"
-                    for change in update['changelog']:
-                        try:
-                            version = change.get('version', 'Unknown')
-                            published = change.get('published', 'Unknown')[:10]  # Limit date length
-                            name = change.get('name', 'Release')
-                            
-                            # Clean up the change name and body
-                            if name:
-                                # Remove problematic characters and limit length
-                                name = str(name).replace('\\n', ' ').replace('\\r', '').replace('\\', '')[:100]
-                            
-                            summary += f"- **{version}** ({published}): {name}\\n"
-                            
-                            # Process body more carefully
-                            body = change.get('body', '')
-                            if body:
-                                # Clean and truncate body
-                                body = str(body).replace('\\n', ' ').replace('\\r', '').replace('\\', '')
-                                body = body[:200]  # Limit to 200 chars
-                                summary += f"  {body}\\n"
-                            
-                            url = change.get('url', '')
-                            if url:
-                                summary += f"  [View Release]({url})\\n"
-                        except Exception as e:
-                            # Skip problematic changelog entries
-                            print(f"Warning: Skipping changelog entry due to formatting error: {e}")
-                            continue
-                else:
-                    summary += "\\n**Changelog**: Check repository releases manually\\n"
-                summary += "\\n"
-            
-            summary += "---\\n\\n"
-        
-        return summary
-        
-    except Exception as e:
-        print(f"Error generating summary: {e}")
-        # Return a simple summary if there's an error
-        return f"## 📋 Updated Services\\n\\n**Total Updates**: {len(all_updates)} services\\n\\n"
 
 if __name__ == "__main__":
     main()
