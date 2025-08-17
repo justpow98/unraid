@@ -10,6 +10,7 @@ import time
 import base64
 import json
 import html
+from packaging import version
 
 # Enhanced repository mappings for GitHub releases
 REPO_MAPPINGS = {
@@ -96,6 +97,23 @@ VERSION_PATTERNS = {
     'github-runner': r'^v\d+\.\d+\.\d+$',
     'autokuma': r'^\d+\.\d+\.\d+$',
 }
+
+def compare_versions(current: str, latest: str) -> bool:
+    """Compare two version strings and return True if latest > current"""
+    try:
+        current_clean = clean_version(current)
+        latest_clean = clean_version(latest)
+        return version.parse(latest_clean) > version.parse(current_clean)
+    except Exception as e:
+        print(f"Version comparison error: {current} vs {latest}: {e}")
+        return False
+
+def clean_version(ver: str) -> str:
+    """Clean version string for comparison"""
+    import re
+    ver = re.sub(r'^(release-|v)', '', ver)
+    ver = re.sub(r'(-alpine|-slim)$', '', ver)
+    return ver
 
 class RateLimitManager:
     """Manages rate limiting across different registries"""
@@ -251,12 +269,12 @@ def get_latest_docker_tag(image_name: str, rate_limiter: RateLimitManager) -> Op
         return None
 
 def get_dockerhub_latest_tag(registry_path: str, rate_limiter: RateLimitManager) -> Optional[str]:
-    """Get latest tag from Docker Hub with authentication"""
+    """Get latest tag with proper semantic version comparison"""
     try:
         rate_limiter.wait_if_needed('dockerhub')
         
         url = f"https://registry.hub.docker.com/v2/repositories/{registry_path}/tags"
-        params = {"page_size": 50, "ordering": "last_updated"}
+        params = {"page_size": 100}  # Increased from 50, removed ordering
         headers = get_docker_hub_auth_headers()
         
         response = requests.get(url, params=params, headers=headers, timeout=20)
@@ -279,22 +297,36 @@ def get_dockerhub_latest_tag(registry_path: str, rate_limiter: RateLimitManager)
         image_key = get_image_key(registry_path)
         pattern = VERSION_PATTERNS.get(image_key)
         
+        # Collect ALL valid version tags
+        valid_tags = []
+        
         # Try pattern matching first
         if pattern:
             for tag in tags:
                 tag_name = tag["name"]
                 if re.match(pattern, tag_name):
-                    return tag_name
+                    valid_tags.append(tag_name)
         
         # Fallback to generic semantic versioning
-        for tag in tags:
-            tag_name = tag["name"]
-            if re.match(r'^\d+\.\d+(\.\d+)?$', tag_name):
-                return tag_name
-            elif re.match(r'^v\d+\.\d+(\.\d+)?$', tag_name):
-                return tag_name
+        if not valid_tags:
+            for tag in tags:
+                tag_name = tag["name"]
+                if re.match(r'^\d+\.\d+(\.\d+)?$', tag_name):
+                    valid_tags.append(tag_name)
+                elif re.match(r'^v\d+\.\d+(\.\d+)?$', tag_name):
+                    valid_tags.append(tag_name)
         
-        return None
+        if not valid_tags:
+            return None
+        
+        # Find the HIGHEST version, not just the first one
+        try:
+            # Sort by semantic version (highest first)
+            sorted_tags = sorted(valid_tags, key=lambda x: version.parse(clean_version(x)), reverse=True)
+            return sorted_tags[0]
+        except Exception as e:
+            print(f"Error sorting versions for {registry_path}: {e}")
+            return valid_tags[0]
         
     except Exception as e:
         print(f"Error checking Docker Hub {registry_path}: {e}")
@@ -394,7 +426,7 @@ def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitMan
         # Get latest version with rate limiting
         latest_tag = get_latest_docker_tag(image_name, rate_limiter)
         
-        if latest_tag and latest_tag != current_tag:
+        if latest_tag and compare_versions(current_tag, latest_tag):
             print(f"  Update available: {current_tag} -> {latest_tag}")
             
             # Get changelog if we have repo mapping
@@ -418,7 +450,7 @@ def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitMan
             })
         else:
             if latest_tag:
-                print(f"  Up to date: {current_tag}")
+                print(f"  Up to date or downgrade rejected: {current_tag} >= {latest_tag}")
             else:
                 print(f"  Could not check: {current_tag}")
     
