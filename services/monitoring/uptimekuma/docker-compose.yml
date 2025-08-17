@@ -1,53 +1,45 @@
-# ============================================================================
-# services/monitoring/uptimekuma/docker-compose.yml
-# ============================================================================
 version: '3.8'
-
 services:
   uptimekuma:
-    image: louislam/uptime-kuma:1.23.15
+    image: louislam/uptime-kuma:1.23.16
     container_name: UptimeKuma
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=UptimeKuma
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=UptimeKuma
     volumes:
-      - ${OBSERVABILITY_PATH}/uptimekuma:/app/data
+    - ${OBSERVABILITY_PATH}/uptimekuma:/app/data
     ports:
-      - "3002:3001"
+    - 3002:3001
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:3002]"
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:3002]
     networks:
-      - monitoring_net
-
+    - monitoring_net
   autokuma:
-    image: ghcr.io/bigboot/autokuma:0.4.0
+    image: ghcr.io/bigboot/autokuma:1.0
     container_name: AutoKuma
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=AutoKuma
-      - AUTOKUMA_UPTIME_KUMA_URL=http://UptimeKuma:3001
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=AutoKuma
+    - AUTOKUMA_UPTIME_KUMA_URL=http://UptimeKuma:3001
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png"
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/autokuma-icon.png
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - monitoring_net
-      - db_net
-      - internal_net
-      - iot_net
-      - teslamate_net
+    - monitoring_net
+    - db_net
+    - internal_net
+    - iot_net
+    - teslamate_net
     depends_on:
-      - uptimekuma
-
+    - uptimekuma
 networks:
   monitoring_net:
     external: true

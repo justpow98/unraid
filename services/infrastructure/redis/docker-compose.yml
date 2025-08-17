@@ -1,42 +1,36 @@
-# services/infrastructure/redis/docker-compose.yml
-# Shared Redis cache infrastructure
-
 version: '3.8'
-
 services:
   redis:
-    image: redis:7.4-alpine  # Pinned version (was redis:latest)
+    image: redis:8.2.0
     container_name: Redis
-    restart: unless-stopped  # Fixed from 'no' restart policy
+    restart: unless-stopped
     environment:
-      - TZ=America/New_York
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Redis
+    - TZ=America/New_York
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Redis
     volumes:
-      # Using docker volume to preserve existing data
-      - redis_data:/data
+    - redis_data:/data
     ports:
-      - "6379:6379"
+    - 6379:6379
     networks:
-      - db_net
+    - db_net
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+      test:
+      - CMD-SHELL
+      - redis-cli ping || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
-    # Redis configuration for persistence
-    command: redis-server --appendonly yes --auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size 64mb
+    command: redis-server --appendonly yes --auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size
+      64mb
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
-
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png
 volumes:
   redis_data:
     external: true
     name: ff0ddf63debae1fd7801a1ba4d1ed1dc81e918e3f19eaaf4b8a13284009baf49
-
 networks:
   db_net:
     external: true
