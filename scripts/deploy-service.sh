@@ -105,7 +105,7 @@ echo -e "${YELLOW}🏷️ Service: $SERVICE_NAME${NC}"
 echo -e "${YELLOW}📍 Path: $SERVICE_PATH${NC}"
 echo
 
-# Find .env file
+# FIXED find_env_file function
 find_env_file() {
     local env_file=""
     
@@ -113,34 +113,35 @@ find_env_file() {
     # 1. Current directory (docker-compose directory)
     if [ -f "$(pwd)/.env" ]; then
         env_file="$(pwd)/.env"
-        echo -e "${GREEN}✅ Using .env from current directory${NC}"
+        echo -e "${GREEN}✅ Using .env from current directory${NC}" >&2
     # 2. Workspace (GitHub Actions runner mount)
     elif [ -f "/workspace/.env" ]; then
         env_file="/workspace/.env"
-        echo -e "${GREEN}✅ Using .env from workspace (GitHub runner)${NC}"
+        echo -e "${GREEN}✅ Using .env from workspace (GitHub runner)${NC}" >&2
     # 3. Docker-compose base directory
     elif [ -f "/mnt/user/appdata/docker-compose/.env" ]; then
         env_file="/mnt/user/appdata/docker-compose/.env"
-        echo -e "${GREEN}✅ Using .env from docker-compose base directory${NC}"
+        echo -e "${GREEN}✅ Using .env from docker-compose base directory${NC}" >&2
     # 4. GitHub workspace
     elif [ -f "$GITHUB_WORKSPACE/.env" ]; then
         env_file="$GITHUB_WORKSPACE/.env"
-        echo -e "${GREEN}✅ Using .env from GitHub workspace${NC}"
+        echo -e "${GREEN}✅ Using .env from GitHub workspace${NC}" >&2
     # 5. Relative path fallback
     elif [ -f "../../../.env" ]; then
         env_file="../../../.env"
-        echo -e "${GREEN}✅ Using .env from relative path${NC}"
+        echo -e "${GREEN}✅ Using .env from relative path${NC}" >&2
     else
-        echo -e "${RED}❌ .env file not found in any expected location${NC}"
-        echo -e "${YELLOW}📍 Checked locations:${NC}"
-        echo "  - $(pwd)/.env"
-        echo "  - /workspace/.env"
-        echo "  - /mnt/user/appdata/docker-compose/.env"
-        echo "  - $GITHUB_WORKSPACE/.env"
-        echo "  - ../../../.env"
+        echo -e "${RED}❌ .env file not found in any expected location${NC}" >&2
+        echo -e "${YELLOW}📍 Checked locations:${NC}" >&2
+        echo "  - $(pwd)/.env" >&2
+        echo "  - /workspace/.env" >&2
+        echo "  - /mnt/user/appdata/docker-compose/.env" >&2
+        echo "  - $GITHUB_WORKSPACE/.env" >&2
+        echo "  - ../../../.env" >&2
         exit 1
     fi
     
+    # ONLY echo the file path to stdout (this gets captured by the variable)
     echo "$env_file"
 }
 
