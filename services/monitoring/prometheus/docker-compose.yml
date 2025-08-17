@@ -1,45 +1,39 @@
-# ============================================================================
-# services/monitoring/prometheus/docker-compose.yml
-# ============================================================================
 version: '3.8'
-
 services:
   prometheus:
-    image: prom/prometheus:v2.54.1
+    image: prom/prometheus:v3.5.0
     container_name: prometheus
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=prometheus
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
-      - '--web.external-url=https://prometheus.azuleluna.xyz'
+    - --config.file=/etc/prometheus/prometheus.yml
+    - --storage.tsdb.path=/prometheus
+    - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME}
+    - --web.console.libraries=/etc/prometheus/console_libraries
+    - --web.console.templates=/etc/prometheus/consoles
+    - --web.enable-lifecycle
+    - --web.external-url=https://prometheus.azuleluna.xyz
     volumes:
-      - ${OBSERVABILITY_PATH}/prometheus/config:/etc/prometheus
-      - ${OBSERVABILITY_PATH}/prometheus/data:/prometheus
+    - ${OBSERVABILITY_PATH}/prometheus/config:/etc/prometheus
+    - ${OBSERVABILITY_PATH}/prometheus/data:/prometheus
     ports:
-      - "9090:9090"
+    - 9090:9090
     networks:
-      - monitoring_net
-    user: "${PUID}:${PGID}"
+    - monitoring_net
+    user: ${PUID}:${PGID}
     labels:
-      - "kuma.prometheus.type=http"
-      - "kuma.prometheus.url=http://prometheus:9090/-/healthy"
-      - "kuma.prometheus.name=Prometheus"
-      - "kuma.prometheus.interval=60"
-      - "kuma.prometheus.keyword=Prometheus is Healthy"
-      - "kuma.prometheus.tags=monitoring,metrics"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:9090]"
-
+    - kuma.prometheus.type=http
+    - kuma.prometheus.url=http://prometheus:9090/-/healthy
+    - kuma.prometheus.name=Prometheus
+    - kuma.prometheus.interval=60
+    - kuma.prometheus.keyword=Prometheus is Healthy
+    - kuma.prometheus.tags=monitoring,metrics
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/prometheus-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:9090]
 networks:
   monitoring_net:
     external: true
