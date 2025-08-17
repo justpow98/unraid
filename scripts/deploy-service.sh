@@ -273,25 +273,33 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
             STATUS=$(docker inspect --format='{{.State.Status}}' "$container" 2>/dev/null || echo "unknown")
             HEALTH=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}no-health-check{{end}}' "$container" 2>/dev/null || echo "unknown")
             
+            # FIXED VERSION:
             case $STATUS in
                 "running")
                     if [ "$HEALTH" = "healthy" ] || [ "$HEALTH" = "no-health-check" ]; then
                         echo -e "${GREEN}✅ $container: running ($HEALTH)${NC}"
                     elif [ "$HEALTH" = "starting" ]; then
                         echo -e "${YELLOW}⏳ $container: starting health checks${NC}"
+                        # DON'T count as unhealthy - give it time!
+                    elif [ "$HEALTH" = "unhealthy" ]; then
+                        echo -e "${RED}⚠️ $container: running but unhealthy${NC}"
                         ((UNHEALTHY_COUNT++))
                     else
-                        echo -e "${YELLOW}⚠️ $container: running but $HEALTH${NC}"
-                        ((UNHEALTHY_COUNT++))
+                        echo -e "${YELLOW}ℹ️ $container: running ($HEALTH)${NC}"
+                        # Don't fail for unknown health states
                     fi
                     ;;
-                "exited")
-                    echo -e "${RED}❌ $container: exited${NC}"
+                "exited"|"dead")
+                    echo -e "${RED}❌ $container: $STATUS${NC}"
+                    ((UNHEALTHY_COUNT++))
+                    ;;
+                "restarting")
+                    echo -e "${YELLOW}🔄 $container: restarting${NC}"
                     ((UNHEALTHY_COUNT++))
                     ;;
                 *)
-                    echo -e "${YELLOW}⚠️ $container: $STATUS${NC}"
-                    ((UNHEALTHY_COUNT++))
+                    echo -e "${YELLOW}ℹ️ $container: $STATUS${NC}"
+                    # Don't fail for unknown statuses during startup
                     ;;
             esac
         done
