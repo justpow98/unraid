@@ -1,94 +1,84 @@
-# ============================================================================
-# services/automotive/teslamate/docker-compose.yml
-# ============================================================================
 version: '3.8'
-
 services:
   teslamate:
-    image: teslamate/teslamate:1.30.1
+    image: teslamate/teslamate:2.1.1
     container_name: TeslaMate
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=TeslaMate
-      - ENCRYPTION_KEY=${TESLAMATE_ENCRYPTION_KEY}
-      - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
-      - MQTT_HOST=mosquitto.iot_net
-      - VIRTUAL_HOST=teslamate.azuleluna.xyz
-      - CHECK_ORIGIN=false
-      - TZ=America/New_York
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=TeslaMate
+    - ENCRYPTION_KEY=${TESLAMATE_ENCRYPTION_KEY}
+    - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
+    - MQTT_HOST=mosquitto.iot_net
+    - VIRTUAL_HOST=teslamate.azuleluna.xyz
+    - CHECK_ORIGIN=false
+    - TZ=America/New_York
     volumes:
-      - ${APPDATA_PATH}/teslamate/import:/opt/app/import
+    - ${APPDATA_PATH}/teslamate/import:/opt/app/import
     ports:
-      - "4001:4000"
+    - 4001:4000
     labels:
-      - "kuma.teslamate.type=http"
-      - "kuma.teslamate.url=http://TeslaMate:4000"
-      - "kuma.teslamate.name=TeslaMate App"
-      - "kuma.teslamate.interval=60"
-      - "kuma.teslamate.tags=automotive,tesla"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/adriankumpf/teslamate/master/priv/static/images/logo.svg"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:4001]"
+    - kuma.teslamate.type=http
+    - kuma.teslamate.url=http://TeslaMate:4000
+    - kuma.teslamate.name=TeslaMate App
+    - kuma.teslamate.interval=60
+    - kuma.teslamate.tags=automotive,tesla
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/adriankumpf/teslamate/master/priv/static/images/logo.svg
+    - net.unraid.docker.webui=http://[IP]:[PORT:4001]
     networks:
-      - teslamate_net
-      - db_net
-      - iot_net
+    - teslamate_net
+    - db_net
+    - iot_net
     depends_on:
-      - teslamate-postgres
-
+    - teslamate-postgres
   teslamate-postgres:
-    image: postgres:17.2
+    image: postgres:13.22
     container_name: teslamate-postgres
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=teslamate-postgres
-      - POSTGRES_USER=${TESLAMATE_DB_USER}
-      - POSTGRES_PASSWORD=${TESLAMATE_DB_PASSWORD}
-      - POSTGRES_DB=${TESLAMATE_DB_NAME}
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=teslamate-postgres
+    - POSTGRES_USER=${TESLAMATE_DB_USER}
+    - POSTGRES_PASSWORD=${TESLAMATE_DB_PASSWORD}
+    - POSTGRES_DB=${TESLAMATE_DB_NAME}
     volumes:
-      - ${TESLAMATE_PATH}/postgres:/var/lib/postgresql/data
+    - ${TESLAMATE_PATH}/postgres:/var/lib/postgresql/data
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     ports:
-      - "5436:5432"
+    - 5436:5432
     networks:
-      - db_net
-
+    - db_net
   teslamate-grafana:
-    image: teslamate/grafana:1.30.1
+    image: teslamate/grafana:2.1.1
     container_name: TeslaMate-Grafana
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=TeslaMate-Grafana
-      - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=TeslaMate-Grafana
+    - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
     volumes:
-      - ${TESLAMATE_PATH}/grafana:/var/lib/grafana
+    - ${TESLAMATE_PATH}/grafana:/var/lib/grafana
     labels:
-      - "kuma.teslamate_grafana.type=http"
-      - "kuma.teslamate_grafana.url=http://TeslaMate-Grafana:3000"
-      - "kuma.teslamate_grafana.name=TeslaMate Grafana"
-      - "kuma.teslamate_grafana.interval=60"
-      - "kuma.teslamate_grafana.keyword=Grafana"
-      - "kuma.teslamate_grafana.tags=automotive,visualization"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:3333]"
+    - kuma.teslamate_grafana.type=http
+    - kuma.teslamate_grafana.url=http://TeslaMate-Grafana:3000
+    - kuma.teslamate_grafana.name=TeslaMate Grafana
+    - kuma.teslamate_grafana.interval=60
+    - kuma.teslamate_grafana.keyword=Grafana
+    - kuma.teslamate_grafana.tags=automotive,visualization
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/grafana-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:3333]
     ports:
-      - "3333:3000"
+    - 3333:3000
     networks:
-      - teslamate_net
-      - db_net
-
+    - teslamate_net
+    - db_net
 networks:
   teslamate_net:
     external: true

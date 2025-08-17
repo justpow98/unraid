@@ -1,88 +1,78 @@
-# ============================================================================
-# services/media/immich/docker-compose.yml
-# ============================================================================
 version: '3.8'
-
 services:
   immich:
-    image: ghcr.io/imagegenius/immich:1.128.0
+    image: ghcr.io/imagegenius/immich:1.138.0
     container_name: immich
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=immich
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - UMASK=${UMASK}
-      - DB_HOSTNAME=immich-postgres
-      - DB_USERNAME=${IMMICH_DB_USER}
-      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
-      - DB_DATABASE_NAME=${IMMICH_DB_NAME}
-      - REDIS_HOSTNAME=immich-redis
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=immich
+    - PUID=${PUID}
+    - PGID=${PGID}
+    - UMASK=${UMASK}
+    - DB_HOSTNAME=immich-postgres
+    - DB_USERNAME=${IMMICH_DB_USER}
+    - DB_PASSWORD=${IMMICH_DB_PASSWORD}
+    - DB_DATABASE_NAME=${IMMICH_DB_NAME}
+    - REDIS_HOSTNAME=immich-redis
     volumes:
-      - ${APPDATA_PATH}/immich/photos:/photos
-      - ${APPDATA_PATH}/immich/libraries:/libraries
-      - ${APPDATA_PATH}/immich/config:/config
+    - ${APPDATA_PATH}/immich/photos:/photos
+    - ${APPDATA_PATH}/immich/libraries:/libraries
+    - ${APPDATA_PATH}/immich/config:/config
     ports:
-      - "8083:8080"
+    - 8083:8080
     labels:
-      - "kuma.immich.type=http"
-      - "kuma.immich.url=http://immich:8080"
-      - "kuma.immich.name=Immich Photos"
-      - "kuma.immich.interval=60"
-      - "kuma.immich.keyword=Immich"
-      - "kuma.immich.tags=media,photos"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:8083]"
+    - kuma.immich.type=http
+    - kuma.immich.url=http://immich:8080
+    - kuma.immich.name=Immich Photos
+    - kuma.immich.interval=60
+    - kuma.immich.keyword=Immich
+    - kuma.immich.tags=media,photos
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:8083]
     networks:
-      - internal_net
-      - db_net
+    - internal_net
+    - db_net
     depends_on:
-      - immich-postgres
-      - immich-redis
-
+    - immich-postgres
+    - immich-redis
   immich-postgres:
     image: ghcr.io/immich-app/postgres:16-vectorchord0.3.0-pgvectors0.3.0
     container_name: Immich_PostgreSQL
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Immich_PostgreSQL
-      - POSTGRES_DB=${IMMICH_DB_NAME}
-      - POSTGRES_USER=${IMMICH_DB_USER}
-      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Immich_PostgreSQL
+    - POSTGRES_DB=${IMMICH_DB_NAME}
+    - POSTGRES_USER=${IMMICH_DB_USER}
+    - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
     volumes:
-      - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
+    - ${CACHE_PATH}/PostgreSQL_Immich:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+    - 5433:5432
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     networks:
-      - db_net
-
+    - db_net
   immich-redis:
-    image: redis:7.4.1-alpine
+    image: redis:8.2.0
     container_name: immich-redis
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=immich-redis
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=immich-redis
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png"
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png
     volumes:
-      - ${CACHE_PATH}/immich/redis:/data
+    - ${CACHE_PATH}/immich/redis:/data
     networks:
-      - db_net
-
+    - db_net
 networks:
   internal_net:
     external: true

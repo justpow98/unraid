@@ -1,57 +1,50 @@
-# ============================================================================
-# services/iot/home-assistant/docker-compose.yml
-# ============================================================================
 version: '3.8'
-
 services:
   home-assistant:
-    image: ghcr.io/home-assistant/home-assistant:2025.8
+    image: ghcr.io/home-assistant/home-assistant:2025.8.2
     container_name: Home-Assistant-Container
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Home-Assistant-Container
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Home-Assistant-Container
     volumes:
-      - ${HOME_ASSISTANT_PATH}/Home-Assistant-Container:/config
-      - /etc/localtime:/etc/localtime:ro
+    - ${HOME_ASSISTANT_PATH}/Home-Assistant-Container:/config
+    - /etc/localtime:/etc/localtime:ro
     ports:
-      - "8123:8123"
+    - 8123:8123
     labels:
-      - "kuma.homeassistant.type=http"
-      - "kuma.homeassistant.url=http://Home-Assistant-Container:8123"
-      - "kuma.homeassistant.name=Home Assistant"
-      - "kuma.homeassistant.interval=60"
-      - "kuma.homeassistant.keyword=Home Assistant"
-      - "kuma.homeassistant.tags=iot,smart-home"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:8123]"
+    - kuma.homeassistant.type=http
+    - kuma.homeassistant.url=http://Home-Assistant-Container:8123
+    - kuma.homeassistant.name=Home Assistant
+    - kuma.homeassistant.interval=60
+    - kuma.homeassistant.keyword=Home Assistant
+    - kuma.homeassistant.tags=iot,smart-home
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:8123]
     networks:
-      - iot_net
+    - iot_net
     privileged: true
-
   matter-server:
-    image: ghcr.io/home-assistant-libs/python-matter-server:6.6.0
+    image: ghcr.io/home-assistant-libs/python-matter-server:8.1
     container_name: matter-server
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=matter-server
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=matter-server
     volumes:
-      - ${HOME_ASSISTANT_PATH}/python-matter-server:/data
+    - ${HOME_ASSISTANT_PATH}/python-matter-server:/data
     network_mode: host
     labels:
-      - "kuma.matter_server.type=http"
-      - "kuma.matter_server.url=http://matter-server:5540"
-      - "kuma.matter_server.name=Matter Server"
-      - "kuma.matter_server.interval=60"
-      - "kuma.matter_server.tags=iot,matter"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png"
+    - kuma.matter_server.type=http
+    - kuma.matter_server.url=http://matter-server:5540
+    - kuma.matter_server.name=Matter Server
+    - kuma.matter_server.interval=60
+    - kuma.matter_server.tags=iot,matter
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/matter-server-icon.png
 networks:
   iot_net:
     external: true

@@ -1,68 +1,63 @@
-# services/networking/nginx-proxy-manager/docker-compose.yml
-# Central reverse proxy for all services - MIGRATED TO NPMplus
-
 version: '3.8'
-
 services:
   nginx-proxy-manager:
-    image: zoeyvid/npmplus:349
-    container_name: NPMplus-Official   
+    image: zoeyvid/npmplus:449
+    container_name: NPMplus-Official
     restart: unless-stopped
     environment:
-      - TZ=US/Eastern
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=NPMplus-Official
-      - DB_SQLITE_FILE=/data/database.sqlite
-      - SUPPRESS_NO_CONFIG_WARNING=1
-      - S6_BEHAVIOUR_IF_STAGE2_FAILS=1
-      - S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
-      - S6_FIX_ATTRS_HIDDEN=1
-      - S6_KILL_FINISH_MAXTIME=10000
-      - S6_VERBOSITY=1
-      - NODE_ENV=production
-      - NODE_OPTIONS=--openssl-legacy-provider
-      # NPMplus specific environment variables
-      - ACME_EMAIL=${ACME_EMAIL}
-      - SKIP_IP_RANGES=${SKIP_IP_RANGES:-true}
-      - MODSEC=${MODSEC:-false}
-      - CROWDSEC=${CROWDSEC:-false}
-      - LOGROTATE=${LOGROTATE:-false}
-      - GOACCESS=${GOACCESS:-false}
+    - TZ=US/Eastern
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=NPMplus-Official
+    - DB_SQLITE_FILE=/data/database.sqlite
+    - SUPPRESS_NO_CONFIG_WARNING=1
+    - S6_BEHAVIOUR_IF_STAGE2_FAILS=1
+    - S6_CMD_WAIT_FOR_SERVICES_MAXTIME=0
+    - S6_FIX_ATTRS_HIDDEN=1
+    - S6_KILL_FINISH_MAXTIME=10000
+    - S6_VERBOSITY=1
+    - NODE_ENV=production
+    - NODE_OPTIONS=--openssl-legacy-provider
+    - ACME_EMAIL=${ACME_EMAIL}
+    - SKIP_IP_RANGES=${SKIP_IP_RANGES:-true}
+    - MODSEC=${MODSEC:-false}
+    - CROWDSEC=${CROWDSEC:-false}
+    - LOGROTATE=${LOGROTATE:-false}
+    - GOACCESS=${GOACCESS:-false}
     labels:
-      - "kuma.nginx_proxy.type=http"
-      - "kuma.nginx_proxy.url=http://NPMplus-Official:81/api/health"
-      - "kuma.nginx_proxy.name=Nginx Proxy Manager"
-      - "kuma.nginx_proxy.interval=60"
-      - "kuma.nginx_proxy.accepted_statuscodes=200,401"
-      - "kuma.nginx_proxy.tags=networking,proxy"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nginx-proxy-manager-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:8091]"
+    - kuma.nginx_proxy.type=http
+    - kuma.nginx_proxy.url=http://NPMplus-Official:81/api/health
+    - kuma.nginx_proxy.name=Nginx Proxy Manager
+    - kuma.nginx_proxy.interval=60
+    - kuma.nginx_proxy.accepted_statuscodes=200,401
+    - kuma.nginx_proxy.tags=networking,proxy
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/nginx-proxy-manager-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:8091]
     volumes:
-      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data:/data  # SAME: Keep existing data path
-      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/letsencrypt:/etc/letsencrypt  # SAME: Keep existing SSL path
-      - /tmp/Nginx-Proxy-Manager-Official/var/log:/var/log  # SAME: Keep existing log path
+    - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data:/data
+    - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/letsencrypt:/etc/letsencrypt
+    - /tmp/Nginx-Proxy-Manager-Official/var/log:/var/log
     ports:
-      - "8090:80"     # HTTP - SAME
-      - "8443:443"    # HTTPS - SAME  
-      - "8091:81"     # Admin Interface (now HTTPS) - SAME port, but interface is now HTTPS
-      - "3003:3000"   # Management API - SAME
+    - 8090:80
+    - 8443:443
+    - 8091:81
+    - 3003:3000
     networks:
-      # NPM needs access to ALL networks to proxy services
-      - public_net
-      - internal_net
-      - db_net
-      - monitoring_net
-      - iot_net
-      - teslamate_net
+    - public_net
+    - internal_net
+    - db_net
+    - monitoring_net
+    - iot_net
+    - teslamate_net
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -k https://localhost:81/api/health || curl -f http://localhost:81/api/health || exit 1"]  # CHANGED: Updated for HTTPS admin interface
+      test:
+      - CMD-SHELL
+      - curl -f -k https://localhost:81/api/health || curl -f http://localhost:81/api/health
+        || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
-
 networks:
   public_net:
     external: true

@@ -1,67 +1,58 @@
-# ============================================================================
-# services/productivity/wikijs/docker-compose.yml
-# ============================================================================
 version: '3.8'
-
 services:
   wikijs:
-    image: requarks/wiki:2.5.304
+    image: requarks/wiki:2.5
     container_name: wikijs
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=wikijs
-      - DB_TYPE=postgres
-      - DB_HOST=wikijs-postgres
-      - DB_PORT=5432
-      - DB_USER=${WIKIJS_DB_USER}
-      - DB_PASS=${WIKIJS_DB_PASSWORD}
-      - DB_NAME=${WIKIJS_DB_NAME}
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=wikijs
+    - DB_TYPE=postgres
+    - DB_HOST=wikijs-postgres
+    - DB_PORT=5432
+    - DB_USER=${WIKIJS_DB_USER}
+    - DB_PASS=${WIKIJS_DB_PASSWORD}
+    - DB_NAME=${WIKIJS_DB_NAME}
     volumes:
-      - ${APPDATA_PATH}/wikijs:/wiki/data
+    - ${APPDATA_PATH}/wikijs:/wiki/data
     labels:
-      - "kuma.wikijs.type=http"
-      - "kuma.wikijs.url=http://wikijs:3000"
-      - "kuma.wikijs.name=Wiki.js"
-      - "kuma.wikijs.interval=60"
-      - "kuma.wikijs.keyword=Wiki.js"
-      - "kuma.wikijs.tags=productivity,wiki"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:3000]"
+    - kuma.wikijs.type=http
+    - kuma.wikijs.url=http://wikijs:3000
+    - kuma.wikijs.name=Wiki.js
+    - kuma.wikijs.interval=60
+    - kuma.wikijs.keyword=Wiki.js
+    - kuma.wikijs.tags=productivity,wiki
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/wikijs-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:3000]
     ports:
-      - "3000:3000"
+    - 3000:3000
     networks:
-      - internal_net
-      - db_net
+    - internal_net
+    - db_net
     depends_on:
-      - wikijs-postgres
-
+    - wikijs-postgres
   wikijs-postgres:
-    image: postgres:17.2
+    image: postgres:13.22
     container_name: wikijs-postgresql
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=wikijs-postgresql
-      - POSTGRES_DB=${WIKIJS_DB_NAME}
-      - POSTGRES_USER=${WIKIJS_DB_USER}
-      - POSTGRES_PASSWORD=${WIKIJS_DB_PASSWORD}
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=wikijs-postgresql
+    - POSTGRES_DB=${WIKIJS_DB_NAME}
+    - POSTGRES_USER=${WIKIJS_DB_USER}
+    - POSTGRES_PASSWORD=${WIKIJS_DB_PASSWORD}
     volumes:
-      - ${APPDATA_PATH}/wikijs/postgres:/var/lib/postgresql/data
+    - ${APPDATA_PATH}/wikijs/postgres:/var/lib/postgresql/data
     labels:
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
-
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     ports:
-      - "5435:5432"
+    - 5435:5432
     networks:
-      - db_net
-
+    - db_net
 networks:
   internal_net:
     external: true
