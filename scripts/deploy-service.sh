@@ -245,7 +245,7 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
     sleep 5
     
     # Get new container list with better error handling
-    NEW_CONTAINERS=$(docker-compose --env-file "$ENV_FILE" ps -q 2>/dev/null | tr '\n' ' ')
+    NEW_CONTAINERS=$(docker-compose --env-file "$ENV_FILE" ps -q 2>/dev/null || true)
     
     # Debug: Show what containers we found
     echo "Debug: Found containers via docker-compose: '$NEW_CONTAINERS'"
@@ -255,11 +255,10 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
         echo -e "${BLUE}ℹ️ Checking for containers by service name...${NC}"
         
         # Fallback: try to find containers by service name pattern
-        NEW_CONTAINERS=$(docker ps -q --filter "name=$SERVICE_NAME" | tr '\n' ' ')
+        NEW_CONTAINERS=$(docker ps -q --filter "name=$SERVICE_NAME" 2>/dev/null || true)
         
         if [ -z "$NEW_CONTAINERS" ]; then
             echo -e "${YELLOW}⚠️ No containers found by name pattern either${NC}"
-            echo -e "${BLUE}ℹ️ Service may be using different naming or may be part of external networks${NC}"
             echo -e "${GREEN}✅ Skipping detailed health checks, deployment likely successful${NC}"
         else
             echo "Debug: Found containers by name pattern: '$NEW_CONTAINERS'"
@@ -268,6 +267,9 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
     
     # Only proceed with health checks if we found containers
     if [ ! -z "$NEW_CONTAINERS" ]; then
+        # Convert to array to handle properly
+        CONTAINER_ARRAY=($NEW_CONTAINERS)
+        
         # Check container health with improved logic
         WAIT_TIME=0
         ALL_HEALTHY=false
@@ -278,14 +280,14 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
             UNHEALTHY_COUNT=0
             TOTAL_COUNT=0
             
-            for container in $NEW_CONTAINERS; do
+            for container in "${CONTAINER_ARRAY[@]}"; do
                 if [ ! -z "$container" ]; then
-                    ((TOTAL_COUNT++))
+                    TOTAL_COUNT=$((TOTAL_COUNT + 1))
                     
                     # Check if container is still running
                     if ! docker inspect "$container" >/dev/null 2>&1; then
                         echo -e "${RED}⚠️ Container $container no longer exists${NC}"
-                        ((UNHEALTHY_COUNT++))
+                        UNHEALTHY_COUNT=$((UNHEALTHY_COUNT + 1))
                         continue
                     fi
                     
@@ -302,14 +304,14 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
                                 # Don't count as unhealthy during startup
                             elif [ "$HEALTH" = "unhealthy" ]; then
                                 echo -e "${RED}⚠️ $container: running but unhealthy${NC}"
-                                ((UNHEALTHY_COUNT++))
+                                UNHEALTHY_COUNT=$((UNHEALTHY_COUNT + 1))
                             else
                                 echo -e "${YELLOW}ℹ️ $container: running ($HEALTH)${NC}"
                             fi
                             ;;
                         "exited"|"dead")
                             echo -e "${RED}❌ $container: $STATUS${NC}"
-                            ((UNHEALTHY_COUNT++))
+                            UNHEALTHY_COUNT=$((UNHEALTHY_COUNT + 1))
                             ;;
                         "restarting")
                             echo -e "${YELLOW}🔄 $container: restarting${NC}"
@@ -322,7 +324,8 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
                 fi
             done
             
-            if [ $UNHEALTHY_COUNT -eq 0 ] && [ $TOTAL_COUNT -gt 0 ]; then
+            # Check if we're healthy (handle case where TOTAL_COUNT might be 0)
+            if [ $TOTAL_COUNT -gt 0 ] && [ $UNHEALTHY_COUNT -eq 0 ]; then
                 ALL_HEALTHY=true
                 break
             fi
@@ -332,7 +335,7 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
             WAIT_TIME=$((WAIT_TIME + HEALTH_CHECK_INTERVAL))
         done
         
-        if [ "$ALL_HEALTHY" = true ]; then
+        if [ "$ALL_HEALTHY" = "true" ]; then
             echo -e "${GREEN}✅ All containers are healthy!${NC}"
         else
             echo -e "${YELLOW}⚠️ Some containers may not be fully healthy yet${NC}"
@@ -340,7 +343,7 @@ if [ "$SKIP_HEALTH" = false ] && [ "$RESTART_NEEDED" = true ]; then
             
             # Show recent logs for debugging but don't fail deployment
             echo -e "${BLUE}📋 Recent logs for troubleshooting:${NC}"
-            docker-compose --env-file "$ENV_FILE" logs --tail 10
+            docker-compose --env-file "$ENV_FILE" logs --tail 10 || true
             
             echo -e "${GREEN}✅ Deployment completed despite health check warnings${NC}"
         fi
