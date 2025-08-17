@@ -184,10 +184,10 @@ jobs:
                 
                 if "$GITHUB_WORKSPACE/scripts/deploy-service.sh" "$service_dir"; then
                   echo "✅ Successfully deployed: $category/$service_name"
-                  ((DEPLOYED_COUNT++))
+                  ((DEPLOYED_COUNT++)) || true
                 else
                   echo "❌ Failed to deploy: $category/$service_name"
-                  ((FAILED_COUNT++))
+                  ((FAILED_COUNT++)) || true
                 fi
                 
                 # Brief pause between deployments
