@@ -39,7 +39,7 @@ services:
     - immich-postgres
     - immich-redis
   immich-postgres:
-    image: ghcr.io/immich-app/postgres:16-vectorchord0.3.0-pgvectors0.3.0
+    image: ghcr.io/immich-app/postgres:16-vectorchord0.4.2-pgvectors0.3.0
     container_name: Immich_PostgreSQL
     restart: unless-stopped
     environment:
