@@ -390,6 +390,10 @@ def get_github_releases(repo_name: str, old_version: str, new_version: str, rate
 def check_service_for_updates(compose_file_path: str, rate_limiter: RateLimitManager) -> Tuple[List[Dict], bool]:
     """Check a specific docker-compose file for updates with rate limiting"""
     updates = []
+
+    if "github-runner" in compose_file_path or "automation/github-runner" in compose_file_path:
+        print(f"🚫 SKIPPING: {compose_file_path} (GitHub runner - never update during CI/CD)")
+        return updates, False
     
     try:
         with open(compose_file_path, 'r') as f:
