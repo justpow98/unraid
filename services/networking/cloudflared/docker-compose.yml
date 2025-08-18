@@ -1,11 +1,10 @@
-# ============================================================================
 # services/networking/cloudflared/docker-compose.yml
-# ============================================================================
+# Updated to use official Cloudflare image
 version: '3.8'
 
 services:
   cloudflared:
-    image: figro/unraid-cloudflared-tunnel:latest
+    image: cloudflare/cloudflared:2025.4.0  # Official image with pinned version
     container_name: Unraid-Cloudflared-Tunnel
     restart: unless-stopped
     environment:
@@ -13,21 +12,18 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=Unraid-Cloudflared-Tunnel
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     volumes:
       - ${APPDATA_PATH}/cloudflared:/etc/cloudflared
     labels:
-      - "kuma.cloudflared.type=http"
-      - "kuma.cloudflared.url=http://Unraid-Cloudflared-Tunnel:46495/ready"
+      - "kuma.cloudflared.type=docker"
+      - "kuma.cloudflared.docker_container=Unraid-Cloudflared-Tunnel"
+      - "kuma.cloudflared.docker_host=unix:///var/run/docker.sock"
       - "kuma.cloudflared.name=Cloudflared Tunnel"
       - "kuma.cloudflared.interval=60"
-      - "kuma.cloudflared.keyword=ready"
       - "kuma.cloudflared.tags=networking,tunnel"
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/cloudflared-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:46495]"
-    ports:
-      - "46495:46495"
     networks:
       - public_net
 
