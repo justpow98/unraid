@@ -66,6 +66,11 @@ jobs:
           COMPOSE_PATH="/workspace"
           cd "$COMPOSE_PATH"
           
+          # Services that should NEVER be deployed
+          EXCLUDED_SERVICES=(
+            "services/automation/github-runner"  # Never redeploy the runner itself!
+          )
+          
           # Initialize arrays
           CHANGED_SERVICES=""
           ALL_SERVICES=""
@@ -81,10 +86,28 @@ jobs:
           
           # Determine deployment scope
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "🚀 Manual deployment triggered - checking all services"
+            echo "🚀 Manual deployment triggered"
             DEPLOYMENT_TYPE="manual"
-            # For manual deployments, we'll deploy services that have been recently modified
-            find services -name "docker-compose.yml" -mtime -7 | head -10 > changed_services.txt
+            
+            # For manual deployments, check git changes in the last commit
+            # This is much safer than file modification time
+            cd "$GITHUB_WORKSPACE"
+            
+            # Get recently changed files from git (last 3 commits to be safe)
+            git diff --name-only HEAD~3 HEAD | grep "docker-compose.yml" > /tmp/manual_changes.txt || touch /tmp/manual_changes.txt
+            
+            # If no recent git changes, don't deploy anything
+            if [ ! -s /tmp/manual_changes.txt ]; then
+              echo "ℹ️ No recent docker-compose.yml changes found in git history"
+              echo "💡 Use --force flag in workflow_dispatch to override"
+              touch changed_services.txt
+            else
+              echo "📝 Found recent changes in git:"
+              cat /tmp/manual_changes.txt
+              cp /tmp/manual_changes.txt changed_services.txt
+            fi
+            
+            cd "$COMPOSE_PATH"
           else
             echo "📝 Automatic deployment - checking git changes"
             DEPLOYMENT_TYPE="automatic"
@@ -106,6 +129,30 @@ jobs:
             cp /tmp/changed_services.txt changed_services.txt
           fi
           
+          # Filter out excluded services
+          if [ -s changed_services.txt ]; then
+            echo "🔒 Filtering out excluded services..."
+            cp changed_services.txt changed_services_unfiltered.txt
+            
+            # Remove excluded services
+            for excluded in "${EXCLUDED_SERVICES[@]}"; do
+              grep -v "$excluded" changed_services_unfiltered.txt > changed_services.txt.tmp || touch changed_services.txt.tmp
+              mv changed_services.txt.tmp changed_services.txt
+            done
+            
+            # Show what was filtered
+            if [ -s changed_services_unfiltered.txt ] && [ ! -s changed_services.txt ]; then
+              echo "⚠️ All changed services were excluded from deployment"
+            elif [ -s changed_services_unfiltered.txt ]; then
+              echo "🔒 Excluded services:"
+              for excluded in "${EXCLUDED_SERVICES[@]}"; do
+                if grep -q "$excluded" changed_services_unfiltered.txt; then
+                  echo "  - $excluded (GitHub runner - never deploy)"
+                fi
+              done
+            fi
+          fi
+          
           # Set outputs
           echo "deployment_type=$DEPLOYMENT_TYPE" >> $GITHUB_OUTPUT
           
@@ -117,6 +164,11 @@ jobs:
           echo "  Total services: $TOTAL_SERVICES"
           echo "  Changed services: $CHANGED_COUNT"
           echo "  Deployment type: $DEPLOYMENT_TYPE"
+          
+          if [ $CHANGED_COUNT -gt 0 ]; then
+            echo "📋 Services to deploy:"
+            cat changed_services.txt
+          fi
           
           echo "total_services=$TOTAL_SERVICES" >> $GITHUB_OUTPUT
           echo "changed_services=$CHANGED_COUNT" >> $GITHUB_OUTPUT
