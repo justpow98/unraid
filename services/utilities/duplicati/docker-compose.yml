@@ -30,6 +30,14 @@ services:
       # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/duplicati-icon.png"
       - "net.unraid.docker.webui=http://[IP]:[PORT:8200]"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'  
+          memory: 400M 
+        reservations:
+          cpus: '0.1'
+          memory: 100M
     ports:
       - "8200:8200"
     networks:

@@ -23,6 +23,14 @@ services:
     - kuma.homeassistant.tags=iot,smart-home
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/home-assistant-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:8123]
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1.5G
+        reservations:
+          cpus: '0.2'
+          memory: 400M
     networks:
     - iot_net
     privileged: true

@@ -108,6 +108,14 @@ services:
     - kuma.authentik.tags=security,auth
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/authentik-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:9000]
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 300M
     networks:
     - db_net
     - internal_net
@@ -168,6 +176,14 @@ services:
     - kuma.authentik_worker.name=Authentik Worker
     - kuma.authentik_worker.interval=60
     - kuma.authentik_worker.tags=security,worker
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 800M
+        reservations:
+          cpus: '0.1'
+          memory: 200M
     networks:
     - db_net
     - internal_net

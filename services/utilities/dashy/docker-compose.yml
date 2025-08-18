@@ -1,9 +1,10 @@
 # services/utilities/dashy/docker-compose.yml
+# Optimized for production use
 version: '3.8'
 
 services:
   dashy:
-    image: lissy93/dashy:release-3.1.1  # Using specific version instead of 'latest'
+    image: lissy93/dashy:release-3.1.1
     container_name: dashy
     restart: unless-stopped
     environment:
@@ -13,10 +14,18 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=dashy
-      - CA_TS_FALLBACK_DIR=/app/user-data/
-      - IS_DOCKER=true
+      
+      # 🔧 PRODUCTION OPTIMIZATIONS
+      - NODE_ENV=production        # Force production mode
+      - DISABLE_DEV_MODE=true      # Disable development features
       - PORT=8080
       - DIRECTORY=/app
+      - IS_DOCKER=true
+      
+      # 📊 PERFORMANCE SETTINGS
+      - VUE_APP_DOMAIN=/           # Base path optimization
+      - BASE_URL=/                 # Static asset path
+      
     labels:
       - "kuma.dashy.type=http"
       - "kuma.dashy.url=http://dashy:8080"
@@ -34,6 +43,16 @@ services:
       - "4000:8080"
     networks:
       - internal_net
+    
+    # 🎯 RESOURCE LIMITS (should drop dramatically)
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'      # Should be very light in production
+          memory: 128M     # Down from 225MB!
+        reservations:
+          cpus: '0.02'
+          memory: 32M
 
 networks:
   internal_net:

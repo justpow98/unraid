@@ -32,6 +32,14 @@ services:
     - kuma.immich.tags=media,photos
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/immich-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:8083]
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.3'
+          memory: 600M
     networks:
     - internal_net
     - db_net
