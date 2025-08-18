@@ -89,11 +89,27 @@ if [ ! -d "$SERVICE_PATH" ]; then
     exit 1
 fi
 
+# 🚫 CRITICAL SAFETY CHECK: Never deploy GitHub runner
+if [[ "$SERVICE_PATH" == *"github-runner"* ]] || [[ "$SERVICE_PATH" == *"automation/github-runner"* ]]; then
+    echo -e "${RED}🚫 BLOCKED: Cannot deploy GitHub runner during active deployment${NC}"
+    echo -e "${YELLOW}💡 This would terminate the current deployment job and cause failures${NC}"
+    echo -e "${BLUE}ℹ️ GitHub runner deployments must be done manually outside of CI/CD${NC}"
+    exit 1
+fi
+
 # Validate compose file exists
 if [ ! -f "$SERVICE_PATH/docker-compose.yml" ]; then
     echo -e "${RED}❌ docker-compose.yml not found in: $SERVICE_PATH${NC}"
     exit 1
 fi
+
+# Validate compose file exists
+if [ ! -f "$SERVICE_PATH/docker-compose.yml" ]; then
+    echo -e "${RED}❌ docker-compose.yml not found in: $SERVICE_PATH${NC}"
+    exit 1
+fi
+
+
 
 # Extract service information
 SERVICE_NAME=$(basename "$SERVICE_PATH")

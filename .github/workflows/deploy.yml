@@ -6,7 +6,23 @@ on:
   pull_request:
     types: [ closed ]
     branches: [ main ]
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch: # Manual trigger
+    inputs:
+      target_service:
+        description: 'Deploy specific service (e.g., services/utilities/dashy)'
+        required: false
+        default: ''
+        type: string
+      force_deploy:
+        description: 'Force deploy even if no changes detected'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Dry run - show what would be deployed without doing it'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   deploy:
@@ -206,7 +222,13 @@ jobs:
       - name: Deploy Application Services
         if: steps.changes.outputs.changed_services > 0 || github.event_name == 'workflow_dispatch'
         run: |
-          echo "📦 Deploying application services..."
+          echo "📦 Processing deployment request..."
+          
+          # Check for dry run mode
+          DRY_RUN="${{ steps.changes.outputs.dry_run }}"
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "🧪 DRY RUN MODE - Showing what would be deployed"
+          fi
           
           # Ensure we're in the docker-compose directory (mounted in runner)
           COMPOSE_PATH="/workspace"
@@ -217,8 +239,9 @@ jobs:
           FAILED_COUNT=0
           
           if [ -s changed_services.txt ]; then
-            echo "🎯 Deploying specific changed services:"
+            echo "🎯 Processing services for deployment:"
             cat changed_services.txt
+            echo ""
             
             while IFS= read -r compose_file; do
               if [ -f "$compose_file" ]; then
@@ -232,28 +255,49 @@ jobs:
                   continue
                 fi
                 
-                echo "🚀 Deploying: $category/$service_name"
-                
-                if "$GITHUB_WORKSPACE/scripts/deploy-service.sh" "$service_dir"; then
-                  echo "✅ Successfully deployed: $category/$service_name"
+                if [ "$DRY_RUN" = "true" ]; then
+                  echo "🧪 DRY RUN: Would deploy $category/$service_name"
+                  echo "  📁 Path: $service_dir"
+                  echo "  📄 Compose file: $compose_file"
+                  
+                  # Validate compose file syntax
+                  if docker-compose -f "$compose_file" config >/dev/null 2>&1; then
+                    echo "  ✅ Compose file syntax valid"
+                  else
+                    echo "  ❌ Compose file syntax errors detected"
+                  fi
+                  
                   ((DEPLOYED_COUNT++)) || true
                 else
-                  echo "❌ Failed to deploy: $category/$service_name"
-                  ((FAILED_COUNT++)) || true
+                  echo "🚀 Deploying: $category/$service_name"
+                  
+                  if "$GITHUB_WORKSPACE/scripts/deploy-service.sh" "$service_dir"; then
+                    echo "✅ Successfully deployed: $category/$service_name"
+                    ((DEPLOYED_COUNT++)) || true
+                  else
+                    echo "❌ Failed to deploy: $category/$service_name"
+                    ((FAILED_COUNT++)) || true
+                  fi
+                  
+                  # Brief pause between deployments
+                  sleep 2
                 fi
-                
-                # Brief pause between deployments
-                sleep 2
               fi
             done < changed_services.txt
           else
-            echo "ℹ️ No changed services found"
+            echo "ℹ️ No services to deploy"
           fi
           
+          echo ""
           echo "📊 Deployment Summary:"
-          echo "  Successful: $DEPLOYED_COUNT"
-          echo "  Failed: $FAILED_COUNT"
-          echo "  Total attempted: $((DEPLOYED_COUNT + FAILED_COUNT))"
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "  🧪 Dry run completed"
+            echo "  📋 Services that would be deployed: $DEPLOYED_COUNT"
+          else
+            echo "  ✅ Successful: $DEPLOYED_COUNT"
+            echo "  ❌ Failed: $FAILED_COUNT"
+            echo "  📊 Total attempted: $((DEPLOYED_COUNT + FAILED_COUNT))"
+          fi
 
       - name: Health Check Deployed Services
         if: steps.changes.outputs.changed_services > 0 || github.event_name == 'workflow_dispatch'
