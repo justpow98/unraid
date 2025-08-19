@@ -25,7 +25,6 @@ services:
       - "9080:9080"
     networks:
       - monitoring_net
-    user: "${PUID}:${PGID}"
     labels:
       - "kuma.promtail.type=http"
       - "kuma.promtail.url=http://GrafanaPromtail:9080/ready"
