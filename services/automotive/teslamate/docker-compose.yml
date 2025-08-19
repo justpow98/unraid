@@ -10,7 +10,14 @@ services:
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=TeslaMate
     - ENCRYPTION_KEY=${TESLAMATE_ENCRYPTION_KEY}
-    - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
+    # REMOVE THIS LINE - TeslaMate doesn't use DATABASE_URL
+    # - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
+    # ADD THESE LINES - Individual database environment variables that TeslaMate actually reads
+    - DATABASE_USER=${TESLAMATE_DB_USER}
+    - DATABASE_PASS=${TESLAMATE_DB_PASSWORD}
+    - DATABASE_HOST=teslamate-postgres
+    - DATABASE_PORT=5432
+    - DATABASE_NAME=${TESLAMATE_DB_NAME}
     - MQTT_HOST=mosquitto.iot_net
     - VIRTUAL_HOST=teslamate.azuleluna.xyz
     - CHECK_ORIGIN=false
@@ -62,7 +69,12 @@ services:
     - HOST_OS=Unraid
     - HOST_HOSTNAME=JP-Dell
     - HOST_CONTAINERNAME=TeslaMate-Grafana
-    - DATABASE_URL=postgresql://${TESLAMATE_DB_USER}:${TESLAMATE_DB_PASSWORD}@teslamate-postgres:5432/${TESLAMATE_DB_NAME}
+    # UPDATE THIS TOO - Use individual variables instead of DATABASE_URL
+    - DATABASE_USER=${TESLAMATE_DB_USER}
+    - DATABASE_PASS=${TESLAMATE_DB_PASSWORD}
+    - DATABASE_HOST=teslamate-postgres
+    - DATABASE_PORT=5432
+    - DATABASE_NAME=${TESLAMATE_DB_NAME}
     volumes:
     - ${TESLAMATE_PATH}/grafana:/var/lib/grafana
     labels:
