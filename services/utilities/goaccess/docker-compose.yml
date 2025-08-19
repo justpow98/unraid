@@ -2,13 +2,15 @@ version: '3.8'
 
 services:
   goaccess:
-    image: xavierh/goaccess-for-nginxproxymanager:latest  # Will pin after we find version
+    image: xavierh/goaccess-for-nginxproxymanager:latest
     container_name: GoAccess-NPMLogs
     restart: unless-stopped
     environment:
       - TZ=America/New_York
-      - PUID=${PUID}
-      - PGID=${PGID}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - SKIP_ARCHIVED_LOGS=${SKIP_ARCHIVED_LOGS:-False}
+      - DEBUG=${DEBUG:-False}
     labels:
       - "kuma.goaccess.type=http"
       - "kuma.goaccess.url=http://GoAccess-NPMLogs:7880"
@@ -16,14 +18,14 @@ services:
       - "kuma.goaccess.interval=60"
       - "kuma.goaccess.keyword=GoAccess"
       - "kuma.goaccess.tags=utilities,analytics"
-      # Keep existing Unraid labels
       - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/goaccess-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:7880]"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:7881]"
 
     volumes:
-      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data/logs:/opt/log:ro  # Read-only access to NPM logs
+      # Use the working log directory we found
+      - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data/nginx:/opt/log:ro
     ports:
-      - "7880:7880"
+      - "7881:7880"    # Use different port to avoid conflict
     networks:
       - public_net
 

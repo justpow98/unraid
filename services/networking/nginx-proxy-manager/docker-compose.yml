@@ -22,8 +22,8 @@ services:
     - SKIP_IP_RANGES=${SKIP_IP_RANGES:-true}
     - MODSEC=${MODSEC:-false}
     - CROWDSEC=${CROWDSEC:-false}
-    - LOGROTATE=true
-    - GOACCESS=true
+    - LOGROTATE=${LOGROTATE:-false}
+    - GOACCESS=${GOACCESS:-false}
     labels:
     - kuma.nginx_proxy.type=http
     - kuma.nginx_proxy.url=http://NPMplus-Official:81/api/health
@@ -42,7 +42,7 @@ services:
     - 8443:443
     - 8091:81
     - 3003:3000
-    - 7880:91
+
     networks:
     - public_net
     - internal_net
