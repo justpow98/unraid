@@ -17,6 +17,7 @@ services:
     command: -config.file=/etc/promtail/config.yml
     volumes:
       - ${OBSERVABILITY_PATH}/promtail/config:/etc/promtail
+      - ${OBSERVABILITY_PATH}/promtail/positions:/positions 
       - /var/log:/var/log:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
