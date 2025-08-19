@@ -1,32 +1,27 @@
-# services/networking/cloudflared/docker-compose.yml
-# Updated to use official Cloudflare image
 version: '3.8'
-
 services:
   cloudflared:
-    image: cloudflare/cloudflared:2025.4.0  # Official image with pinned version
+    image: cloudflare/cloudflared:2025.8.0
     container_name: Unraid-Cloudflared-Tunnel
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=Unraid-Cloudflared-Tunnel
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=Unraid-Cloudflared-Tunnel
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     volumes:
-      - ${APPDATA_PATH}/cloudflared:/etc/cloudflared
+    - ${APPDATA_PATH}/cloudflared:/etc/cloudflared
     labels:
-      - "kuma.cloudflared.type=docker"
-      - "kuma.cloudflared.docker_container=Unraid-Cloudflared-Tunnel"
-      - "kuma.cloudflared.docker_host=unix:///var/run/docker.sock"
-      - "kuma.cloudflared.name=Cloudflared Tunnel"
-      - "kuma.cloudflared.interval=60"
-      - "kuma.cloudflared.tags=networking,tunnel"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/cloudflared-icon.png"
+    - kuma.cloudflared.type=docker
+    - kuma.cloudflared.docker_container=Unraid-Cloudflared-Tunnel
+    - kuma.cloudflared.docker_host=unix:///var/run/docker.sock
+    - kuma.cloudflared.name=Cloudflared Tunnel
+    - kuma.cloudflared.interval=60
+    - kuma.cloudflared.tags=networking,tunnel
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/cloudflared-icon.png
     networks:
-      - public_net
-
+    - public_net
 networks:
   public_net:
     external: true
