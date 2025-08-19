@@ -42,7 +42,7 @@ services:
     - 8443:443
     - 8091:81
     - 3003:3000
-    - 7880:7880    # Add GoAccess port - NPM Plus has built-in GoAccess
+    - 7880:91
     networks:
     - public_net
     - internal_net
