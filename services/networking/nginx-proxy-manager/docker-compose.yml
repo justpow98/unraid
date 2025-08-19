@@ -22,8 +22,8 @@ services:
     - SKIP_IP_RANGES=${SKIP_IP_RANGES:-true}
     - MODSEC=${MODSEC:-false}
     - CROWDSEC=${CROWDSEC:-false}
-    - LOGROTATE=${LOGROTATE:-true}  # Enable log rotation
-    - GOACCESS=${GOACCESS:-true}    # Enable GoAccess - THIS IS THE KEY CHANGE
+    - LOGROTATE=true
+    - GOACCESS=true
     labels:
     - kuma.nginx_proxy.type=http
     - kuma.nginx_proxy.url=http://NPMplus-Official:81/api/health
