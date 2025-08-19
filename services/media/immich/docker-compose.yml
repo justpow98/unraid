@@ -4,6 +4,10 @@ services:
     image: ghcr.io/imagegenius/immich:1.138.1
     container_name: immich
     restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "44"
     environment:
     - TZ=${TZ}
     - HOST_OS=Unraid
