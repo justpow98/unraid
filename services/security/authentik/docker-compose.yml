@@ -31,7 +31,7 @@ services:
       retries: 3
       start_period: 30s
   authentik-redis:
-    image: bitnami/redis:8.2.0
+    image: bitnami/redis:8.2.1
     container_name: redis-authentik
     restart: unless-stopped
     environment:

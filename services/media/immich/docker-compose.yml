@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   immich:
-    image: ghcr.io/imagegenius/immich:1.138.0
+    image: ghcr.io/imagegenius/immich:1.138.1
     container_name: immich
     restart: unless-stopped
     environment:
@@ -67,7 +67,7 @@ services:
     networks:
     - db_net
   immich-redis:
-    image: redis:8.2.0
+    image: redis:8.2.1-alpine
     container_name: immich-redis
     restart: unless-stopped
     environment:
