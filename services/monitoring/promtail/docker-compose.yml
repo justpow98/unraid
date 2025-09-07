@@ -1,41 +1,34 @@
-# ============================================================================
-# services/monitoring/promtail/docker-compose.yml  
-# Grafana Promtail - Log Collector Agent
-# ============================================================================
 version: '3.8'
-
 services:
   promtail:
-    image: grafana/promtail:2.9.8
+    image: grafana/promtail:3.5.4
     container_name: GrafanaPromtail
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=GrafanaPromtail
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=GrafanaPromtail
     command: -config.file=/etc/promtail/config.yml
     volumes:
-      - ${OBSERVABILITY_PATH}/promtail/config:/etc/promtail
-      - ${OBSERVABILITY_PATH}/promtail/positions:/positions 
-      - /var/log:/var/log:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+    - ${OBSERVABILITY_PATH}/promtail/config:/etc/promtail
+    - ${OBSERVABILITY_PATH}/promtail/positions:/positions
+    - /var/log:/var/log:ro
+    - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - "9080:9080"
+    - 9080:9080
     networks:
-      - monitoring_net
+    - monitoring_net
     labels:
-      - "kuma.promtail.type=http"
-      - "kuma.promtail.url=http://GrafanaPromtail:9080/ready"
-      - "kuma.promtail.name=Grafana Promtail"
-      - "kuma.promtail.interval=60"
-      - "kuma.promtail.keyword=ready"
-      - "kuma.promtail.tags=monitoring,logs"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/promtail-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:9080]"
-
+    - kuma.promtail.type=http
+    - kuma.promtail.url=http://GrafanaPromtail:9080/ready
+    - kuma.promtail.name=Grafana Promtail
+    - kuma.promtail.interval=60
+    - kuma.promtail.keyword=ready
+    - kuma.promtail.tags=monitoring,logs
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/promtail-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:9080]
 networks:
   monitoring_net:
     external: true
