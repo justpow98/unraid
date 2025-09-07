@@ -1,39 +1,32 @@
-# ============================================================================
-# services/monitoring/loki/docker-compose.yml
-# Grafana Loki - Log Aggregation System
-# ============================================================================
 version: '3.8'
-
 services:
   loki:
-    image: grafana/loki:2.9.8
+    image: grafana/loki:3.5.4
     container_name: GrafanaLoki
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - HOST_OS=Unraid
-      - HOST_HOSTNAME=JP-Dell
-      - HOST_CONTAINERNAME=GrafanaLoki
+    - TZ=${TZ}
+    - HOST_OS=Unraid
+    - HOST_HOSTNAME=JP-Dell
+    - HOST_CONTAINERNAME=GrafanaLoki
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
-      - ${OBSERVABILITY_PATH}/loki/config:/etc/loki
-      - ${OBSERVABILITY_PATH}/loki/data:/loki
+    - ${OBSERVABILITY_PATH}/loki/config:/etc/loki
+    - ${OBSERVABILITY_PATH}/loki/data:/loki
     ports:
-      - "3100:3100"
+    - 3100:3100
     networks:
-      - monitoring_net
-    user: "${PUID}:${PGID}"
+    - monitoring_net
+    user: ${PUID}:${PGID}
     labels:
-      - "kuma.loki.type=http"
-      - "kuma.loki.url=http://GrafanaLoki:3100/ready"
-      - "kuma.loki.name=Grafana Loki"
-      - "kuma.loki.interval=60"
-      - "kuma.loki.keyword=ready"
-      - "kuma.loki.tags=monitoring,logs"
-      # Keep existing Unraid labels
-      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/loki-icon.png"
-      - "net.unraid.docker.webui=http://[IP]:[PORT:3100]"
-
+    - kuma.loki.type=http
+    - kuma.loki.url=http://GrafanaLoki:3100/ready
+    - kuma.loki.name=Grafana Loki
+    - kuma.loki.interval=60
+    - kuma.loki.keyword=ready
+    - kuma.loki.tags=monitoring,logs
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/loki-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:3100]
 networks:
   monitoring_net:
     external: true
