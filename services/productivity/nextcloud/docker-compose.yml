@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   nextcloud:
-    image: nextcloud:31.0.8
+    image: nextcloud:31.0.9
     container_name: Nextcloud
     restart: unless-stopped
     environment:
@@ -18,7 +18,7 @@ services:
     - OVERWRITEHOST=nextcloud.azuleluna.xyz
     - PUID=33
     - PGID=33
-    user: "33:33"
+    user: '33:33'
     volumes:
     - ${APPDATA_PATH}/nextcloud/html:/var/www/html
     - ${APPDATA_PATH}/nextcloud/apps:/var/www/html/custom_apps
