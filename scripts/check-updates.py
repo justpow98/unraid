@@ -23,7 +23,7 @@ REPO_MAPPINGS = {
     
     # Security
     'vaultwarden/server': 'dani-garcia/vaultwarden',
-    'beryju/authentik': 'goauthentik/authentik',
+    'goauthentik/server': 'goauthentik/server',
     
     # Media
     'ghcr.io/imagegenius/immich': 'imagegenius/docker-immich',
