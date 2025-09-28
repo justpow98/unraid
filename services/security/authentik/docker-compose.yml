@@ -61,7 +61,7 @@ services:
       retries: 3
       start_period: 10s
   authentik-server:
-    image: beryju/authentik:2025.6.4
+    image: ghcr.io/goauthentik/server:2025.8.3
     container_name: authentik
     restart: unless-stopped
     privileged: true
@@ -133,7 +133,7 @@ services:
     security_opt:
     - label=disable
   authentik-worker:
-    image: beryju/authentik:2025.6.4
+    image: ghcr.io/goauthentik/server:2025.8.3
     container_name: authentik-worker
     restart: unless-stopped
     command: worker
