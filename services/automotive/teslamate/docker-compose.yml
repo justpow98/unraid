@@ -50,7 +50,11 @@ services:
     - POSTGRES_PASSWORD=${TESLAMATE_DB_PASSWORD}
     - POSTGRES_DB=${TESLAMATE_DB_NAME}
     volumes:
-    - ${TESLAMATE_PATH}/postgres:/var/lib/postgresql/data
+    - type: bind
+      source: ${TESLAMATE_PATH}/postgres
+      target: /var/lib/postgresql/data
+      bind:
+        propagation: rshared
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     ports:

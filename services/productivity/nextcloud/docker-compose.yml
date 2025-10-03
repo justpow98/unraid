@@ -53,7 +53,11 @@ services:
     - POSTGRES_USER=${NEXTCLOUD_DB_USER}
     - POSTGRES_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
     volumes:
-    - ${CACHE_PATH}/postgresql17:/var/lib/postgresql/data
+    - type: bind
+      source: ${CACHE_PATH}/postgresql17
+      target: /var/lib/postgresql/data
+      bind:
+        propagation: rshared
     ports:
     - 5432:5432
     labels:
