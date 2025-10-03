@@ -41,7 +41,7 @@ services:
     depends_on:
     - nextcloud-postgres
   nextcloud-postgres:
-    image: postgres:17.6
+    image: postgres:18.0
     container_name: Nextcloud-PostGres
     restart: unless-stopped
     environment:
