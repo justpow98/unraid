@@ -15,7 +15,7 @@ services:
     - CA_TS_FALLBACK_DIR=/var/lib/postgresql/data
     - PGDATA=/var/lib/postgresql/data
     volumes:
-    - ${APPDATA_PATH}/authentik/sql:/var/lib/postgresql/data
+    - ${CACHE_PATH}/authentik/sql:/var/lib/postgresql/data
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     ports:
@@ -45,7 +45,7 @@ services:
       64mb
     - CA_TS_FALLBACK_DIR=/bitnami/redis
     volumes:
-    - ${APPDATA_PATH}/authentik/redis:/bitnami/redis
+    - ${CACHE_PATH}/authentik/redis:/bitnami/redis
     ports:
     - 6380:6379
     labels:
