@@ -213,7 +213,11 @@ def get_ghcr_latest_tag(registry_path: str, rate_limiter: RateLimitManager) -> O
         headers = get_auth_headers()
         
         response = requests.get(url, headers=headers, timeout=20)
-        
+
+        if response.status_code == 404:
+            url_org = f"https://api.github.com/orgs/{owner}/packages/container/{package}/versions"
+            response = requests.get(url_org, headers=headers, timeout=20)
+
         if response.status_code == 429:
             print(f"Rate limited for GHCR {registry_path}, waiting...")
             time.sleep(60)
