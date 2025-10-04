@@ -29,8 +29,11 @@ services:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/redis-icon.png
 volumes:
   redis_data:
-    external: true
-    name: ff0ddf63debae1fd7801a1ba4d1ed1dc81e918e3f19eaaf4b8a13284009baf49
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${CACHE_PATH}/redis
 networks:
   db_net:
     external: true
