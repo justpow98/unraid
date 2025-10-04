@@ -15,11 +15,7 @@ services:
       # PGDATA default is /var/lib/postgresql/data, you can remove it:
       # - PGDATA=/var/lib/postgresql/data
     volumes:
-      - type: bind
-        source: ${CACHE_PATH}/authentik/sql
-        target: /var/lib/postgresql/data
-        bind:
-          propagation: rshared
+      - ${CACHE_PATH}/authentik/sql:/var/lib/postgresql/data
     ports:
       - "5434:5432"
     networks:
