@@ -35,7 +35,7 @@ services:
       retries: 3
       start_period: 30s
   authentik-redis:
-    image: bitnami/redis:8.2.1
+    image: redis:8.2.2
     container_name: redis-authentik
     restart: unless-stopped
     environment:
@@ -43,13 +43,15 @@ services:
       - HOST_OS=Unraid
       - HOST_HOSTNAME=JP-Dell
       - HOST_CONTAINERNAME=redis-authentik
-      - ALLOW_EMPTY_PASSWORD=no
-      - REDIS_PASSWORD=${REDIS_AUTHENTIK_PASSWORD}
-      - REDIS_EXTRA_FLAGS=--auto-aof-rewrite-percentage 100 --auto-aof-rewrite-min-size
-        64mb
-      - CA_TS_FALLBACK_DIR=/bitnami/redis
+      # Redis official image uses requirepass in the config file instead of env vars
+    command: >
+      redis-server
+      --requirepass ${REDIS_AUTHENTIK_PASSWORD}
+      --appendonly yes
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 64mb
     volumes:
-      - ${CACHE_PATH}/authentik/redis:/bitnami/redis
+      - ${CACHE_PATH}/authentik/redis:/data
     ports:
       - 6380:6379
     labels:
@@ -57,9 +59,7 @@ services:
     networks:
       - db_net
     healthcheck:
-      test:
-        - CMD-SHELL
-        - redis-cli -a ${REDIS_AUTHENTIK_PASSWORD} ping
+      test: ["CMD", "redis-cli", "-a", "${REDIS_AUTHENTIK_PASSWORD}", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3

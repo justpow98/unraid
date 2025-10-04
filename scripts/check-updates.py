@@ -56,7 +56,6 @@ REPO_MAPPINGS = {
     'postgres': 'postgres/postgres',
     'redis': 'redis/redis',
     'mariadb': 'MariaDB/server',
-    'bitnami/redis': 'bitnami/containers',
     
     # Networking
     'zoeyvid/npmplus': 'ZoeyVid/NPMplus',
