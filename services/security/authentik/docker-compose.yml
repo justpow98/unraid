@@ -207,7 +207,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${CACHE_PATH}/authentik/sql18
+      device: ${CACHE_PATH}/authentik/pg18
 
 networks:
   db_net:
