@@ -57,7 +57,7 @@ services:
       source: ${CACHE_PATH}/postgresql17
       target: /var/lib/postgresql/data
       bind:
-        propagation: rshared
+        propagation: rshared 
     ports:
     - 5432:5432
     labels:
