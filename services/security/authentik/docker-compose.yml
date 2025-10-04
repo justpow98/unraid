@@ -13,7 +13,7 @@ services:
       - POSTGRES_USER=${AUTHENTIK_DB_USER}
       - POSTGRES_PASSWORD=${AUTHENTIK_DB_PASSWORD}
       # PGDATA default is /var/lib/postgresql/data, you can remove it:
-      # - PGDATA=/var/lib/postgresql/data
+      - PGDATA=/var/lib/postgresql/data
     volumes:
       - ${CACHE_PATH}/authentik/sql:/var/lib/postgresql/data
     ports:
