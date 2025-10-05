@@ -71,7 +71,7 @@ services:
     networks:
     - db_net
   immich-redis:
-    image: redis:8.2.1-alpine
+    image: redis:8.2.2-alpine
     container_name: immich-redis
     restart: unless-stopped
     environment:
