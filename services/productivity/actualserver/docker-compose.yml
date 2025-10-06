@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   actualserver:
-    image: actualbudget/actual-server:25.9.0
+    image: actualbudget/actual-server:25.10.0
     container_name: ActualServer
     restart: unless-stopped
     environment:
