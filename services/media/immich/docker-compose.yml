@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   immich:
-    image: ghcr.io/imagegenius/immich:2.0.1
+    image: ghcr.io/imagegenius/immich:2.1.0
     container_name: immich
     restart: unless-stopped
     devices:
