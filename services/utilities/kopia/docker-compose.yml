@@ -12,6 +12,7 @@ services:
     - ${APPDATA_PATH}/kopia/cache:/app/cache
     - ${APPDATA_PATH}/kopia/logs:/app/logs
     - ${APPDATA_PATH}/kopia/repository:/repository
+    - ${APPDATA_PATH}/kopia/cert:/app/cert
     - /mnt/user:/data/user
     - /mnt/user/backups:/data/backups
     ports:
@@ -19,9 +20,9 @@ services:
     command: >
       server start
         --address=0.0.0.0:51515
-        --tls-generate-cert 
-        --tls-cert-file ~/my.cert 
-        --tls-key-file ~/my.key
+        --tls-generate-cert
+        --tls-cert-file /app/cert/my.cert
+        --tls-key-file /app/cert/my.key
         --insecure
         --disable-csrf-token-checks
         --server-control-password=${KOPIA_PASSWORD}
