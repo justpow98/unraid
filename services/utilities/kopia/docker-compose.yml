@@ -6,7 +6,6 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
-      KOPIA_USERNAME: admin
       KOPIA_PASSWORD: ${KOPIA_PASSWORD}
     volumes:
     - ${APPDATA_PATH}/kopia/config:/app/config
@@ -18,11 +17,13 @@ services:
     ports:
     - 51515:51515
     command: >
-      server start
+      kopia server start
         --address=0.0.0.0:51515
+        --tls-generate-cert 
+        --tls-cert-file ~/my.cert 
+        --tls-key-file ~/my.key
         --insecure
         --disable-csrf-token-checks
-        --server-control-username=admin
         --server-control-password=${KOPIA_PASSWORD}
     networks:
     - internal_net
