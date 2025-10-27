@@ -6,7 +6,6 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
-      KOPIA_PASSWORD: ${KOPIA_PASSWORD}
     volumes:
     - ${APPDATA_PATH}/kopia/config:/app/config
     - ${APPDATA_PATH}/kopia/cache:/app/cache
@@ -25,7 +24,7 @@ services:
         --tls-key-file /app/cert/my.key
         --insecure
         --disable-csrf-token-checks
-        --server-control-password=${KOPIA_PASSWORD}
+        --random-password
     networks:
     - internal_net
     labels:
