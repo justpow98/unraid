@@ -22,6 +22,8 @@ services:
         --address=0.0.0.0:51515
         --insecure
         --disable-csrf-token-checks
+        --server-control-username=admin
+        --server-control-password=${KOPIA_PASSWORD}
     networks:
     - internal_net
     labels:
