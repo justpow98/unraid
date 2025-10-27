@@ -17,8 +17,13 @@ services:
     - /mnt/user/backups:/data/backups
     ports:
     - 51515:51515
-    command: server start --address=0.0.0.0:51515 --insecure --without-repository
-      --server-username=admin --server-password=${KOPIA_PASSWORD}
+    command: >
+      server start
+        --address=0.0.0.0:51515
+        --insecure
+        --disable-csrf-token-checks
+        --server-username=admin
+        --server-password=${KOPIA_PASSWORD}
     networks:
     - internal_net
     labels:
