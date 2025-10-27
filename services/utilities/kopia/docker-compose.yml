@@ -7,10 +7,10 @@ services:
     environment:
       TZ: ${TZ}
     volumes:
-    - ${APPDATA_PATH:-./appdata}/kopia/config:/app/config
-    - ${APPDATA_PATH:-./appdata}/kopia/cache:/app/cache
-    - ${APPDATA_PATH:-./appdata}/kopia/logs:/app/logs
-    - ${APPDATA_PATH:-./appdata}/kopia/repository:/repository
+    - ${APPDATA_PATH}/kopia/config:/app/config
+    - ${APPDATA_PATH}/kopia/cache:/app/cache
+    - ${APPDATA_PATH}/kopia/logs:/app/logs
+    - ${APPDATA_PATH}/kopia/repository:/repository
     - /mnt/user:/data/user
     - /mnt/user/backups:/data/backups
     ports:
