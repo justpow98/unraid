@@ -89,7 +89,7 @@ VERSION_PATTERNS = {
     'actualserver': r'^\d+\.\d+\.\d+$',
     'wikijs': r'^\d+\.\d+\.\d+$',
     'onlyoffice': r'^\d+\.\d+\.\d+$',
-    'kopia': r'^\d+\.\d+\.\d+$',
+    'kopia': r'^\d{8}\.\d+\.\d+$',
     'mosquitto': r'^\d+\.\d+\.\d+$',
     'npmplus': r'^\d+$',
     'cloudflared': r'^\d{4}\.\d+\.\d+$',

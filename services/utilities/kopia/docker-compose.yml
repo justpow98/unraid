@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   kopia:
-    image: kopia/kopia:0.17.1
+    image: kopia/kopia:20251023.0.52914
     container_name: kopia
     restart: unless-stopped
     environment:
