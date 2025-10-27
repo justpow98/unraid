@@ -17,7 +17,7 @@ services:
     ports:
     - 51515:51515
     command: >
-      kopia server start
+      server start
         --address=0.0.0.0:51515
         --tls-generate-cert 
         --tls-cert-file ~/my.cert 
