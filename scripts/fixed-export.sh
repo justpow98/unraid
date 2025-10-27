@@ -158,7 +158,7 @@ done < "$CONTAINER_LIST_FILE"
     
     echo
     echo "### 📋 Productivity:"
-    grep -iE "(nextcloud|actual|wiki|office|duplicati)" "$CONTAINER_LIST_FILE" | sed 's/^/- /' || echo "- None found"
+    grep -iE "(nextcloud|actual|wiki|office|kopia)" "$CONTAINER_LIST_FILE" | sed 's/^/- /' || echo "- None found"
     
     echo
     echo "### 🏠 Home Automation:"

@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  kopia:
+    image: kopia/kopia:0.17.1
+    container_name: kopia
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+    volumes:
+    - ${APPDATA_PATH:-./appdata}/kopia/config:/app/config
+    - ${APPDATA_PATH:-./appdata}/kopia/cache:/app/cache
+    - ${APPDATA_PATH:-./appdata}/kopia/logs:/app/logs
+    - ${APPDATA_PATH:-./appdata}/kopia/repository:/repository
+    - /mnt/user:/data/user
+    - /mnt/user/backups:/data/backups
+    ports:
+    - 8200:51515
+    command: server start --address=0.0.0.0:51515 --insecure --disable-csrf-token-check
+      --server-username=${KOPIA_USERNAME:-admin} --server-password=${KOPIA_PASSWORD:-change-me}
+    networks:
+    - internal_net
+    labels:
+    - kuma.kopia.type=http
+    - kuma.kopia.url=http://kopia:51515
+    - kuma.kopia.name=Kopia Backup
+    - kuma.kopia.interval=60
+    - kuma.kopia.keyword=Kopia
+    - kuma.kopia.tags=utilities,backup
+    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
+    - net.unraid.docker.webui=http://[IP]:[PORT:51515]
+    user: ${PUID}:${PGID}
+networks:
+  internal_net:
+    external: true

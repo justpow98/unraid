@@ -18,7 +18,7 @@ REPO_MAPPINGS = {
     'lissy93/dashy': 'lissy93/dashy',
     'filebrowser/filebrowser': 'filebrowser/filebrowser',
     'xavierh/goaccess-for-nginxproxymanager': 'xavier-hernandez/goaccess-for-nginxproxymanager',
-    'lscr.io/linuxserver/duplicati': 'linuxserver/docker-duplicati',
+    'kopia/kopia': 'kopia/kopia',
     'honeygain/honeygain': 'honeygain/honeygain-docker',
     
     # Security
@@ -89,7 +89,7 @@ VERSION_PATTERNS = {
     'actualserver': r'^\d+\.\d+\.\d+$',
     'wikijs': r'^\d+\.\d+\.\d+$',
     'onlyoffice': r'^\d+\.\d+\.\d+$',
-    'duplicati': r'^\d+\.\d+\.\d+$',
+    'kopia': r'^\d+\.\d+\.\d+$',
     'mosquitto': r'^\d+\.\d+\.\d+$',
     'npmplus': r'^\d+$',
     'cloudflared': r'^\d{4}\.\d+\.\d+$',
