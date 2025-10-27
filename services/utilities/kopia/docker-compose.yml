@@ -15,7 +15,7 @@ services:
     - /mnt/user/backups:/data/backups
     ports:
     - 51515:51515
-    command: server start --address=0.0.0.0:51515 --insecure --disable-csrf-token-check
+    command: server start --address=0.0.0.0:51515 --insecure
       --server-username=${KOPIA_USERNAME:-admin} --server-password=${KOPIA_PASSWORD:-change-me}
     networks:
     - internal_net
