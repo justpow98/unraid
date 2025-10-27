@@ -6,6 +6,8 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
+      KOPIA_USERNAME: admin
+      KOPIA_PASSWORD: ${KOPIA_PASSWORD}
     volumes:
     - ${APPDATA_PATH}/kopia/config:/app/config
     - ${APPDATA_PATH}/kopia/cache:/app/cache
@@ -15,7 +17,7 @@ services:
     - /mnt/user/backups:/data/backups
     ports:
     - 51515:51515
-    command: server start --address=0.0.0.0:51515 --insecure --auth=server
+    command: server start --address=0.0.0.0:51515 --insecure --without-repository
       --server-username=admin --server-password=${KOPIA_PASSWORD}
     networks:
     - internal_net
