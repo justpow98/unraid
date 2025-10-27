@@ -37,8 +37,6 @@ services:
         --random-password
     # Run as root so before/after actions can call zfs+mount
     user: "0:0"
-    networks:
-      - internal_net
     labels:
       - kuma.kopia.type=http
       - kuma.kopia.url=http://kopia:51515
@@ -48,3 +46,6 @@ services:
       - kuma.kopia.tags=utilities,backup
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
       - net.unraid.docker.webui=http://[IP]:[PORT:51515]
+networks:
+  internal_net:
+    external: true
