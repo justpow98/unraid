@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   kopia:
     image: kopia/kopia:20251023.0.52914
@@ -7,15 +6,26 @@ services:
     environment:
       TZ: ${TZ}
     volumes:
-    - ${APPDATA_PATH}/kopia/config:/app/config
-    - ${APPDATA_PATH}/kopia/cache:/app/cache
-    - ${APPDATA_PATH}/kopia/logs:/app/logs
-    - ${APPDATA_PATH}/kopia/repository:/repository
-    - ${APPDATA_PATH}/kopia/cert:/app/cert
-    - /mnt/user:/data/user
-    - /mnt/user/backups:/data/backups
+      - ${APPDATA_PATH}/kopia/config:/app/config
+      - ${APPDATA_PATH}/kopia/cache:/app/cache
+      - ${APPDATA_PATH}/kopia/logs:/app/logs
+      - ${APPDATA_PATH}/kopia/repository:/repository
+      - ${APPDATA_PATH}/kopia/cert:/app/cert
+      - ${APPDATA_PATH}/kopia/scripts:/app/scripts            # scripts live here
+      - /mnt:/mnt:ro                                          # see host ZFS mountpoints
+      - /mnt/user:/data/user:ro                               # your current data path (unchanged)
+      - /mnt/user/backups:/data/backups                       # optional, handy
+      # Host binaries (your actual paths)
+      - /usr/sbin/zfs:/usr/sbin/zfs:ro
+      - /usr/sbin/zpool:/usr/sbin/zpool:ro
+      - /sbin/mount:/sbin/mount:ro
+      - /sbin/umount:/sbin/umount:ro
+    devices:
+      - /dev/zfs:/dev/zfs
+    cap_add:
+      - SYS_ADMIN
     ports:
-    - 51515:51515
+      - "51515:51515"
     command: >
       server start
         --address=0.0.0.0:51515
@@ -25,18 +35,16 @@ services:
         --insecure
         --disable-csrf-token-checks
         --random-password
+    # Run as root so before/after actions can call zfs+mount
+    user: "0:0"
     networks:
-    - internal_net
+      - internal_net
     labels:
-    - kuma.kopia.type=http
-    - kuma.kopia.url=http://kopia:51515
-    - kuma.kopia.name=Kopia Backup
-    - kuma.kopia.interval=60
-    - kuma.kopia.keyword=Kopia
-    - kuma.kopia.tags=utilities,backup
-    - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
-    - net.unraid.docker.webui=http://[IP]:[PORT:51515]
-    user: ${PUID}:${PGID}
-networks:
-  internal_net:
-    external: true
+      - kuma.kopia.type=http
+      - kuma.kopia.url=http://kopia:51515
+      - kuma.kopia.name=Kopia Backup
+      - kuma.kopia.interval=60
+      - kuma.kopia.keyword=Kopia
+      - kuma.kopia.tags=utilities,backup
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:51515]
