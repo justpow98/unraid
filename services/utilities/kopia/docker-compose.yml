@@ -1,21 +1,20 @@
 services:
-  kopia:
+  kopia-backblaze:
     image: kopia/kopia:20251023.0.52914
-    container_name: kopia
+    container_name: kopia-backblaze
     restart: unless-stopped
     environment:
       TZ: ${TZ}
     volumes:
-      - ${APPDATA_PATH}/kopia/config:/app/config
-      - ${APPDATA_PATH}/kopia/cache:/app/cache
-      - ${APPDATA_PATH}/kopia/logs:/app/logs
-      - ${APPDATA_PATH}/kopia/repository:/repository
-      - ${APPDATA_PATH}/kopia/cert:/app/cert
-      - ${APPDATA_PATH}/kopia/scripts:/app/scripts            # scripts live here
-      - /mnt:/mnt:ro                                          # see host ZFS mountpoints
-      - /mnt/user:/data/user:ro                               # your current data path (unchanged)
-      - /mnt/user/backups:/data/backups                       # optional, handy
-      # Host binaries (your actual paths)
+      - ${APPDATA_PATH}/kopia/backblaze/config:/app/config
+      - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
+      - ${APPDATA_PATH}/kopia/backblaze/logs:/app/logs
+      - ${APPDATA_PATH}/kopia/backblaze/repository:/repository
+      - ${APPDATA_PATH}/kopia/backblaze/cert:/app/cert
+      - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
+      - /mnt:/mnt:ro
+      - /mnt/user:/data/user:ro
+      - /mnt/user/backups:/data/backups
       - /usr/sbin/zfs:/usr/sbin/zfs:ro
       - /usr/sbin/zpool:/usr/sbin/zpool:ro
       - /sbin/mount:/sbin/mount:ro
@@ -35,17 +34,67 @@ services:
         --insecure
         --disable-csrf-token-checks
         --random-password
-    # Run as root so before/after actions can call zfs+mount
     user: "0:0"
     labels:
-      - kuma.kopia.type=http
-      - kuma.kopia.url=http://kopia:51515
-      - kuma.kopia.name=Kopia Backup
-      - kuma.kopia.interval=60
-      - kuma.kopia.keyword=Kopia
-      - kuma.kopia.tags=utilities,backup
+      - kuma.kopia-backblaze.type=http
+      - kuma.kopia-backblaze.url=http://kopia-backblaze:51515
+      - kuma.kopia-backblaze.name=Kopia Backup (Backblaze)
+      - kuma.kopia-backblaze.interval=60
+      - kuma.kopia-backblaze.keyword=Kopia
+      - kuma.kopia-backblaze.tags=utilities,backup,backblaze
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
       - net.unraid.docker.webui=http://[IP]:[PORT:51515]
+    networks:
+      - internal_net
+
+  kopia-local:
+    image: kopia/kopia:20251023.0.52914
+    container_name: kopia-truenas
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${APPDATA_PATH}/kopia/truenas/config:/app/config
+      - ${APPDATA_PATH}/kopia/truenas/cache:/app/cache
+      - ${APPDATA_PATH}/kopia/truenas/logs:/app/logs
+      - ${APPDATA_PATH}/kopia/truenas/repository:/repository
+      - ${APPDATA_PATH}/kopia/truenas/cert:/app/cert
+      - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
+      - /mnt:/mnt:ro
+      - /mnt/user:/data/user:ro
+      - /mnt/user/backups:/data/backups
+      - /usr/sbin/zfs:/usr/sbin/zfs:ro
+      - /usr/sbin/zpool:/usr/sbin/zpool:ro
+      - /sbin/mount:/sbin/mount:ro
+      - /sbin/umount:/sbin/umount:ro
+    devices:
+      - /dev/zfs:/dev/zfs
+    cap_add:
+      - SYS_ADMIN
+    ports:
+      - "51516:51515"
+    command: >
+      server start
+        --address=0.0.0.0:51515
+        --tls-generate-cert
+        --tls-cert-file /app/cert/my.cert
+        --tls-key-file /app/cert/my.key
+        --insecure
+        --disable-csrf-token-checks
+        --random-password
+    user: "0:0"
+    labels:
+      - kuma.kopia-truenas.type=http
+      - kuma.kopia-truenas.url=http://kopia-truenas:51515
+      - kuma.kopia-truenas.name=Kopia Backup (Local)
+      - kuma.kopia-truenas.interval=60
+      - kuma.kopia-truenas.keyword=Kopia
+      - kuma.kopia-truenas.tags=utilities,backup,truenas
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/kopia-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:51516]
+    networks:
+      - internal_net
+
 networks:
   internal_net:
     external: true
