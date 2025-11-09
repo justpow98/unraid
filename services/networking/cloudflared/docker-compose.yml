@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   cloudflared:
-    image: cloudflare/cloudflared:2025.10.1
+    image: cloudflare/cloudflared:2025.11.1
     container_name: Unraid-Cloudflared-Tunnel
     restart: unless-stopped
     environment:
