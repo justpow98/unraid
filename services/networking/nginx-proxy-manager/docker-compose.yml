@@ -50,6 +50,7 @@ services:
     - monitoring_net
     - iot_net
     - teslamate_net
+    - mc_net
     healthcheck:
       test:
       - CMD-SHELL
@@ -71,4 +72,6 @@ networks:
   iot_net:
     external: true
   teslamate_net:
+    external: true
+  mc_net:
     external: true
