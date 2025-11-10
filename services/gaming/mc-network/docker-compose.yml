@@ -57,8 +57,7 @@ services:
     environment:
       EULA: "TRUE"
       TYPE: FTBA
-      FTB_MODPACK_ID: "126"              # ex: FTB Skies; swap to your pack
-      FTB_MODPACK_VERSION_ID: "100095"      # optional pin
+      FTB_MODPACK_ID: "126"
       MEMORY: ${MC_RAM_FTB}
       ONLINE_MODE: "FALSE"
       CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
