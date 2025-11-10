@@ -1,5 +1,0 @@
-settings:
-  velocity-support:
-    enabled: true
-    online-mode: true
-    secret: "${CFG_FORWARDING_SECRET}"
