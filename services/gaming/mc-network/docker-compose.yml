@@ -24,12 +24,12 @@ services:
       EULA: "TRUE"
       TYPE: PAPER
       MEMORY: ${MC_RAM_HUB}
-      ONLINE_MODE: "FALSE"          # behind Velocity
-      CFG_VELOCITY_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
+      ONLINE_MODE: "FALSE"
+      REPLACE_ENV_VARIABLES: "true"
+      CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/hub/data:/data
-      - ./hub/paper.yml:/data/paper.yml
-      - ./hub/spigot.yml:/data/spigot.yml
+      - ./hub/paper-global.yml:/data/config/paper-global.yml:ro
     networks: [mc_net]
 
   vanilla:
@@ -41,15 +41,13 @@ services:
       TYPE: PAPER
       MEMORY: ${MC_RAM_VANILLA}
       ONLINE_MODE: "FALSE"
+      REPLACE_ENV_VARIABLES: "true"
       CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/vanilla/data:/data
-      - ./vanilla/paper.yml:/data/paper.yml
+      - ./vanilla/paper-global.yml:/data/config/paper-global.yml:ro
     networks: [mc_net]
 
-  # --- choose ONE modpack mode below ---
-
-  # 1) FTB app packs (recommended when using FTB): TYPE=FTBA
   ftb:
     image: ${MC_IMAGE_JAVA}
     container_name: mc-ftb-dw20
