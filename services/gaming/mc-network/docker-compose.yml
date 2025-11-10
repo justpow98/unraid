@@ -10,8 +10,8 @@ services:
       CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/velocity/data:/server
-      - ${APPDATA_PATH}/mc-network/velocity/velocity.toml:/server/velocity.toml
-      - ${APPDATA_PATH}/mc-network/velocity/plugins:/server/plugins
+      - ./velocity/velocity.toml:/server/velocity.toml
+      - ./velocity/plugins:/server/plugins
     networks: [mc_net]
     ports:
       - "25565:25565"
@@ -28,8 +28,8 @@ services:
       CFG_VELOCITY_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/hub/data:/data
-      - ${APPDATA_PATH}/mc-network/hub/paper.yml:/data/paper.yml
-      - ${APPDATA_PATH}/mc-network/hub/spigot.yml:/data/spigot.yml
+      - ./hub/paper.yml:/data/paper.yml
+      - ./hub/spigot.yml:/data/spigot.yml
     networks: [mc_net]
 
   vanilla:
@@ -44,7 +44,7 @@ services:
       CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/vanilla/data:/data
-      - ${APPDATA_PATH}/mc-network/vanilla/paper.yml:/data/paper.yml
+      - ./vanilla/paper.yml:/data/paper.yml
     networks: [mc_net]
 
   # --- choose ONE modpack mode below ---
