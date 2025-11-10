@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   teslamate:
-    image: teslamate/teslamate:2.1.1
+    image: teslamate/teslamate:2.2.0
     container_name: TeslaMate
     restart: unless-stopped
     environment:
@@ -62,7 +62,7 @@ services:
     networks:
     - db_net
   teslamate-grafana:
-    image: teslamate/grafana:2.1.1
+    image: teslamate/grafana:2.2.0
     container_name: TeslaMate-Grafana
     restart: unless-stopped
     environment:
