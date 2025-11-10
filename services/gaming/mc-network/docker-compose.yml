@@ -1,0 +1,68 @@
+services:
+  velocity:
+    image: ${MC_IMAGE_PROXY}
+    container_name: velocity
+    restart: unless-stopped
+    environment:
+      TYPE: VELOCITY
+      MEMORY: ${MC_RAM_PROXY}
+      REPLACE_ENV_VARIABLES: "true"
+      VELOCITY_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
+    volumes:
+      - ${APPDATA_PATH}/mc-network/velocity/data:/server
+      - ${APPDATA_PATH}/mc-network/velocity/velocity.toml:/server/velocity.toml:ro
+      - ${APPDATA_PATH}/mc-network/velocity/plugins:/server/plugins:ro
+    networks: [mc_net]
+    ports:
+      - "25565:25565"
+
+  hub:
+    image: ${MC_IMAGE_JAVA}
+    container_name: mc-hub
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      MEMORY: ${MC_RAM_HUB}
+      ONLINE_MODE: "FALSE"          # behind Velocity
+    volumes:
+      - ${APPDATA_PATH}/mc-network/hub/data:/data
+      - ${APPDATA_PATH}/mc-network/hub/paper.yml:/data/paper.yml:ro
+      - ${APPDATA_PATH}/mc-network/hub/spigot.yml:/data/spigot.yml:ro
+    networks: [mc_net]
+
+  vanilla:
+    image: ${MC_IMAGE_JAVA}
+    container_name: mc-vanilla
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: PAPER
+      MEMORY: ${MC_RAM_VANILLA}
+      ONLINE_MODE: "FALSE"
+    volumes:
+      - ${APPDATA_PATH}/mc-network/vanilla/data:/data
+      - ${APPDATA_PATH}/mc-network/vanilla/paper.yml:/data/paper.yml:ro
+    networks: [mc_net]
+
+  # --- choose ONE modpack mode below ---
+
+  # 1) FTB app packs (recommended when using FTB): TYPE=FTBA
+  ftb:
+    image: ${MC_IMAGE_JAVA}
+    container_name: mc-ftb-dw20
+    restart: unless-stopped
+    environment:
+      EULA: "TRUE"
+      TYPE: FTBA
+      FTB_MODPACK_ID: "100123"              # ex: FTB Skies; swap to your pack
+      # FTB_MODPACK_VERSION_ID: "6"      # optional pin
+      MEMORY: ${MC_RAM_FTB}
+      ONLINE_MODE: "FALSE"
+    volumes:
+      - ${APPDATA_PATH}/mc-network/ftb/dw20:/data
+    networks: [mc_net]
+
+networks:
+  mc_net:
+    external: true
