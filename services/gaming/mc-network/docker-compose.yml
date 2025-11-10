@@ -10,7 +10,6 @@ services:
       CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/velocity/data:/server
-      - ${APPDATA_PATH}/mc-network/velocity/velocity.toml:/server/velocity.toml
       - ${APPDATA_PATH}/mc-network/velocity/plugins:/server/plugins
     networks: [mc_net]
     ports:
@@ -58,6 +57,7 @@ services:
       FTB_MODPACK_ID: "126"
       MEMORY: ${MC_RAM_FTB}
       ONLINE_MODE: "FALSE"
+      REPLACE_ENV_VARIABLES: "true"
       CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/ftb/dw20:/data
