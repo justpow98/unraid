@@ -10,11 +10,10 @@ proxy-protocol = true
 player-info-forwarding-mode = "modern"
 forwarding-secret = "${CFG_FORWARDING_SECRET}"
 
-servers = {
-  hub = "mc-hub:25565",
-  vanilla = "mc-vanilla:25565",
-  ftb = "mc-ftb:25565"
-}
+[servers]
+hub = "mc-hub:25565"
+vanilla = "mc-vanilla:25565"
+dw20 = "mc-ftb-dw20:25565"
 
 try = ["hub"]
 connection-throttle = 3000
