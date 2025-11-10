@@ -7,7 +7,7 @@ services:
       TYPE: VELOCITY
       MEMORY: ${MC_RAM_PROXY}
       REPLACE_ENV_VARIABLES: "true"
-      VELOCITY_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
+      CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/velocity/data:/server
       - ${APPDATA_PATH}/mc-network/velocity/velocity.toml:/server/velocity.toml:ro
@@ -25,6 +25,7 @@ services:
       TYPE: PAPER
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"          # behind Velocity
+      CFG_VELOCITY_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/hub/data:/data
       - ${APPDATA_PATH}/mc-network/hub/paper.yml:/data/paper.yml:ro
@@ -40,6 +41,7 @@ services:
       TYPE: PAPER
       MEMORY: ${MC_RAM_VANILLA}
       ONLINE_MODE: "FALSE"
+      CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/vanilla/data:/data
       - ${APPDATA_PATH}/mc-network/vanilla/paper.yml:/data/paper.yml:ro
@@ -59,6 +61,7 @@ services:
       # FTB_MODPACK_VERSION_ID: "6"      # optional pin
       MEMORY: ${MC_RAM_FTB}
       ONLINE_MODE: "FALSE"
+      CFG_FORWARDING_SECRET: ${VELOCITY_FORWARDING_SECRET}
     volumes:
       - ${APPDATA_PATH}/mc-network/ftb/dw20:/data
     networks: [mc_net]

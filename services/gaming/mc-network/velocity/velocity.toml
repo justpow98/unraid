@@ -8,7 +8,7 @@ force-key-authentication = true
 
 proxy-protocol = true
 player-info-forwarding-mode = "modern"
-forwarding-secret = "${VELOCITY_FORWARDING_SECRET}"
+forwarding-secret = "${CFG_FORWARDING_SECRET}"
 
 servers = {
   hub = "mc-hub:25565",
