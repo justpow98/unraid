@@ -27,7 +27,7 @@ services:
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
       ENV_VARIABLE_PREFIX: "FORWARDING_"
-      FORWARDING_SECRET: "dNgT6MKf7D3F2V40HnRL9sqWX/5rEQl3oea0gMg1+Pg="
+      FORWARDING_SECRET: "FuySHt8xKNCQF4SqD5j3pWlJscPx/gq+FqDy8cDo="
     volumes:
       - ${APPDATA_PATH}/mc-network/hub/data:/data
     networks: [mc_net]
@@ -43,7 +43,7 @@ services:
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
       ENV_VARIABLE_PREFIX: "FORWARDING_"
-      FORWARDING_SECRET: "dNgT6MKf7D3F2V40HnRL9sqWX/5rEQl3oea0gMg1+Pg="
+      FORWARDING_SECRET: "FuySHt8xKNCQF4SqD5j3pWlJscPx/gq+FqDy8cDo="
     volumes:
       - ${APPDATA_PATH}/mc-network/vanilla/data:/data
     networks: [mc_net]
@@ -60,7 +60,7 @@ services:
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
       ENV_VARIABLE_PREFIX: "FORWARDING_"
-      FORWARDING_SECRET: "dNgT6MKf7D3F2V40HnRL9sqWX/5rEQl3oea0gMg1+Pg="
+      FORWARDING_SECRET: "FuySHt8xKNCQF4SqD5j3pWlJscPx/gq+FqDy8cDo="
     volumes:
       - ${APPDATA_PATH}/mc-network/ftb/dw20:/data
     networks: [mc_net]
