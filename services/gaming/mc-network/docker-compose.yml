@@ -26,6 +26,7 @@ services:
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
+      ENV_VARIABLE_PREFIX: "FORWARDING_"
       FORWARDING_SECRET: "dNgT6MKf7D3F2V40HnRL9sqWX/5rEQl3oea0gMg1+Pg="
     volumes:
       - ${APPDATA_PATH}/mc-network/hub/data:/data
@@ -41,6 +42,7 @@ services:
       MEMORY: ${MC_RAM_VANILLA}
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
+      ENV_VARIABLE_PREFIX: "FORWARDING_"
       FORWARDING_SECRET: "dNgT6MKf7D3F2V40HnRL9sqWX/5rEQl3oea0gMg1+Pg="
     volumes:
       - ${APPDATA_PATH}/mc-network/vanilla/data:/data
@@ -57,6 +59,7 @@ services:
       MEMORY: ${MC_RAM_FTB}
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
+      ENV_VARIABLE_PREFIX: "FORWARDING_"
       FORWARDING_SECRET: "dNgT6MKf7D3F2V40HnRL9sqWX/5rEQl3oea0gMg1+Pg="
     volumes:
       - ${APPDATA_PATH}/mc-network/ftb/dw20:/data
