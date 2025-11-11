@@ -6,7 +6,9 @@ services:
     environment:
       TYPE: VELOCITY
       MEMORY: ${MC_RAM_PROXY}
-      REPLACE_ENV_VARIABLES: "true"
+      REPLACE_ENV_VARIABLES: "false"
+      REPLACE_ENV_IN_PLACE: "false"
+      REPLACE_ENV_DURING_SYNC: "false"
     volumes:
       - ${APPDATA_PATH}/mc-network/velocity/data:/server
       - ${APPDATA_PATH}/mc-network/velocity/plugins:/server/plugins
@@ -23,7 +25,9 @@ services:
       TYPE: PAPER
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"
-      REPLACE_ENV_VARIABLES: "true"
+      REPLACE_ENV_VARIABLES: "false"
+      REPLACE_ENV_IN_PLACE: "false"
+      REPLACE_ENV_DURING_SYNC: "false"
     volumes:
       - ${APPDATA_PATH}/mc-network/hub/data:/data
     networks: [mc_net]
@@ -37,7 +41,9 @@ services:
       TYPE: PAPER
       MEMORY: ${MC_RAM_VANILLA}
       ONLINE_MODE: "FALSE"
-      REPLACE_ENV_VARIABLES: "true"
+      REPLACE_ENV_VARIABLES: "false"
+      REPLACE_ENV_IN_PLACE: "false"
+      REPLACE_ENV_DURING_SYNC: "false"
     volumes:
       - ${APPDATA_PATH}/mc-network/vanilla/data:/data
     networks: [mc_net]
@@ -52,7 +58,9 @@ services:
       FTB_MODPACK_ID: "126"
       MEMORY: ${MC_RAM_FTB}
       ONLINE_MODE: "FALSE"
-      REPLACE_ENV_VARIABLES: "true"
+      REPLACE_ENV_VARIABLES: "false"
+      REPLACE_ENV_IN_PLACE: "false"
+      REPLACE_ENV_DURING_SYNC: "false"
     volumes:
       - ${APPDATA_PATH}/mc-network/ftb/dw20:/data
     networks: [mc_net]
