@@ -62,6 +62,7 @@ services:
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
       ENV_VARIABLE_PREFIX: "FORWARDING_"
       FORWARDING_SECRET: "FuySHt8xKNCQF4SqD5j3pWlJscPx/gq+FqDy8cDo="
+      JVM_OPTS: "-Dvelocity.max-known-packs=256"
     volumes:
       - ${APPDATA_PATH}/mc-network/ftb/dw20:/data
     networks: [mc_net]
