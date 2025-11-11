@@ -9,6 +9,7 @@ services:
       REPLACE_ENV_VARIABLES: "false"
       REPLACE_ENV_IN_PLACE: "false"
       REPLACE_ENV_DURING_SYNC: "false"
+      JVM_OPTS: "-Dvelocity.max-known-packs=256"
     volumes:
       - ${APPDATA_PATH}/mc-network/velocity/data:/server
       - ${APPDATA_PATH}/mc-network/velocity/plugins:/server/plugins
