@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
     environment:
       EULA: "TRUE"
-      TYPE: PAPER
+      TYPE: MOHIST
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
