@@ -23,7 +23,9 @@ services:
     restart: unless-stopped
     environment:
       EULA: "TRUE"
-      TYPE: MOHIST
+      TYPE: CUSTOM
+      CUSTOM_SERVER_JAR: "/data/arclight.jar"
+      JAVA_TOOL_OPTIONS: "-Dvelocity.max-known-packs=700"
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"
       REPLACE_ENV_VARIABLES: "true"      # enable templating so the placeholder gets filled
