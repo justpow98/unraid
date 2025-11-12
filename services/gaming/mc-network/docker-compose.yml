@@ -24,7 +24,7 @@ services:
     environment:
       EULA: "TRUE"
       TYPE: CUSTOM
-      CUSTOM_SERVER_JAR: "/data/arclight.jar"
+      CUSTOM_SERVER: "/data/arclight.jar"
       JAVA_TOOL_OPTIONS: "-Dvelocity.max-known-packs=700"
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"
