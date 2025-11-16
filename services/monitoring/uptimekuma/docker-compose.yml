@@ -19,7 +19,7 @@ services:
     networks:
     - monitoring_net
   autokuma:
-    image: ghcr.io/bigboot/autokuma:1.0
+    image: ghcr.io/bigboot/autokuma:2.0
     container_name: AutoKuma
     restart: unless-stopped
     environment:
