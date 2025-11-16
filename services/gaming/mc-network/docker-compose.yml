@@ -26,6 +26,7 @@ services:
       TYPE: ARCLIGHT
       VERSION: "1.21.1"
       NEOFORGE_VERSION: "21.1.213"
+      FORGEAPI_ARCLIGHT: "true"
       JAVA_TOOL_OPTIONS: "-Dvelocity.max-known-packs=700"
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"
