@@ -23,8 +23,9 @@ services:
     restart: unless-stopped
     environment:
       EULA: "TRUE"
-      TYPE: CUSTOM
-      CUSTOM_SERVER: "/data/arclight.jar"
+      TYPE: ARCLIGHT
+      VERSION: "1.21.1"
+      NEOFORGE_VERSION: "21.1.213"
       JAVA_TOOL_OPTIONS: "-Dvelocity.max-known-packs=700"
       MEMORY: ${MC_RAM_HUB}
       ONLINE_MODE: "FALSE"
