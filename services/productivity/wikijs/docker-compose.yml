@@ -34,7 +34,7 @@ services:
     depends_on:
     - wikijs-postgres
   wikijs-postgres:
-    image: postgres:18.0
+    image: postgres:18.1
     container_name: wikijs-postgresql
     restart: unless-stopped
     environment:

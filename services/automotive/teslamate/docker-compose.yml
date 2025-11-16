@@ -38,7 +38,7 @@ services:
     depends_on:
     - teslamate-postgres
   teslamate-postgres:
-    image: postgres:18.0
+    image: postgres:18.1
     container_name: teslamate-postgres
     restart: unless-stopped
     environment:
