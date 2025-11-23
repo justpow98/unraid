@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   romm:
-    image: rommapp/romm:4.4.0
+    image: rommapp/romm:4.4.1
     container_name: romm
     restart: unless-stopped
     environment:
@@ -34,7 +34,7 @@ services:
     depends_on:
     - romm-mariadb
   romm-mariadb:
-    image: mariadb:12.0.2
+    image: mariadb:12.1.2
     container_name: romm-MariaDB-Official
     restart: unless-stopped
     environment:
