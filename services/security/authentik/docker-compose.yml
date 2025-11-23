@@ -27,7 +27,7 @@ services:
       retries: 3
       start_period: 30s
   authentik-redis:
-    image: redis:8.2.3
+    image: redis:8.4.0-alpine
     container_name: redis-authentik
     restart: unless-stopped
     environment:
@@ -58,7 +58,7 @@ services:
       retries: 3
       start_period: 10s
   authentik-server:
-    image: ghcr.io/goauthentik/server:2025.10.1
+    image: ghcr.io/goauthentik/server:2025.10.2
     container_name: authentik
     restart: unless-stopped
     privileged: true
@@ -130,7 +130,7 @@ services:
     security_opt:
     - label=disable
   authentik-worker:
-    image: ghcr.io/goauthentik/server:2025.10.1
+    image: ghcr.io/goauthentik/server:2025.10.2
     container_name: authentik-worker
     restart: unless-stopped
     command: worker
