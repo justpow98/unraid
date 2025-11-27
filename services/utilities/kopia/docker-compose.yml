@@ -6,6 +6,8 @@ services:
     environment:
       TZ: ${TZ}
       KOPIA_PASSWORD: ${KOPIA_B2_PASSWORD}
+      KOPIA_CONFIG_PATH: /app/config/repository.config
+      KOPIA_PERSIST_CREDENTIALS_ON_CONNECT: "true"
     volumes:
     - ${APPDATA_PATH}/kopia/backblaze/config:/app/config
     - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
