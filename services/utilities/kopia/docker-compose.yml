@@ -5,6 +5,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
+      KOPIA_PASSWORD: ${KOPIA_B2_PASSWORD}
     volumes:
     - ${APPDATA_PATH}/kopia/backblaze/config:/app/config
     - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
@@ -46,6 +47,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
+      KOPIA_PASSWORD: ${KOPIA_TNAS_PASSWORD}
     volumes:
     - ${APPDATA_PATH}/kopia/truenas/config:/app/config
     - ${APPDATA_PATH}/kopia/truenas/cache:/app/cache
