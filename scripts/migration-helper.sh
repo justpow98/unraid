@@ -105,7 +105,6 @@ scaffold_service() {
     
     # Create basic docker-compose.yml template
     cat > "${service_path}/docker-compose.yml" << EOF
-version: '3.8'
 
 services:
   ${service}:
@@ -173,7 +172,7 @@ generate_template() {
         "database")
             cat << 'EOF'
 # Database Service Template
-version: '3.8'
+
 
 services:
   database:
@@ -202,7 +201,7 @@ EOF
         "webapp")
             cat << 'EOF'
 # Web Application Template
-version: '3.8'
+
 
 services:
   webapp:
@@ -247,7 +246,7 @@ create_networks() {
     mkdir -p "services/infrastructure/networks"
     
     cat > "services/infrastructure/networks/docker-compose.yml" << 'EOF'
-version: '3.8'
+
 
 # Shared networks for all services
 # Run this first: ./manage-service.sh services/infrastructure/networks up -d

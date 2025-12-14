@@ -33,6 +33,7 @@ REPO_MAPPINGS = {
     'nextcloud': 'nextcloud/server',
     'actualbudget/actual-server': 'actualbudget/actual-server',
     'requarks/wiki': 'requarks/wiki',
+    'vabene1111/recipes': 'vabene1111/recipes',
     
     # Monitoring
     'grafana/grafana': 'grafana/grafana',
@@ -95,6 +96,7 @@ VERSION_PATTERNS = {
     'cloudflared': r'^\d{4}\.\d+\.\d+$',
     'github-runner': r'^v\d+\.\d+\.\d+$',
     'autokuma': r'^\d+\.\d+\.\d+$',
+    'recipes': r'^\d+\.\d+\.\d+$',
 }
 
 def compare_versions(current: str, latest: str) -> bool:
