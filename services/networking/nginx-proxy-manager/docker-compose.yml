@@ -1,4 +1,4 @@
-version: '3.8'
+
 services:
   nginx-proxy-manager:
     image: zoeyvid/npmplus:449

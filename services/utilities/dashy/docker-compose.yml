@@ -1,6 +1,6 @@
 # services/utilities/dashy/docker-compose.yml
 # Optimized for production use
-version: '3.8'
+
 
 services:
   dashy:

@@ -1,4 +1,4 @@
-version: '3.8'
+
 services:
   teslamate:
     image: teslamate/teslamate:2.2.0

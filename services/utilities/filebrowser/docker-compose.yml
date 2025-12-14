@@ -1,4 +1,4 @@
-version: '3.8'
+
 services:
   filebrowser:
     image: filebrowser/filebrowser:v2.52.0

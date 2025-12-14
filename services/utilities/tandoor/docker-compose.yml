@@ -1,0 +1,109 @@
+services:
+  tandoor:
+    image: vabene1111/recipes:1.5.31
+    container_name: tandoor
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=tandoor
+      
+      # Database configuration
+      - DB_ENGINE=django.db.backends.postgresql
+      - POSTGRES_HOST=tandoor-postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${TANDOOR_DB_NAME}
+      - POSTGRES_USER=${TANDOOR_DB_USER}
+      - POSTGRES_PASSWORD=${TANDOOR_DB_PASSWORD}
+      
+      # Application settings
+      - SECRET_KEY=${TANDOOR_SECRET_KEY}
+      - ALLOWED_HOSTS=*
+      - CSRF_TRUSTED_ORIGINS=${TANDOOR_CSRF_TRUSTED_ORIGINS}
+      
+      # Optional: Email configuration (uses same as Authentik)
+      - EMAIL_HOST=${AUTHENTIK_EMAIL_HOST}
+      - EMAIL_PORT=${AUTHENTIK_EMAIL_PORT}
+      - EMAIL_HOST_USER=${AUTHENTIK_EMAIL_USERNAME}
+      - EMAIL_HOST_PASSWORD=${AUTHENTIK_EMAIL_PASSWORD}
+      - EMAIL_USE_TLS=${AUTHENTIK_EMAIL_USE_TLS}
+      - DEFAULT_FROM_EMAIL=${AUTHENTIK_EMAIL_FROM}
+      
+      # Feature flags
+      - ENABLE_SIGNUP=0
+      - ENABLE_PDF_EXPORT=1
+      - FRACTION_PREF_DEFAULT=0
+      - COMMENT_PREF_DEFAULT=1
+      - SHOPPING_MIN_AUTOSYNC_INTERVAL=5
+      
+    volumes:
+      - ${APPDATA_PATH}/tandoor/staticfiles:/opt/recipes/staticfiles
+      - ${APPDATA_PATH}/tandoor/mediafiles:/opt/recipes/mediafiles
+      
+    ports:
+      - "8084:8080"
+      
+    networks:
+      - internal_net
+      - db_net
+      
+    depends_on:
+      - tandoor-postgres
+      
+    labels:
+      - "kuma.tandoor.type=http"
+      - "kuma.tandoor.url=http://tandoor:8080"
+      - "kuma.tandoor.name=Tandoor Recipes"
+      - "kuma.tandoor.interval=60"
+      - "kuma.tandoor.keyword=Tandoor"
+      - "kuma.tandoor.tags=productivity,recipes"
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/tandoor-icon.png"
+      - "net.unraid.docker.webui=http://[IP]:[PORT:8084]"
+
+  tandoor-postgres:
+    image: postgres:18.1
+    container_name: tandoor-postgres
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=tandoor-postgres
+      - POSTGRES_DB=${TANDOOR_DB_NAME}
+      - POSTGRES_USER=${TANDOOR_DB_USER}
+      - POSTGRES_PASSWORD=${TANDOOR_DB_PASSWORD}
+      - PGDATA=/var/lib/postgresql/18/main
+      
+    volumes:
+      - tandoor_pgdata:/var/lib/postgresql
+      
+    ports:
+      - "5437:5432"
+      
+    networks:
+      - db_net
+      
+    labels:
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png"
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${TANDOOR_DB_USER} -d ${TANDOOR_DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  tandoor_pgdata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${CACHE_PATH}/tandoor/pg18
+
+networks:
+  internal_net:
+    external: true
+  db_net:
+    external: true
