@@ -4,8 +4,7 @@ Found updates for container services.
 
 ### Modified Files
 - `services/iot/home-assistant/docker-compose.yml`
-- `services/monitoring/loki/docker-compose.yml`
-- `services/monitoring/promtail/docker-compose.yml`
-- `services/productivity/nextcloud/docker-compose.yml`
-- `services/utilities/filebrowser/docker-compose.yml`
-- `services/utilities/kopia/docker-compose.yml`
+- `services/monitoring/grafana/docker-compose.yml`
+- `services/monitoring/prometheus/docker-compose.yml`
+- `services/productivity/tandoor/docker-compose.yml`
+- `services/security/authentik/docker-compose.yml`
