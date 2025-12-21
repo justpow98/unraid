@@ -1,7 +1,6 @@
-
 services:
   home-assistant:
-    image: ghcr.io/home-assistant/home-assistant:2025.12.3
+    image: ghcr.io/home-assistant/home-assistant:2025.12.4
     container_name: Home-Assistant-Container
     restart: unless-stopped
     environment:
