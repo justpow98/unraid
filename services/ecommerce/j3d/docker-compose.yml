@@ -1,0 +1,120 @@
+version: '3.8'
+
+# J3D - Etsy Orders & Filament Tracker
+# Version: 2.0.0
+# For Unraid deployment with shared networks
+
+services:
+  postgres:
+    image: postgres:18.1
+    container_name: j3d-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: j3d
+      POSTGRES_USER: j3d_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+      TZ: ${TZ}
+      HOST_OS: Unraid
+      HOST_HOSTNAME: ${HOST_HOSTNAME}
+      HOST_CONTAINERNAME: j3d-postgres
+    volumes:
+      - ${APPDATA_PATH}/j3d/postgres/data:/var/lib/postgresql/data
+      - ${APPDATA_PATH}/j3d/postgres/backups:/backups
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U j3d_user -d j3d"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - db_net
+    user: ${PUID}:${PGID}
+    labels:
+      - kuma.postgres.type=http
+      - kuma.postgres.url=http://j3d-postgres:5432/j3d
+      - kuma.postgres.name=J3D PostgreSQL
+      - kuma.postgres.interval=60
+      - kuma.postgres.tags=j3d,database
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
+
+  j3d-backend:
+    image: ghcr.io/justpow98/j3d-backend:${J3D_VERSION:-2.0.0}
+    container_name: j3d-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database
+      DATABASE_URL: postgresql://j3d_user:${POSTGRES_PASSWORD:-changeme}@j3d-postgres:5432/j3d
+      
+      # Flask config
+      FLASK_CONFIG: production
+      SECRET_KEY: ${SECRET_KEY}
+      
+      # Etsy OAuth
+      ETSY_CLIENT_ID: ${ETSY_CLIENT_ID}
+      ETSY_CLIENT_SECRET: ${ETSY_CLIENT_SECRET}
+      ETSY_REDIRECT_URI: ${ETSY_REDIRECT_URI}
+      
+      # Auto-migration on startup
+      AUTO_MIGRATE: "1"
+      
+      # Unraid environment
+      TZ: ${TZ}
+      HOST_OS: Unraid
+      HOST_HOSTNAME: ${HOST_HOSTNAME}
+      HOST_CONTAINERNAME: j3d-backend
+    volumes:
+      - ${APPDATA_PATH}/j3d/backend:/app/instance
+      - ${APPDATA_PATH}/j3d/uploads:/app/instance/uploads
+    ports:
+      - "5000:5000"
+    networks:
+      - internal_net
+      - db_net
+    user: ${PUID}:${PGID}
+    labels:
+      - kuma.backend.type=http
+      - kuma.backend.url=http://j3d-backend:5000/api/health
+      - kuma.backend.name=J3D Backend
+      - kuma.backend.interval=60
+      - kuma.backend.tags=j3d,api
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/flask-icon.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:5000]
+
+  j3d-frontend:
+    image: ghcr.io/justpow98/j3d-frontend:${J3D_VERSION:-2.0.0}
+    container_name: j3d-frontend
+    restart: unless-stopped
+    depends_on:
+      - j3d-backend
+    environment:
+      TZ: ${TZ}
+      HOST_OS: Unraid
+      HOST_HOSTNAME: ${HOST_HOSTNAME}
+      HOST_CONTAINERNAME: j3d-frontend
+    ports:
+      - "4200:4200"
+    networks:
+      - internal_net
+      - public_net
+    user: ${PUID}:${PGID}
+    labels:
+      - kuma.frontend.type=http
+      - kuma.frontend.url=http://j3d-frontend:4200/health
+      - kuma.frontend.name=J3D Frontend
+      - kuma.frontend.interval=60
+      - kuma.frontend.tags=j3d,web
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/justpow98/j3d-frontend/main/src/assets/logo.png
+      - net.unraid.docker.webui=http://[IP]:[PORT:4200]
+
+networks:
+  internal_net:
+    external: true
+  public_net:
+    external: true
+  db_net:
+    external: true

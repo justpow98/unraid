@@ -6,6 +6,8 @@ services:
     environment:
       TZ: ${TZ}
       KOPIA_PASSWORD: ${KOPIA_B2_PASSWORD}
+      KOPIA_SERVER_USERNAME: ${KOPIA_B2_USERNAME}
+      KOPIA_SERVER_PASSWORD: ${KOPIA_B2_PASSWORD}
       KOPIA_CONFIG_PATH: /app/config/repository.config
       KOPIA_PERSIST_CREDENTIALS_ON_CONNECT: 'true'
     volumes:
@@ -13,7 +15,6 @@ services:
     - ${APPDATA_PATH}/kopia/backblaze/cache:/app/cache
     - ${APPDATA_PATH}/kopia/backblaze/logs:/app/logs
     - ${APPDATA_PATH}/kopia/backblaze/repository:/repository
-    - ${APPDATA_PATH}/kopia/backblaze/cert:/app/cert
     - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
     - /mnt:/mnt:ro
     - /mnt/user:/data/user:ro
@@ -28,9 +29,13 @@ services:
     - SYS_ADMIN
     ports:
     - 51515:51515
-    command: "server start\n  --address=0.0.0.0:51515\n  --tls-generate-cert\n  --tls-cert-file\
-      \ /app/cert/my.cert\n  --tls-key-file /app/cert/my.key\n  --insecure\n  --disable-csrf-token-checks\n\
-      \  --random-password\n"
+    command:
+      - server
+      - start
+      - --address=0.0.0.0:51515
+      - --disable-csrf-token-checks
+      - --server-username=admin
+      - --server-password=${KOPIA_SERVER_PASSWORD}
     user: 0:0
     labels:
     - kuma.kopia-backblaze.type=http
@@ -50,12 +55,13 @@ services:
     environment:
       TZ: ${TZ}
       KOPIA_PASSWORD: ${KOPIA_TNAS_PASSWORD}
+      KOPIA_SERVER_USERNAME: ${KOPIA_TNAS_USERNAME}
+      KOPIA_SERVER_PASSWORD: ${KOPIA_TNAS_PASSWORD}
     volumes:
     - ${APPDATA_PATH}/kopia/truenas/config:/app/config
     - ${APPDATA_PATH}/kopia/truenas/cache:/app/cache
     - ${APPDATA_PATH}/kopia/truenas/logs:/app/logs
     - ${APPDATA_PATH}/kopia/truenas/repository:/repository
-    - ${APPDATA_PATH}/kopia/truenas/cert:/app/cert
     - ${APPDATA_PATH}/kopia/scripts:/app/scripts:ro
     - /mnt:/mnt:ro
     - /mnt/user:/data/user:ro
@@ -70,9 +76,13 @@ services:
     - SYS_ADMIN
     ports:
     - 51516:51515
-    command: "server start\n  --address=0.0.0.0:51515\n  --tls-generate-cert\n  --tls-cert-file\
-      \ /app/cert/my.cert\n  --tls-key-file /app/cert/my.key\n  --insecure\n  --disable-csrf-token-checks\n\
-      \  --random-password\n"
+    command:
+      - server
+      - start
+      - --address=0.0.0.0:51515
+      - --disable-csrf-token-checks
+      - --server-username=admin
+      - --server-password=${KOPIA_SERVER_PASSWORD}
     user: 0:0
     labels:
     - kuma.kopia-truenas.type=http
