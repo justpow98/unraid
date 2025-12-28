@@ -1,6 +1,6 @@
 services:
   kopia-backblaze:
-    image: kopia/kopia:20251209.0.15319
+    image: kopia/kopia:20251215.0.232403
     container_name: kopia-backblaze
     restart: unless-stopped
     environment:
@@ -30,12 +30,12 @@ services:
     ports:
     - 51515:51515
     command:
-      - server
-      - start
-      - --address=0.0.0.0:51515
-      - --disable-csrf-token-checks
-      - --server-username=admin
-      - --server-password=${KOPIA_SERVER_PASSWORD}
+    - server
+    - start
+    - --address=0.0.0.0:51515
+    - --disable-csrf-token-checks
+    - --server-username=admin
+    - --server-password=${KOPIA_SERVER_PASSWORD}
     user: 0:0
     labels:
     - kuma.kopia-backblaze.type=http
@@ -49,7 +49,7 @@ services:
     networks:
     - internal_net
   kopia-local:
-    image: kopia/kopia:20251209.0.15319
+    image: kopia/kopia:20251215.0.232403
     container_name: kopia-truenas
     restart: unless-stopped
     environment:
@@ -77,12 +77,12 @@ services:
     ports:
     - 51516:51515
     command:
-      - server
-      - start
-      - --address=0.0.0.0:51515
-      - --disable-csrf-token-checks
-      - --server-username=admin
-      - --server-password=${KOPIA_SERVER_PASSWORD}
+    - server
+    - start
+    - --address=0.0.0.0:51515
+    - --disable-csrf-token-checks
+    - --server-username=admin
+    - --server-password=${KOPIA_SERVER_PASSWORD}
     user: 0:0
     labels:
     - kuma.kopia-truenas.type=http
