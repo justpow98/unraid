@@ -40,7 +40,7 @@ services:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
 
   j3d-backend:
-    image: ghcr.io/justpow98/j3d-backend:${J3D_VERSION:-2.0.0}
+    image: ghcr.io/justpow98/j3d-backend:2.0.0
     container_name: j3d-backend
     restart: unless-stopped
     depends_on:
@@ -86,7 +86,7 @@ services:
       - net.unraid.docker.webui=http://[IP]:[PORT:5000]
 
   j3d-frontend:
-    image: ghcr.io/justpow98/j3d-frontend:${J3D_VERSION:-2.0.0}
+    image: ghcr.io/justpow98/j3d-frontend:2.0.0
     container_name: j3d-frontend
     restart: unless-stopped
     depends_on:
