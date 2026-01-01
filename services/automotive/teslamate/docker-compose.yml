@@ -96,14 +96,6 @@ services:
     labels:
     - kuma.teslamate_grafana.type=http
     - kuma.teslamate_grafana.url=http://TeslaMate-Grafana:3000
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
-        reservations:
-          cpus: '0.15'
-          memory: 256M
     - kuma.teslamate_grafana.name=TeslaMate Grafana
     - kuma.teslamate_grafana.interval=60
     - kuma.teslamate_grafana.keyword=Grafana
@@ -112,6 +104,14 @@ services:
     - net.unraid.docker.webui=http://[IP]:[PORT:3333]
     ports:
     - 3333:3000
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M
     networks:
     - teslamate_net
     - db_net

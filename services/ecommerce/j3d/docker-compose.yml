@@ -143,7 +143,7 @@ services:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/justpow98/j3d-frontend/main/src/assets/logo.png
       - net.unraid.docker.webui=http://[IP]:[PORT:4200]
 
-networks:networks:
+networks:
   internal_net:
     external: true
   public_net:

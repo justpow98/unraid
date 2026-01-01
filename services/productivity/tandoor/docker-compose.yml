@@ -66,6 +66,8 @@ services:
     - HOST_CONTAINERNAME=tandoor-postgres
     - POSTGRES_DB=${TANDOOR_DB_NAME}
     - POSTGRES_USER=${TANDOOR_DB_USER}
+    - POSTGRES_PASSWORD=${TANDOOR_DB_PASSWORD}
+    - PGDATA=/var/lib/postgresql/18/main
     deploy:
       resources:
         limits:
@@ -74,8 +76,6 @@ services:
         reservations:
           cpus: '0.2'
           memory: 256M
-    - POSTGRES_PASSWORD=${TANDOOR_DB_PASSWORD}
-    - PGDATA=/var/lib/postgresql/18/main
     volumes:
     - tandoor_pgdata:/var/lib/postgresql
     ports:
