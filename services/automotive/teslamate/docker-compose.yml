@@ -23,6 +23,14 @@ services:
     - ${APPDATA_PATH}/teslamate/import:/opt/app/import
     ports:
     - 4001:4000
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
     labels:
     - kuma.teslamate.type=http
     - kuma.teslamate.url=http://TeslaMate:4000
@@ -61,6 +69,14 @@ services:
     - 5436:5432
     networks:
     - db_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 768M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
   teslamate-grafana:
     image: teslamate/grafana:2.2.0
     container_name: TeslaMate-Grafana
@@ -80,6 +96,14 @@ services:
     labels:
     - kuma.teslamate_grafana.type=http
     - kuma.teslamate_grafana.url=http://TeslaMate-Grafana:3000
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M
     - kuma.teslamate_grafana.name=TeslaMate Grafana
     - kuma.teslamate_grafana.interval=60
     - kuma.teslamate_grafana.keyword=Grafana

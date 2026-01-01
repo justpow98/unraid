@@ -14,6 +14,14 @@ services:
     - /run/udev:/run/udev:ro
     ports:
     - 9442:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/zigbee2mqtt-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:9442]

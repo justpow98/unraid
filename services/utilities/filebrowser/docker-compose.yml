@@ -17,6 +17,14 @@ services:
     - ${APPDATA_PATH}/filebrowser/:/db/:rw
     ports:
     - 8080:80
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M
     networks:
     - internal_net
     labels:

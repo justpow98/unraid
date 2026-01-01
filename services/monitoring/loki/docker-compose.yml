@@ -18,6 +18,14 @@ services:
     networks:
     - monitoring_net
     user: ${PUID}:${PGID}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1G
+        reservations:
+          cpus: '0.2'
+          memory: 512M
     labels:
     - kuma.loki.type=http
     - kuma.loki.url=http://GrafanaLoki:3100/ready

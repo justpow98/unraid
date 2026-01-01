@@ -37,6 +37,14 @@ services:
       - --server-username=admin
       - --server-password=${KOPIA_SERVER_PASSWORD}
     user: 0:0
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
     labels:
     - kuma.kopia-backblaze.type=http
     - kuma.kopia-backblaze.url=http://kopia-backblaze:51515
@@ -84,6 +92,14 @@ services:
       - --server-username=admin
       - --server-password=${KOPIA_SERVER_PASSWORD}
     user: 0:0
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
     labels:
     - kuma.kopia-truenas.type=http
     - kuma.kopia-truenas.url=http://kopia-truenas:51515

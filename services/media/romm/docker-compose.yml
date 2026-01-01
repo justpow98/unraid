@@ -28,6 +28,14 @@ services:
     - /mnt/user/roms:/romm/library
     ports:
     - 8085:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
     networks:
     - internal_net
     - db_net
@@ -52,6 +60,14 @@ services:
     - ${ROMM_PATH}/romm/mariadb:/var/lib/mysql
     ports:
     - 3307:3306
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
     networks:
     - db_net
 networks:

@@ -36,6 +36,14 @@ services:
       # NO persistent runner data - fresh container each time!
     networks:
       - monitoring_net
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
     labels:
       - "kuma.github_runner.type=docker"
       - "kuma.github_runner.docker_container=Docker-Compose-Runner"

@@ -115,7 +115,7 @@ def clean_version(ver: str) -> str:
     """Clean version string for comparison"""
     import re
     ver = re.sub(r'^(release-|v)', '', ver)
-    ver = re.sub(r'(-alpine|-slim)$', '', ver)
+    ver = re.sub(r'(-alpine|-slim|-lts)$', '', ver)
     return ver
 
 class RateLimitManager:

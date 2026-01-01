@@ -7,11 +7,43 @@ services:
       - '50000:50000'
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - JENKINS_OPTS=--httpPort=8080
-    # Allow Jenkins to manage Docker for ephemeral agents
-    user: root
+      # Use Docker socket proxy instead of direct /var/run/docker.sock mount
+      - DOCKER_HOST=tcp://docker-socket-proxy:2375
+    # Allow Jenkins to manage Docker for ephemeral agents via the proxy
+    depends_on:
+      - docker-socket-proxy
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:latest
+    container_name: docker-socket-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      # Restrict proxy capabilities to what Jenkins needs
+      - CONTAINERS=1
+      - IMAGES=1
+      - NETWORKS=1
+      - VOLUMES=1
+    ports:
+      - '2375:2375'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
 
 volumes:
   jenkins_home:

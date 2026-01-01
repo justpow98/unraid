@@ -22,6 +22,14 @@ services:
     - ${VAULTWARDEN_PATH}/vaultwarden:/data
     ports:
     - 4743:80
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
     labels:
     - kuma.vaultwarden.type=http
     - kuma.vaultwarden.url=http://vaultwarden:80/alive

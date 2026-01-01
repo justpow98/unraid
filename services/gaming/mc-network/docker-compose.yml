@@ -16,6 +16,14 @@ services:
     networks: [mc_net]
     ports:
       - "25565:25565"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 3G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
 
   hub:
     image: ${MC_IMAGE_JAVA}
