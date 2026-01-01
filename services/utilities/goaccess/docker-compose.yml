@@ -26,6 +26,14 @@ services:
       - ${APPDATA_PATH}/Nginx-Proxy-Manager-Official/data/nginx:/opt/log:ro
     ports:
       - "7881:7880"    # Use different port to avoid conflict
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
     networks:
       - public_net
 

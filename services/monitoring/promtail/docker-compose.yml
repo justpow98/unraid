@@ -18,6 +18,14 @@ services:
     - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
     - 9080:9080
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
     networks:
     - monitoring_net
     labels:

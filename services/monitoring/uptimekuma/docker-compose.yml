@@ -13,6 +13,14 @@ services:
     - ${OBSERVABILITY_PATH}/uptimekuma:/app/data
     ports:
     - 3002:3001
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/uptimekuma-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:3002]
@@ -40,6 +48,14 @@ services:
     - teslamate_net
     depends_on:
     - uptimekuma
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
 networks:
   monitoring_net:
     external: true

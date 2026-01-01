@@ -12,6 +12,14 @@ services:
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     volumes:
     - ${APPDATA_PATH}/cloudflared:/etc/cloudflared
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     labels:
     - kuma.cloudflared.type=docker
     - kuma.cloudflared.docker_container=Unraid-Cloudflared-Tunnel

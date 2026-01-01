@@ -24,6 +24,14 @@ services:
     networks:
     - monitoring_net
     user: ${PUID}:${PGID}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
     labels:
     - kuma.prometheus.type=http
     - kuma.prometheus.url=http://prometheus:9090/-/healthy

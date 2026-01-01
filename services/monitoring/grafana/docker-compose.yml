@@ -30,6 +30,14 @@ services:
     - monitoring_net
     - db_net
     user: ${PUID}:${PGID}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
 networks:
   monitoring_net:
     external: true

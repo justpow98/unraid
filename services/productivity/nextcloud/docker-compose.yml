@@ -26,6 +26,14 @@ services:
     - ${APPDATA_PATH}/nextcloud/data:/var/www/html/data
     ports:
     - 8666:80
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
     labels:
     - kuma.nextcloud.type=http
     - kuma.nextcloud.url=http://Nextcloud:80/status.php
@@ -57,6 +65,14 @@ services:
     - nextcloud_pgdata:/var/lib/postgresql
     ports:
     - 5432:5432
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
     networks:

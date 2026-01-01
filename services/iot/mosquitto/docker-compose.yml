@@ -16,6 +16,14 @@ services:
     ports:
     - 1883:1883
     - 9001:9001
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
     labels:
     - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/mosquitto-icon.png
     - net.unraid.docker.webui=http://[IP]:[PORT:9001]

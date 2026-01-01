@@ -15,6 +15,14 @@ services:
     - ${APPDATA_PATH}/actual-server:/data
     ports:
     - 5006:5006
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M
     networks:
     - internal_net
     labels:

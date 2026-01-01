@@ -26,6 +26,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.3'
+          memory: 256M
   authentik-redis:
     image: redis:8.4.0-alpine
     container_name: redis-authentik
@@ -57,6 +65,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
   authentik-server:
     image: ghcr.io/goauthentik/server:2025.10.3
     container_name: authentik
@@ -108,11 +124,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: '1'
           memory: 1G
         reservations:
-          cpus: '0.1'
-          memory: 300M
+          cpus: '0.25'
+          memory: 512M
     networks:
     - db_net
     - internal_net

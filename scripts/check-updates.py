@@ -64,6 +64,7 @@ REPO_MAPPINGS = {
     
     # Automation
     'myoung34/github-runner': 'myoung34/docker-github-actions-runner',
+    'jenkins/jenkins': 'jenkinsci/jenkins',
 }
 
 # Enhanced version patterns
@@ -97,6 +98,7 @@ VERSION_PATTERNS = {
     'github-runner': r'^v\d+\.\d+\.\d+$',
     'autokuma': r'^\d+\.\d+\.\d+$',
     'recipes': r'^\d+\.\d+\.\d+$',
+    'jenkins': r'^\d+\.\d+(\.\d+)?(-lts)?$',
 }
 
 def compare_versions(current: str, latest: str) -> bool:
@@ -113,7 +115,7 @@ def clean_version(ver: str) -> str:
     """Clean version string for comparison"""
     import re
     ver = re.sub(r'^(release-|v)', '', ver)
-    ver = re.sub(r'(-alpine|-slim)$', '', ver)
+    ver = re.sub(r'(-alpine|-slim|-lts)$', '', ver)
     return ver
 
 class RateLimitManager:

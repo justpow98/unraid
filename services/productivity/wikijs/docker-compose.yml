@@ -28,6 +28,14 @@ services:
     - net.unraid.docker.webui=http://[IP]:[PORT:3000]
     ports:
     - 3000:3000
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
     networks:
     - internal_net
     - db_net
@@ -48,7 +56,15 @@ services:
     volumes:
     - type: bind
       source: ${APPDATA_PATH}/wikijs/postgres
-      target: /var/lib/postgresql/data
+      target
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.15'
+          memory: 256M: /var/lib/postgresql/data
       bind:
         propagation: rshared
     labels:

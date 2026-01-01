@@ -31,6 +31,14 @@ services:
     networks:
       - db_net
     user: ${PUID}:${PGID}
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.3'
+          memory: 256M
     labels:
       - kuma.postgres.type=http
       - kuma.postgres.url=http://j3d-postgres:5432/j3d
@@ -40,7 +48,7 @@ services:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
 
   j3d-backend:
-    image: ghcr.io/justpow98/j3d-backend:${J3D_VERSION:-2.0.0}
+    image: ghcr.io/justpow98/j3d-backend:2.0.0
     container_name: j3d-backend
     restart: unless-stopped
     depends_on:
@@ -76,6 +84,14 @@ services:
       - internal_net
       - db_net
     user: ${PUID}:${PGID}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 768M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
     labels:
       - kuma.backend.type=http
       - kuma.backend.url=http://j3d-backend:5000/api/health
@@ -84,9 +100,17 @@ services:
       - kuma.backend.tags=j3d,api
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/flask-icon.png
       - net.unraid.docker.webui=http://[IP]:[PORT:5000]
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   j3d-frontend:
-    image: ghcr.io/justpow98/j3d-frontend:${J3D_VERSION:-2.0.0}
+    image: ghcr.io/justpow98/j3d-frontend:2.0.0
     container_name: j3d-frontend
     restart: unless-stopped
     depends_on:
@@ -102,6 +126,14 @@ services:
       - internal_net
       - public_net
     user: ${PUID}:${PGID}
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
     labels:
       - kuma.frontend.type=http
       - kuma.frontend.url=http://j3d-frontend:4200/health
@@ -111,7 +143,7 @@ services:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/justpow98/j3d-frontend/main/src/assets/logo.png
       - net.unraid.docker.webui=http://[IP]:[PORT:4200]
 
-networks:
+networks:networks:
   internal_net:
     external: true
   public_net:
