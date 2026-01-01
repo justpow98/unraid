@@ -87,10 +87,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.75'
-          memory: 768M
+          cpus: '1.0'
+          memory: 1G
         reservations:
-          cpus: '0.2'
+          cpus: '0.25'
           memory: 256M
     labels:
       - kuma.backend.type=http
@@ -100,14 +100,6 @@ services:
       - kuma.backend.tags=j3d,api
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/flask-icon.png
       - net.unraid.docker.webui=http://[IP]:[PORT:5000]
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1G
-        reservations:
-          cpus: '0.25'
-          memory: 256M
 
   j3d-frontend:
     image: ghcr.io/justpow98/j3d-frontend:2.0.0
