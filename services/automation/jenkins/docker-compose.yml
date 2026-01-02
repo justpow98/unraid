@@ -6,7 +6,7 @@ services:
       - '8080:8080'
       - '50000:50000'
     volumes:
-      - jenkins_home:/var/jenkins_home
+      - ${APPDATA_PATH}/jenkins_home:/var/jenkins_home
     environment:
       - JENKINS_OPTS=--httpPort=8080
       # Use Docker socket proxy instead of direct /var/run/docker.sock mount
@@ -44,7 +44,3 @@ services:
         reservations:
           cpus: '0.1'
           memory: 256M
-
-volumes:
-  jenkins_home:
-    driver: local

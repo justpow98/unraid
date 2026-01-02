@@ -14,26 +14,35 @@ from packaging import version
 
 # Enhanced repository mappings for GitHub releases
 REPO_MAPPINGS = {
-    # Utilities
-    'lissy93/dashy': 'lissy93/dashy',
-    'filebrowser/filebrowser': 'filebrowser/filebrowser',
-    'xavierh/goaccess-for-nginxproxymanager': 'xavier-hernandez/goaccess-for-nginxproxymanager',
-    'kopia/kopia': 'kopia/kopia',
-    'honeygain/honeygain': 'honeygain/honeygain-docker',
+    # Automation
+    'myoung34/github-runner': 'myoung34/docker-github-actions-runner',
+    'jenkins/jenkins': 'jenkinsci/jenkins',
     
-    # Security
-    'vaultwarden/server': 'dani-garcia/vaultwarden',
-    'goauthentik/server': 'goauthentik/server',
+    # Automotive
+    'teslamate/teslamate': 'adriankumpf/teslamate',
+    'teslamate/grafana': 'adriankumpf/teslamate',
+    
+    # Ecommerce
+    'ghcr.io/justinmpowers/j3d-backend': 'justinmpowers/j3d-backend',
+    'ghcr.io/justinmpowers/j3d-frontend': 'justinmpowers/j3d-frontend',
+    
+    # Gaming
+    # (None currently defined)
+    
+    # Infrastructure
+    'postgres': 'postgres/postgres',
+    'redis': 'redis/redis',
+    'mariadb': 'MariaDB/server',
+    
+    # IoT
+    'ghcr.io/home-assistant/home-assistant': 'home-assistant/core',
+    'eclipse-mosquitto': 'eclipse/mosquitto',
+    'koenkk/zigbee2mqtt': 'Koenkk/zigbee2mqtt',
+    'ghcr.io/home-assistant-libs/python-matter-server': 'home-assistant-libs/python-matter-server',
     
     # Media
     'ghcr.io/imagegenius/immich': 'imagegenius/docker-immich',
     'rommapp/romm': 'rommapp/romm',
-    
-    # Productivity
-    'nextcloud': 'nextcloud/server',
-    'actualbudget/actual-server': 'actualbudget/actual-server',
-    'requarks/wiki': 'requarks/wiki',
-    'vabene1111/recipes': 'vabene1111/recipes',
     
     # Monitoring
     'grafana/grafana': 'grafana/grafana',
@@ -43,62 +52,85 @@ REPO_MAPPINGS = {
     'louislam/uptime-kuma': 'louislam/uptime-kuma',
     'ghcr.io/bigboot/autokuma': 'BigBoot/AutoKuma',
     
-    # IoT
-    'ghcr.io/home-assistant/home-assistant': 'home-assistant/core',
-    'eclipse-mosquitto': 'eclipse/mosquitto',
-    'koenkk/zigbee2mqtt': 'Koenkk/zigbee2mqtt',
-    'ghcr.io/home-assistant-libs/python-matter-server': 'home-assistant-libs/python-matter-server',
-    
-    # Automotive
-    'teslamate/teslamate': 'adriankumpf/teslamate',
-    'teslamate/grafana': 'adriankumpf/teslamate',
-    
-    # Infrastructure
-    'postgres': 'postgres/postgres',
-    'redis': 'redis/redis',
-    'mariadb': 'MariaDB/server',
-    
     # Networking
     'zoeyvid/npmplus': 'ZoeyVid/NPMplus',
     'figro/unraid-cloudflared-tunnel': 'cloudflare/cloudflared',
     
-    # Automation
-    'myoung34/github-runner': 'myoung34/docker-github-actions-runner',
-    'jenkins/jenkins': 'jenkinsci/jenkins',
+    # Productivity
+    'nextcloud': 'nextcloud/server',
+    'actualbudget/actual-server': 'actualbudget/actual-server',
+    'requarks/wiki': 'requarks/wiki',
+    'vabene1111/recipes': 'vabene1111/recipes',
+    
+    # Security
+    'vaultwarden/server': 'dani-garcia/vaultwarden',
+    'goauthentik/server': 'goauthentik/server',
+    
+    # Utilities
+    'lissy93/dashy': 'lissy93/dashy',
+    'filebrowser/filebrowser': 'filebrowser/filebrowser',
+    'xavierh/goaccess-for-nginxproxymanager': 'xavier-hernandez/goaccess-for-nginxproxymanager',
+    'kopia/kopia': 'kopia/kopia',
+    'honeygain/honeygain': 'honeygain/honeygain-docker',
 }
 
 # Enhanced version patterns
 VERSION_PATTERNS = {
-    'dashy': r'^release-\d+\.\d+\.\d+$',
-    'filebrowser': r'^v\d+\.\d+\.\d+$',
-    'uptimekuma': r'^\d+\.\d+\.\d+$',
+    # Automation
+    'github-runner': r'^v\d+\.\d+\.\d+$',
+    'jenkins': r'^\d+\.\d+(\.\d+)?(-lts)?$',
+    
+    # Automotive
+    'teslamate': r'^\d+\.\d+\.\d+$',
+    
+    # Ecommerce
+    'j3d-backend': r'^\d+\.\d+\.\d+$',
+    'j3d-frontend': r'^\d+\.\d+\.\d+$',
+    
+    # Infrastructure
+    'postgres': r'^\d+(\.\d+)?$',
+    'redis': r'^\d+\.\d+(\.\d+)?(-alpine)?$',
+    'mariadb': r'^\d+\.\d+\.\d+$',
+    
+    # IoT
+    'home-assistant': r'^\d{4}\.\d+$',
+    'mosquitto': r'^\d+\.\d+\.\d+$',
+    'zigbee2mqtt': r'^\d+\.\d+\.\d+$',
+    'matter-server': r'^\d+\.\d+\.\d+$',
+    
+    # Media
+    'immich': r'^\d+\.\d+\.\d+$',
+    'romm': r'^\d+\.\d+\.\d+$',
+    
+    # Monitoring
     'grafana': r'^\d+\.\d+\.\d+$',
     'prometheus': r'^v\d+\.\d+\.\d+$',
     'loki': r'^\d+\.\d+\.\d+$',
     'promtail': r'^\d+\.\d+\.\d+$',
-    'authentik': r'^\d{4}\.\d+\.\d+$',
-    'vaultwarden': r'^\d+\.\d+\.\d+$',
-    'nextcloud': r'^\d+\.\d+\.\d+$',
-    'teslamate': r'^\d+\.\d+\.\d+$',
-    'home-assistant': r'^\d{4}\.\d+$',
-    'zigbee2mqtt': r'^\d+\.\d+\.\d+$',
-    'matter-server': r'^\d+\.\d+\.\d+$',
-    'redis': r'^\d+\.\d+(\.\d+)?(-alpine)?$',
-    'postgres': r'^\d+(\.\d+)?$',
-    'mariadb': r'^\d+\.\d+\.\d+$',
-    'immich': r'^\d+\.\d+\.\d+$',
-    'romm': r'^\d+\.\d+\.\d+$',
-    'actualserver': r'^\d+\.\d+\.\d+$',
-    'wikijs': r'^\d+\.\d+\.\d+$',
-    'onlyoffice': r'^\d+\.\d+\.\d+$',
-    'kopia': r'^\d{8}\.\d+\.\d+$',
-    'mosquitto': r'^\d+\.\d+\.\d+$',
+    'uptimekuma': r'^\d+\.\d+\.\d+$',
+    'autokuma': r'^\d+\.\d+\.\d+$',
+    
+    # Networking
     'npmplus': r'^\d+$',
     'cloudflared': r'^\d{4}\.\d+\.\d+$',
-    'github-runner': r'^v\d+\.\d+\.\d+$',
-    'autokuma': r'^\d+\.\d+\.\d+$',
+    
+    # Productivity
+    'nextcloud': r'^\d+\.\d+\.\d+$',
+    'actualserver': r'^\d+\.\d+\.\d+$',
+    'wikijs': r'^\d+\.\d+\.\d+$',
     'recipes': r'^\d+\.\d+\.\d+$',
-    'jenkins': r'^\d+\.\d+(\.\d+)?(-lts)?$',
+    
+    # Security
+    'vaultwarden': r'^\d+\.\d+\.\d+$',
+    'authentik': r'^\d{4}\.\d+\.\d+$',
+    
+    # Utilities
+    'dashy': r'^release-\d+\.\d+\.\d+$',
+    'filebrowser': r'^v\d+\.\d+\.\d+$',
+    'goaccess': r'^\d+\.\d+\.\d+$',
+    'kopia': r'^\d{8}\.\d+\.\d+$',
+    'honeygain': r'^\d+\.\d+\.\d+$',
+    'onlyoffice': r'^\d+\.\d+\.\d+$',
 }
 
 def compare_versions(current: str, latest: str) -> bool:
