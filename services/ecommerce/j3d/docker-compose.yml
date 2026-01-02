@@ -48,7 +48,7 @@ services:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
 
   j3d-backend:
-    image: ghcr.io/justpow98/j3d-backend:2.0.0
+    image: ghcr.io/justinmpowers/j3d-backend:2.1.0
     container_name: j3d-backend
     restart: unless-stopped
     depends_on:
@@ -102,7 +102,7 @@ services:
       - net.unraid.docker.webui=http://[IP]:[PORT:5000]
 
   j3d-frontend:
-    image: ghcr.io/justpow98/j3d-frontend:2.0.0
+    image: ghcr.io/justinmpowers/j3d-frontend:2.1.0
     container_name: j3d-frontend
     restart: unless-stopped
     depends_on:
@@ -132,7 +132,7 @@ services:
       - kuma.frontend.name=J3D Frontend
       - kuma.frontend.interval=60
       - kuma.frontend.tags=j3d,web
-      - net.unraid.docker.icon=https://raw.githubusercontent.com/justpow98/j3d-frontend/main/src/assets/logo.png
+      - net.unraid.docker.icon=https://raw.githubusercontent.com/justinmpowers/j3d-frontend/main/src/assets/logo.png
       - net.unraid.docker.webui=http://[IP]:[PORT:4200]
 
 networks:
