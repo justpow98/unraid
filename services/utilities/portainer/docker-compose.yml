@@ -24,8 +24,8 @@ services:
       - /mnt/user/appdata/docker-compose:/compose:ro
     ports:
       - "9444:9443"   # HTTPS UI (recommended)
-      - "9001:9000"   # HTTP UI
-      - "8001:8000"   # Edge agent (optional)
+      - "9002:9000"   # HTTP UI
+      - "8002:8000"   # Edge agent (optional)
     networks:
       - monitoring_net
       - internal_net
