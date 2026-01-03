@@ -14,14 +14,6 @@ services:
     # Allow Jenkins to manage Docker for ephemeral agents via the proxy
     depends_on:
       - docker-socket-proxy
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 4G
-        reservations:
-          cpus: '0.5'
-          memory: 2G
 
   docker-socket-proxy:
     image: tecnativa/docker-socket-proxy:latest
