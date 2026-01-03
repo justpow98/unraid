@@ -57,13 +57,14 @@ services/
     ├── filebrowser/     # File browser and manager
     ├── goaccess/        # Web analytics
     ├── honeygain/       # Passive income network
-    └── kopia/           # Backup and recovery
+    ├── kopia/           # Backup and recovery
+    └── portainer/       # Docker management UI
 ```
 
 ## 🔧 Service Categories & Resource Limits
 
 ### Light Services (0.25-0.5 CPU, 128-512MB RAM)
-- Dashy, GoAccess, Honeygain, Cloudflared, Mosquitto
+- Dashy, GoAccess, Honeygain, Cloudflared, Mosquitto, Portainer
 - These are dashboards, analytics, and lightweight utilities
 
 ### Medium Services (0.5-1 CPU, 512MB-2GB RAM)

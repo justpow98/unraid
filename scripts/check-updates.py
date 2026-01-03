@@ -72,6 +72,7 @@ REPO_MAPPINGS = {
     'xavierh/goaccess-for-nginxproxymanager': 'xavier-hernandez/goaccess-for-nginxproxymanager',
     'kopia/kopia': 'kopia/kopia',
     'honeygain/honeygain': 'honeygain/honeygain-docker',
+    'portainer/portainer-ce': 'portainer/portainer',
 }
 
 # Enhanced version patterns
@@ -131,6 +132,7 @@ VERSION_PATTERNS = {
     'kopia': r'^\d{8}\.\d+\.\d+$',
     'honeygain': r'^\d+\.\d+\.\d+$',
     'onlyoffice': r'^\d+\.\d+\.\d+$',
+    'portainer-ce': r'^\d+\.\d+\.\d+$',
 }
 
 def compare_versions(current: str, latest: str) -> bool:
