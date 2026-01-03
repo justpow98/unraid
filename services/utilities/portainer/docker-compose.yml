@@ -23,9 +23,9 @@ services:
       # Optional: Import your compose files for viewing
       - /mnt/user/appdata/docker-compose:/compose:ro
     ports:
-      - "9443:9443"   # HTTPS UI (recommended)
-      - "9000:9000"   # HTTP UI
-      - "8000:8000"   # Edge agent (optional)
+      - "9444:9443"   # HTTPS UI (recommended)
+      - "9001:9000"   # HTTP UI
+      - "8001:8000"   # Edge agent (optional)
     networks:
       - monitoring_net
       - internal_net
