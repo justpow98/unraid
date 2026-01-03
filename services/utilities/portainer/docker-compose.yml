@@ -1,0 +1,65 @@
+# services/utilities/portainer/docker-compose.yml
+# Portainer - Docker Management UI
+# Integrates with existing infrastructure for monitoring and quick actions
+
+
+services:
+  portainer:
+    image: portainer/portainer-ce:2.21.4
+    container_name: portainer
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - HOST_OS=Unraid
+      - HOST_HOSTNAME=JP-Dell
+      - HOST_CONTAINERNAME=portainer
+    volumes:
+      # Portainer data
+      - ${APPDATA_PATH}/portainer:/data
+      
+      # Docker socket for container management
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Read-only recommended
+      
+      # Optional: Import your compose files for viewing
+      - /mnt/user/appdata/docker-compose:/compose:ro
+    ports:
+      - "9443:9443"   # HTTPS UI (recommended)
+      - "9000:9000"   # HTTP UI
+      - "8000:8000"   # Edge agent (optional)
+    networks:
+      - monitoring_net
+      - internal_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    labels:
+      # Uptime Kuma monitoring
+      - "kuma.portainer.type=http"
+      - "kuma.portainer.url=https://portainer:9443"
+      - "kuma.portainer.name=Portainer"
+      - "kuma.portainer.interval=60"
+      - "kuma.portainer.keyword=Portainer"
+      - "kuma.portainer.tags=utilities,docker-management"
+      
+      # Unraid labels
+      - "net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/portainer-icon.png"
+      - "net.unraid.docker.webui=https://[IP]:[PORT:9443]"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider https://localhost:9443 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  monitoring_net:
+    external: true
+  internal_net:
+    external: true
