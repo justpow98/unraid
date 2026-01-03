@@ -7,7 +7,7 @@ services:
     restart: unless-stopped  # Service will restart the container after each job
     environment:
       # Repository configuration
-      - REPO_URL=https://github.com/justpow98/unraid
+      - REPO_URL=https://github.com/justinmpowers/unraid
       
       # Use PAT for automatic token generation
       - ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
