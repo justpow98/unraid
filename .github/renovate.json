@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "platform": "github",
   "onboarding": false,
   "dependencyDashboard": false,
@@ -8,7 +8,7 @@
   "branchPrefix": "renovate/",
   "timezone": "UTC",
   "schedule": ["after 09:00 on Sunday"],
-  "baseBranches": ["main"],
+  "baseBranchPatterns": ["main"],
   "rebaseWhen": "conflicted",
   "rangeStrategy": "pin",
   "respectLatest": true,
@@ -17,12 +17,11 @@
   "packageRules": [
     {
       "matchManagers": ["docker-compose"],
-      "matchPaths": ["services/**/docker-compose.yml"],
+      "matchFileNames": ["services/**/docker-compose.yml"],
       "groupName": "Weekly container updates",
       "groupSlug": "weekly-container-updates",
       "separateMajorMinor": true,
-      "stabilityDays": 1,
-      "prTitle": "📦 Weekly container updates",
+      "minimumReleaseAge": "1 day",
       "commitMessagePrefix": "chore: ",
       "commitMessageTopic": "{{depName}}",
       "labels": ["automated", "container-updates", "infrastructure"]
