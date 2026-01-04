@@ -1,19 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
-  "platform": "github",
   "onboarding": false,
   "dependencyDashboard": false,
   "labels": ["automated", "container-updates", "infrastructure"],
   "branchPrefix": "renovate/",
   "timezone": "UTC",
   "schedule": ["after 09:00 on Sunday"],
-  "baseBranchPatterns": ["main"],
+  "baseBranches": ["main"],
   "rebaseWhen": "conflicted",
   "rangeStrategy": "pin",
   "respectLatest": true,
   "enabledManagers": ["docker-compose"],
-  "prCreation": "not-pending",
   "packageRules": [
     {
       "matchManagers": ["docker-compose"],
