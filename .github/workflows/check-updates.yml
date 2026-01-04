@@ -28,6 +28,27 @@ jobs:
           token: ${{ secrets.GH_TOKEN  }}
           fetch-depth: 1
 
+      - name: Ensure lsb_release is available
+        run: |
+          if command -v lsb_release >/dev/null 2>&1; then
+            echo "lsb_release already installed"
+            exit 0
+          fi
+
+          if command -v apt-get >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y lsb-release
+          elif command -v dnf >/dev/null 2>&1; then
+            sudo dnf install -y redhat-lsb-core || sudo dnf install -y redhat-lsb || true
+          elif command -v yum >/dev/null 2>&1; then
+            sudo yum install -y redhat-lsb-core || sudo yum install -y redhat-lsb || true
+          elif command -v apk >/dev/null 2>&1; then
+            sudo apk add lsb-release || apk add lsb-release
+          else
+            echo "Unable to install lsb_release: no supported package manager found"
+            exit 1
+          fi
+
       - name: Set up Python Environment
         uses: actions/setup-python@v4
         with:
