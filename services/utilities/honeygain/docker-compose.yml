@@ -5,7 +5,7 @@
 
 services:
   honeygain:
-    image: honeygain/honeygain:latest
+    image: honeygain/honeygain:latest@sha256:fe340e0539532ba79635cb359291d9491aae38c3edb7b0bb5b0a7e22e671fe0a
     container_name: honeygain
     restart: unless-stopped
     environment:

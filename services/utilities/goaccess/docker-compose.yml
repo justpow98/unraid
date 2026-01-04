@@ -2,7 +2,7 @@
 
 services:
   goaccess:
-    image: xavierh/goaccess-for-nginxproxymanager:latest
+    image: xavierh/goaccess-for-nginxproxymanager:latest@sha256:a0e46a6460356861d2965cd6a1779c50faa605a83a80e3028b937f13afff92e8
     container_name: GoAccess-NPMLogs
     restart: unless-stopped
     environment:

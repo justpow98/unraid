@@ -4,7 +4,7 @@
 
 services:
   dashy:
-    image: lissy93/dashy:release-3.1.1
+    image: lissy93/dashy:release-3.1.1@sha256:358c44167431d454775d3ff6082ca3996557663aa85edaf8488c48b93b8825e6
     container_name: dashy
     restart: unless-stopped
     environment:
