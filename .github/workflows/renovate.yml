@@ -24,5 +24,4 @@ jobs:
           RENOVATE_DRY_RUN: full
           RENOVATE_REPOSITORIES: ${{ github.repository }}
         with:
-          configurationFile: renovate.json
           token: ${{ secrets.RENOVATE_TOKEN || secrets.GH_TOKEN || github.token }}
