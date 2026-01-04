@@ -1,8 +1,7 @@
 name: Weekly Container Update Check
 
 on:
-  schedule:
-    - cron: '0 9 * * SUN'  # Every Sunday at 9 AM UTC
+  # Disabled scheduled runs now that Renovate handles weekly updates
   workflow_dispatch:  # Manual trigger
     inputs:
       force_check:

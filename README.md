@@ -7,7 +7,7 @@ Comprehensive Docker Compose management for my Unraid server with 35+ containeri
 - **Complete Service Coverage**: 35+ services across 11 categories
 - **Pinned Versions**: All services use specific versions, not `:latest`
 - **Organized Structure**: Services grouped logically by function
-- **Automated Updates**: Python script detects new releases
+- **Automated Updates**: Renovate opens weekly PRs for container updates (legacy Python script still available)
 - **Resource Management**: CPU and memory limits on all containers
 - **Docker Socket Security**: Using proxy instead of direct socket access
 - **Git-Tracked**: All changes are reversible and auditable
@@ -93,7 +93,13 @@ services/
   - Automated update checks and deployment
   - 2 CPU / 2GB memory limit
 
-### Automated Update Script
+### Automated Updates (Renovate)
+- **Config**: `.github/renovate.json`
+- **Workflow**: `.github/workflows/renovate.yml`
+- **What it does**: Scans all `services/**/docker-compose.yml` images weekly (Sun 09:00 UTC), groups them into a single PR with labels `automated` and `container-updates`, and respects pinned versions.
+- **Notes**: Use a repo-scoped `RENOVATE_TOKEN` (or `GH_TOKEN`) secret for the workflow. Major updates are labeled `breaking-change?` and not auto-merged.
+
+### Legacy Update Script (manual)
 - **Script**: `scripts/check-updates.py`
 - **Features**:
   - Monitors 35+ services for new releases
