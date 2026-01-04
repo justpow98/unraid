@@ -56,7 +56,7 @@ services:
     volumes:
     - type: bind
       source: ${APPDATA_PATH}/wikijs/postgres
-      target
+      target: /var/lib/postgresql/data
     deploy:
       resources:
         limits:
@@ -64,7 +64,7 @@ services:
           memory: 512M
         reservations:
           cpus: '0.15'
-          memory: 256M: /var/lib/postgresql/data
+          memory: 256M
       bind:
         propagation: rshared
     labels:
