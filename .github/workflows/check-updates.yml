@@ -46,7 +46,43 @@ jobs:
             sudo apk add lsb-release || apk add lsb-release
           else
             echo "Unable to install lsb_release: no supported package manager found"
-            exit 1
+          fi
+
+          # Fallback: create a minimal shim using /etc/os-release so actions/setup-python can detect distro
+          if ! command -v lsb_release >/dev/null 2>&1; then
+            echo "Creating lsb_release shim in /usr/local/bin"
+            shim_path="/usr/local/bin/lsb_release"
+            cat <<'SCRIPT' | sudo tee "$shim_path" >/dev/null
+            #!/usr/bin/env bash
+            flag="$1"
+
+            if [ -f /etc/os-release ]; then
+              . /etc/os-release
+            fi
+
+            case "$flag" in
+              -si)
+                if [ -n "$ID" ]; then
+                  echo "$ID" | tr '[:lower:]' '[:upper:]'
+                else
+                  echo "UNKNOWN"
+                fi
+                ;;
+              -sr)
+                if [ -n "$VERSION_ID" ]; then
+                  echo "$VERSION_ID" | tr -d '"'
+                else
+                  echo "0"
+                fi
+                ;;
+              *)
+                echo "Usage: lsb_release -si|-sr" >&2
+                exit 1
+                ;;
+            esac
+            SCRIPT
+            sudo chmod +x "$shim_path"
+            echo "Shim created at $shim_path"
           fi
 
       - name: Set up Python Environment
