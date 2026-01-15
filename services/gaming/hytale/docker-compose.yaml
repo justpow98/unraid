@@ -1,0 +1,24 @@
+services:
+    hytale:
+        image: deinfreu/hytale-server:experimental
+        container_name: hytale-server
+        environment:
+        - SERVER_IP=0.0.0.0
+        - SERVER_PORT=5520
+        - PROD=FALSE
+        - DEBUG=FALSE
+        - TZ=America/New_York
+        - CACHE=TRUE
+        - HYTALE_BACKUP=TRUE
+        - HYTALE_BACKUP_FREQUENCY=30
+        - HYTALE_AUTH_MODE=TRUE
+        - HYTALE_SERVER_NAME="Azuleluna Hytale"
+        - HYTALE_PASSWORD=${HYTALE_PASSWORD}
+        restart: unless-stopped
+        ports:
+        - "5520:5520/udp"
+        volumes:
+        - ${APPDATA_PATH}/hytale/data:/home/container
+        - /etc/machine-id:/etc/machine-id:ro
+        tty: true
+        stdin_open: true
