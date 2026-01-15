@@ -51,6 +51,7 @@ services:
     - iot_net
     - teslamate_net
     - mc_net
+    - hytale_default
     deploy:
       resources:
         limits:
@@ -82,4 +83,6 @@ networks:
   teslamate_net:
     external: true
   mc_net:
+    external: true
+  hytale_default:
     external: true
