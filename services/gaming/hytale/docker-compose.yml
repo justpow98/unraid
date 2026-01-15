@@ -12,7 +12,7 @@ services:
         - HYTALE_BACKUP=TRUE
         - HYTALE_BACKUP_FREQUENCY=30
         - HYTALE_AUTH_MODE=TRUE
-        - HYTALE_SERVER_NAME="Azuleluna Hytale"
+        - HYTALE_SERVER_NAME=Azuleluna Hytale
         - HYTALE_PASSWORD=${HYTALE_PASSWORD}
         restart: unless-stopped
         ports:
