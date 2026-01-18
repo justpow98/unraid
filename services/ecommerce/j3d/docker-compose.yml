@@ -19,7 +19,7 @@ services:
       HOST_HOSTNAME: ${HOST_HOSTNAME}
       HOST_CONTAINERNAME: j3d-postgres
     volumes:
-      - ${APPDATA_PATH}/j3d/postgres/data:/var/lib/postgresql/data
+      - ${APPDATA_PATH}/j3d/postgres/data:/var/lib/postgresql
       - ${APPDATA_PATH}/j3d/postgres/backups:/backups
     ports:
       - "5435:5432"
