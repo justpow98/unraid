@@ -47,7 +47,7 @@ services:
       - net.unraid.docker.icon=https://raw.githubusercontent.com/selfhosted/unRAID-CA-templates/master/templates/img/postgresql-icon.png
 
   j3d-backend:
-    image: ghcr.io/justinmpowers/j3d-backend:2.1.3
+    image: ghcr.io/justinmpowers/j3d-backend:2.1.4
     container_name: j3d-backend
     restart: unless-stopped
     depends_on:
