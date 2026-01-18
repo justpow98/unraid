@@ -22,7 +22,7 @@ services:
       - ${APPDATA_PATH}/j3d/postgres/data:/var/lib/postgresql/data
       - ${APPDATA_PATH}/j3d/postgres/backups:/backups
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U j3d_user -d j3d"]
       interval: 10s
@@ -55,7 +55,7 @@ services:
         condition: service_healthy
     environment:
       # Database
-      DATABASE_URL: postgresql://j3d_user:${POSTGRES_PASSWORD:-changeme}@j3d-postgres:5432/j3d
+      DATABASE_URL: postgresql://j3d_user:${POSTGRES_PASSWORD:-changeme}@j3d-postgres:5433/j3d
       
       # Flask config
       FLASK_CONFIG: production
