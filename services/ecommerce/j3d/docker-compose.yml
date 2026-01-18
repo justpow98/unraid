@@ -12,7 +12,7 @@ services:
     environment:
       POSTGRES_DB: j3d
       POSTGRES_USER: j3d_user
-      J3D_DB_PASSWORD: ${J3D_DB_PASSWORD:-changeme}
+      POSTGRES_PASSWORD: ${J3D_DB_PASSWORD:-changeme}
       POSTGRES_INITDB_ARGS: "-E UTF8"
       TZ: ${TZ}
       HOST_OS: Unraid
