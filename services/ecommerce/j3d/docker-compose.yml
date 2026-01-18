@@ -12,7 +12,7 @@ services:
     environment:
       POSTGRES_DB: j3d
       POSTGRES_USER: j3d_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      J3D_DB_PASSWORD: ${J3D_DB_PASSWORD:-changeme}
       POSTGRES_INITDB_ARGS: "-E UTF8"
       TZ: ${TZ}
       HOST_OS: Unraid
@@ -22,7 +22,7 @@ services:
       - ${APPDATA_PATH}/j3d/postgres/data:/var/lib/postgresql/data
       - ${APPDATA_PATH}/j3d/postgres/backups:/backups
     ports:
-      - "5433:5432"
+      - "5435:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U j3d_user -d j3d"]
       interval: 10s
@@ -55,11 +55,11 @@ services:
         condition: service_healthy
     environment:
       # Database
-      DATABASE_URL: postgresql://j3d_user:${POSTGRES_PASSWORD:-changeme}@j3d-postgres:5433/j3d
+      DATABASE_URL: postgresql://j3d_user:${J3D_DB_PASSWORD:-changeme}@j3d-postgres:5435/j3d
       
       # Flask config
       FLASK_CONFIG: production
-      SECRET_KEY: ${SECRET_KEY}
+      SECRET_KEY: ${J3D_SECRET_KEY}
       
       # Etsy OAuth
       ETSY_CLIENT_ID: ${ETSY_CLIENT_ID}
