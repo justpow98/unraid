@@ -55,7 +55,7 @@ services:
         condition: service_healthy
     environment:
       # Database
-      DATABASE_URL: postgresql://j3d_user:${J3D_DB_PASSWORD:-changeme}@j3d-postgres:5435/j3d
+      DATABASE_URL: postgresql://j3d_user:${J3D_DB_PASSWORD:-changeme}@j3d-postgres:5432/j3d
       
       # Flask config
       FLASK_CONFIG: production
