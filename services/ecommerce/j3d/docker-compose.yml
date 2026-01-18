@@ -30,7 +30,6 @@ services:
       retries: 5
     networks:
       - db_net
-    user: ${PUID}:${PGID}
     deploy:
       resources:
         limits:
@@ -83,7 +82,6 @@ services:
     networks:
       - internal_net
       - db_net
-    user: ${PUID}:${PGID}
     deploy:
       resources:
         limits:
@@ -117,7 +115,6 @@ services:
     networks:
       - internal_net
       - public_net
-    user: ${PUID}:${PGID}
     deploy:
       resources:
         limits:
