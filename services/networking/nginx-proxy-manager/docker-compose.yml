@@ -52,6 +52,7 @@ services:
     - teslamate_net
     - mc_net
     - hytale_default
+    - jenkins_default
     deploy:
       resources:
         limits:
@@ -85,4 +86,6 @@ networks:
   mc_net:
     external: true
   hytale_default:
+    external: true
+  jenkins_default:
     external: true
