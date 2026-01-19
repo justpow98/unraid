@@ -101,7 +101,7 @@ services:
       - net.unraid.docker.webui=http://[IP]:[PORT:5000]
 
   j3d-frontend:
-    image: ghcr.io/justinmpowers/j3d-frontend:2.1.0
+    image: ghcr.io/justinmpowers/j3d-frontend:2.1.1
     container_name: j3d-frontend
     restart: unless-stopped
     depends_on:
@@ -111,6 +111,7 @@ services:
       HOST_OS: Unraid
       HOST_HOSTNAME: ${HOST_HOSTNAME}
       HOST_CONTAINERNAME: j3d-frontend
+      API_URL: ${J3D_API_URL}
     ports:
       - "4200:4200"
     networks:
