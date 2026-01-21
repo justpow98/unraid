@@ -11,6 +11,10 @@ services:
       - JENKINS_OPTS=--httpPort=8080
       # Use Docker socket proxy instead of direct /var/run/docker.sock mount
       - DOCKER_HOST=tcp://docker-socket-proxy:2375
+      - JAVA_OPTS=-Xmx2g -Xms512m -Dhudson.model.DirectoryBrowserSupport.CSP=
+      # These tell Jenkins about the reverse proxy
+      - JENKINS_UC=https://updates.jenkins.io
+      - JENKINS_UC_INSECURE=false
     # Allow Jenkins to manage Docker for ephemeral agents via the proxy
     depends_on:
       - docker-socket-proxy
